@@ -4,7 +4,7 @@
 
 Aletheia (Greek: *unconcealment*) is a reference implementation for governed money movement: customer claims, payroll, agent commissions, tax withholding, and cross-domain risk intelligence — built around **versioned policy references**, **zero double-disbursement**, and an **immutable audit trail**.
 
-> **Status:** M1 sampai M5.3 selesai. M5.4 sedang berjalan: pool service runtime kini memakai role non-owner `aletheia_app` dengan tenant binding per request (RLS), security gate 36/36, integration test 27/36/34 lulus dengan RLS aktif, dan worker Go terverifikasi dengan tenant context. Deployment production ke Cloudflare/Neon/Upstash/Cloudinary/Koyeb-Render menunggu kredensial provider. Server demo dihentikan; nyalakan dengan `bash scripts/dev-up.sh`. Baca [`HANDOVER.md`](HANDOVER.md) sebelum melanjutkan.
+> **Status:** M1 sampai M5.3 selesai. M5.4 sedang berjalan: pool service runtime memakai role non-owner `aletheia_app` dengan tenant binding per request (RLS), security gate 36/36, integration test 27/36/34 lulus dengan RLS aktif, worker Go terverifikasi, dan Neon production sudah dimigrasi/seed dengan RLS 36/36. Deployment Cloudflare/Upstash/Cloudinary/Koyeb-Render menunggu kredensial provider. Server demo dihentikan; nyalakan dengan `bash scripts/dev-up.sh`. Baca [`HANDOVER.md`](HANDOVER.md) sebelum melanjutkan.
 
 ## Why this exists
 

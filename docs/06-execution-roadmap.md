@@ -172,7 +172,7 @@
 * **Gerbang:** 21/21 lulus dua run berturut-turut; 0 flaky; axe 0 serious/critical; coverage domain 96,26% lines; integration 27/36/34 lulus; Go race lulus.
 
 #### `TASK-18` — CI/CD Production & Deployment
-* **Status:** sebagian. Prasyarat runtime selesai 26 November 2026: service memakai role non-owner `aletheia_app`, tenant binding per request/transaksi, worker Go dan webhook terverifikasi, security gate 36/36. Deployment provider eksternal belum dijalankan karena kredensial belum tersedia.
+* **Status:** sebagian. Prasyarat runtime selesai 26 November 2026: service memakai role non-owner `aletheia_app`, tenant binding per request/transaksi, worker Go dan webhook terverifikasi, security gate 36/36. Neon production sudah dibuat, dimigrasi 0000–0011, di-seed, dan lulus `db:check`/`security:db` 36/36. Deployment Koyeb/Render, Upstash, Cloudinary, dan Cloudflare masih menunggu kredensial/config.
 * **Konteks Wajib:** `docs/05`, `docs/12`.
 * **Cakupan:** pipeline deploy, Cloudflare Pages/Workers, Koyeb/Render, Neon/Upstash/Cloudinary, smoke test, rollback.
 * **Gerbang:** `/readyz` 200; demo live; rollback diuji; tidak ada secret.

@@ -70,7 +70,7 @@
 - Cloudinary → folder `preview/`.
 
 **Demo:** login 6 role → buat klaim → risk/conflict → approve/SoD → audit.
-**Status 26 November 2026:** M5.3 selesai. M5.4 prasyarat runtime selesai: service memakai `aletheia_app` dengan tenant binding, worker Go terverifikasi, security gate 36/36, dan integration test 27/36/34 lulus dengan RLS aktif. Cloudflare Pages preview aktif di `aletheia-web-preview.pages.dev` dan menyajikan CSP serta security header. Edge preview perlu deploy ulang. Server demo lokal sudah dihentikan; nyalakan dengan `bash scripts/dev-up.sh`. Neon, Koyeb, Render, Redis, Cloudinary, dan QStash production belum dikonfigurasi.
+**Status 26 November 2026:** M5.3 selesai. M5.4 prasyarat runtime selesai: service memakai `aletheia_app` dengan tenant binding, worker Go terverifikasi, security gate 36/36, dan integration test 27/36/34 lulus dengan RLS aktif. Neon production sudah dibuat (PG16, Singapore), migrasi 0000–0011, seed, provisioning `aletheia_app`, `db:check` dan `security:db` 36/36 lulus. Cloudflare Pages preview aktif di `aletheia-web-preview.pages.dev` dan menyajikan CSP serta security header. Edge preview perlu deploy ulang. Server demo lokal sudah dihentikan; nyalakan dengan `bash scripts/dev-up.sh`. Koyeb/Render, Upstash Redis/QStash, dan Cloudinary production belum dikonfigurasi.
 **Catatan:** payroll BE (TASK-06/07) boleh berjalan paralel setelah kontrak stabil, tetapi tidak menghambat demo klaim.
 
 ---

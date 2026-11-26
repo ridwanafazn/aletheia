@@ -1,6 +1,6 @@
 # Aletheia — Handover
 
-* **Status:** M1 sampai M5.3 selesai. M5.4 sedang berjalan: prasyarat runtime (role `aletheia_app`, tenant binding, worker) selesai; deployment provider eksternal menunggu kredensial.
+* **Status:** M1 sampai M5.3 selesai. M5.4 sedang berjalan: prasyarat runtime (role `aletheia_app`, tenant binding, worker) selesai; Neon production sudah dimigrasi, di-seed, dan lulus 36/36. Deployment Koyeb/Render, Upstash, Cloudinary, dan Cloudflare menunggu kredensial/config.
 * **Tanggal handover:** 26 November 2026
 * **Data:** seluruhnya sintetis. Tidak ada uang nyata atau PII nyata.
 * **Server demo:** dihentikan. Nyalakan ulang dengan `bash scripts/dev-up.sh`.
