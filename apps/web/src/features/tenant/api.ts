@@ -26,7 +26,7 @@ export function useTenantProfile(enabled = true) {
 
 export function hasFeature(profile: TenantProfile | undefined, feature: TenantFeature): boolean {
   if (profile === undefined) {
-    return true;
+    return false;
   }
   return tenantPlanHasFeature(profile.plan, feature);
 }

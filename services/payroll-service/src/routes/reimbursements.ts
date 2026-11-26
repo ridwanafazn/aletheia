@@ -185,7 +185,13 @@ reimbursementRouter.post(
             decision: input.decision,
             notes: input.notes ?? null,
             personnel_id: row.personnel_id,
+            category: row.category,
+            expense_date: row.expense_date,
             amount: row.amount,
+            receipt_attached: row.receipt_url !== null,
+            created_by: row.created_by,
+            from_status: "PENDING",
+            to_status: input.decision,
           },
           correlationId: request.correlationId,
         },
@@ -229,6 +235,13 @@ reimbursementRouter.post("/:id/pay", requireRoles("FINANCE_MANAGER"), async (req
     if ((row.user_id !== null && row.user_id === auth.userId) || row.created_by === auth.userId) {
       throw new ApiError(403, "ERR_SOD_VIOLATION", "Tidak dapat membayar reimburse sendiri");
     }
+    if (row.decided_by !== null && row.decided_by === auth.userId) {
+      throw new ApiError(
+        403,
+        "ERR_SOD_VIOLATION",
+        "Tidak dapat membayar reimburse yang Anda setujui sendiri",
+      );
+    }
     if (row.status !== "APPROVED") {
       throw new ApiError(409, "ERR_PAYMENT_STATE_CONFLICT", "Reimburse belum disetujui");
     }
@@ -254,7 +267,13 @@ reimbursementRouter.post("/:id/pay", requireRoles("FINANCE_MANAGER"), async (req
         policyVersionId: null,
         decisionContext: {
           personnel_id: row.personnel_id,
+          category: row.category,
+          expense_date: row.expense_date,
           amount: row.amount,
+          receipt_attached: row.receipt_url !== null,
+          decided_by: row.decided_by,
+          from_status: row.status,
+          to_status: "PAID",
           provider: "MOCK",
         },
         correlationId: request.correlationId,

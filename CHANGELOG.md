@@ -37,6 +37,7 @@ Semua perubahan penting pada Aletheia. Format mengikuti [Keep a Changelog](https
 - M6.6: policy `PAYROLL_COST_POLICY` dan laporan `PAYROLL_COST_INVOICE` per cabang dengan BJO, management fee, pembulatan, checksum, dan audit.
 - M6.6: halaman laporan menampilkan total invoice dan opsi unduhan CSV.
 - Bukti M6.6: `docs/evidence/m6.6-verification.md` dan screenshot invoice biaya payroll.
+- Hardening review: default paket tenant menjadi BASIC, invoice dicek ulang saat unduhan, reimburse memakai idempotency key dan SoD decider/payer, bukti Cloudinary divalidasi per tenant, dan app role tidak dapat menghapus baris reimburse.
 
 ### Changed
 

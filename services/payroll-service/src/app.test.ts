@@ -17,6 +17,7 @@ const TENANT = "019361a2-7c00-7000-8000-000000000941";
 const BRANCH = "019361a2-7c00-7000-8000-000000000942";
 const HR = "019361a2-7c00-7000-8000-000000000943";
 const FINANCE = "019361a2-7c00-7000-8000-000000000944";
+const FINANCE_2 = "019361a2-7c00-7000-8000-00000000094a";
 const MANAGER = "019361a2-7c00-7000-8000-000000000945";
 const COMPLIANCE = "019361a2-7c00-7000-8000-000000000946";
 const MIS = "019361a2-7c00-7000-8000-000000000947";
@@ -33,6 +34,12 @@ interface Identity {
 const hr: Identity = { userId: HR, role: "HR_SPECIALIST", branchId: BRANCH, tenantId: TENANT };
 const finance: Identity = {
   userId: FINANCE,
+  role: "FINANCE_MANAGER",
+  branchId: BRANCH,
+  tenantId: TENANT,
+};
+const finance2: Identity = {
+  userId: FINANCE_2,
   role: "FINANCE_MANAGER",
   branchId: BRANCH,
   tenantId: TENANT,
@@ -187,6 +194,7 @@ describe.skipIf(!integrationEnabled)("payroll service integration", () => {
        on conflict (id) do nothing`,
       [TENANT],
     );
+    await pool.query(`update governance.tenants set plan = 'HRIS_PRO' where id = $1`, [TENANT]);
     await pool.query(`delete from governance.users where tenant_id = $1`, [TENANT]);
     await pool.query(`delete from governance.branches where tenant_id = $1`, [TENANT]);
     await pool.query(
@@ -198,6 +206,7 @@ describe.skipIf(!integrationEnabled)("payroll service integration", () => {
     const users = [
       [HR, "M31-01", "Payroll HR", "hr@m31.test", "HR_SPECIALIST"],
       [FINANCE, "M31-02", "Payroll Finance", "finance@m31.test", "FINANCE_MANAGER"],
+      [FINANCE_2, "M31-06", "Payroll Finance Two", "finance2@m31.test", "FINANCE_MANAGER"],
       [MANAGER, "M31-03", "Payroll Manager", "manager@m31.test", "BRANCH_MANAGER"],
       [COMPLIANCE, "M31-04", "Payroll Compliance", "compliance@m31.test", "COMPLIANCE_ADMIN"],
       [MIS, "M31-05", "Payroll MIS", "mis@m31.test", "MIS_ANALYST"],
@@ -493,11 +502,12 @@ describe.skipIf(!integrationEnabled)("payroll service integration", () => {
       "/api/v1/me/reimbursements",
       {
         category: "TRANSPORT",
-        expense_date: "2026-12-05",
+        expense_date: "2026-11-05",
         amount: "150000.00",
-        description: "Perjalanan dinas Desember",
+        description: "Perjalanan dinas November",
       },
       manager,
+      `reimb-${randomUUID()}`,
     );
     expect(created.status).toBe(201);
     expect(created.body.data.status).toBe("PENDING");
@@ -523,7 +533,7 @@ describe.skipIf(!integrationEnabled)("payroll service integration", () => {
       "POST",
       `/api/v1/reimbursements/${created.body.data.id}/decide`,
       { decision: "APPROVED" },
-      hr,
+      finance,
     );
     expect(approved.status).toBe(200);
     expect(approved.body.data.status).toBe("APPROVED");
@@ -537,11 +547,20 @@ describe.skipIf(!integrationEnabled)("payroll service integration", () => {
     expect(doubleDecision.status).toBe(409);
     expect(doubleDecision.body.error.code).toBe("ERR_CONCURRENT_LOCK");
 
-    const paid = await call(
+    const deciderSelfPay = await call(
       "POST",
       `/api/v1/reimbursements/${created.body.data.id}/pay`,
       undefined,
       finance,
+    );
+    expect(deciderSelfPay.status).toBe(403);
+    expect(deciderSelfPay.body.error.code).toBe("ERR_SOD_VIOLATION");
+
+    const paid = await call(
+      "POST",
+      `/api/v1/reimbursements/${created.body.data.id}/pay`,
+      undefined,
+      finance2,
     );
     expect(paid.status).toBe(200);
     expect(paid.body.data.status).toBe("PAID");
@@ -550,7 +569,7 @@ describe.skipIf(!integrationEnabled)("payroll service integration", () => {
       "POST",
       `/api/v1/reimbursements/${created.body.data.id}/pay`,
       undefined,
-      finance,
+      finance2,
     );
     expect(doublePay.status).toBe(409);
     expect(doublePay.body.error.code).toBe("ERR_PAYMENT_STATE_CONFLICT");
@@ -560,11 +579,12 @@ describe.skipIf(!integrationEnabled)("payroll service integration", () => {
       "/api/v1/me/reimbursements",
       {
         category: "MEAL",
-        expense_date: "2026-12-06",
+        expense_date: "2026-11-06",
         amount: "90000.00",
-        description: "Konsumsi rapat Desember",
+        description: "Konsumsi rapat November",
       },
       manager,
+      `reimb-${randomUUID()}`,
     );
     expect(rejected.status).toBe(201);
 
@@ -581,7 +601,7 @@ describe.skipIf(!integrationEnabled)("payroll service integration", () => {
       "POST",
       `/api/v1/reimbursements/${rejected.body.data.id}/pay`,
       undefined,
-      finance,
+      finance2,
     );
     expect(payRejected.status).toBe(409);
     expect(payRejected.body.error.code).toBe("ERR_PAYMENT_STATE_CONFLICT");
@@ -591,11 +611,13 @@ describe.skipIf(!integrationEnabled)("payroll service integration", () => {
       "/api/v1/me/reimbursements",
       {
         category: "MEDICAL",
-        expense_date: "2026-12-07",
+        expense_date: "2026-11-07",
         amount: "120000.00",
-        description: "Klinik Desember",
+        description: "Klinik November",
+        receipt_url: `https://res.cloudinary.com/aletheia-demo/image/upload/aletheia/${TENANT}/reimbursements/receipt-medical.pdf`,
       },
       finance,
+      `reimb-${randomUUID()}`,
     );
     expect(financeOwn.status).toBe(201);
 
@@ -615,6 +637,23 @@ describe.skipIf(!integrationEnabled)("payroll service integration", () => {
     );
     expect(selfPay.status).toBe(403);
     expect(selfPay.body.error.code).toBe("ERR_SOD_VIOLATION");
+  });
+
+  it("mengembalikan reimburse idempoten untuk kunci yang sama", async () => {
+    const key = `reimb-idem-${randomUUID()}`;
+    const input = {
+      category: "OTHER",
+      expense_date: "2026-11-10",
+      amount: "50000.00",
+      description: "Reimburse idempoten",
+    };
+    const first = await call("POST", "/api/v1/me/reimbursements", input, manager, key);
+    expect(first.status).toBe(201);
+
+    const replay = await call("POST", "/api/v1/me/reimbursements", input, manager, key);
+    expect(replay.status).toBe(200);
+    expect(replay.headers["x-idempotent-replay"]).toBe("true");
+    expect(replay.body.data.id).toBe(first.body.data.id);
   });
 
   it("membatasi struktur organisasi branch manager ke cabangnya", async () => {
@@ -703,7 +742,42 @@ describe.skipIf(!integrationEnabled)("payroll service integration", () => {
       expect(blockedReport.status).toBe(403);
       expect(blockedReport.body.error.code).toBe("ERR_PLAN_FEATURE_UNAVAILABLE");
     } finally {
-      await pool.query(`update governance.tenants set plan = 'ENTERPRISE' where id = $1`, [TENANT]);
+      await pool.query(`update governance.tenants set plan = 'HRIS_PRO' where id = $1`, [TENANT]);
+    }
+  });
+
+  it("menolak unduhan invoice setelah paket tenant diturunkan", async () => {
+    const reportId = randomUUID();
+    const content = Buffer.from("branch_code,total_invoice\nBDG-01,1000.00\n");
+    const checksum = createHash("sha256").update(content).digest("hex");
+    await pool.query(
+      `insert into payroll.tax_reports
+        (id, tenant_id, report_type, branch_id, policy_version_id, period_start, period_end,
+         version, status, file_url, snapshot_hash_sha256, file_checksum_sha256,
+         total_gross, headcount, totals, generated_by, generated_at)
+       values ($1,$2,'PAYROLL_COST_INVOICE',$3,$4,'2026-10-01','2026-10-31',1,'READY',
+               '/api/v1/reports/$1/download',repeat('a',64),$5,'0.00',1,'{}',$6,now())`,
+      [reportId, TENANT, BRANCH, COST_POLICY, checksum, HR],
+    );
+    await pool.query(
+      `insert into payroll.generated_files
+        (id, tenant_id, kind, entity_id, file_name, mime_type, file_size, content, checksum_sha256)
+       values ($1,$2,'REPORT',$3,'cost-invoice-test.csv','text/csv',$4,$5,$6)`,
+      [randomUUID(), TENANT, reportId, content.length, content, checksum],
+    );
+
+    await pool.query(`update governance.tenants set plan = 'HRIS_PRO' where id = $1`, [TENANT]);
+    try {
+      const download = await call("GET", `/api/v1/reports/${reportId}/download`, undefined, hr);
+      expect(download.status).toBe(200);
+      const fileUrl = download.body.data.url as string;
+
+      await pool.query(`update governance.tenants set plan = 'BASIC' where id = $1`, [TENANT]);
+      const blocked = await request(app).get(fileUrl);
+      expect(blocked.status).toBe(403);
+      expect(blocked.body.error.code).toBe("ERR_PLAN_FEATURE_UNAVAILABLE");
+    } finally {
+      await pool.query(`update governance.tenants set plan = 'HRIS_PRO' where id = $1`, [TENANT]);
     }
   });
 

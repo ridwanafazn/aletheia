@@ -31,7 +31,7 @@ const EnvSchema = z.object({
   CLOUDINARY_CLOUD_NAME: OptionalString,
   CLOUDINARY_API_KEY: OptionalString,
   CLOUDINARY_API_SECRET: OptionalString,
-  CLOUDINARY_FOLDER_PREFIX: z.string().min(1).default("aletheia/reimbursements"),
+  CLOUDINARY_FOLDER_PREFIX: z.string().min(1).default("aletheia"),
   FILE_URL_TTL_SECONDS: z.coerce.number().int().min(30).max(3600).default(300),
   LOG_LEVEL: z.string().default("info"),
 });

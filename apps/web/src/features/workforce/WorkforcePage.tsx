@@ -510,7 +510,16 @@ export default function WorkforcePage() {
                       <td>{formatDate(item.expense_date)}</td>
                       <td>{reimbursementCategoryLabel(item.category)}</td>
                       <td className="numeric">{formatMoney(item.amount)}</td>
-                      <td className="col-hide-sm small">{item.description}</td>
+                      <td className="col-hide-sm small">
+                        <div>{item.description}</div>
+                        {item.receipt_url === null ? (
+                          <div className="muted">Tanpa bukti</div>
+                        ) : (
+                          <a href={item.receipt_url} target="_blank" rel="noopener noreferrer">
+                            Lihat bukti
+                          </a>
+                        )}
+                      </td>
                       <td>
                         <StatusBadge status={item.status} />
                       </td>

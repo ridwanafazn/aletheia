@@ -116,11 +116,13 @@ export function listMyReimbursements(): Promise<ApiResult<ReimbursementPage>> {
 
 export function createMyReimbursement(
   input: ReimbursementCreate,
+  idempotencyKey: string,
 ): Promise<ApiResult<Reimbursement>> {
   const parsed = ReimbursementCreateSchema.parse(input);
   return apiRequest("/api/v1/me/reimbursements", {
     method: "POST",
     body: parsed,
+    idempotencyKey,
     schema: ReimbursementSchema,
   });
 }

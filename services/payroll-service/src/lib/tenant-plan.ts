@@ -1,4 +1,4 @@
-import { pool } from "@aletheia/database";
+import { pool, runWithTenant } from "@aletheia/database";
 import {
   TenantPlanSchema,
   tenantPlanHasFeature,
@@ -10,9 +10,11 @@ import type { NextFunction, Request, Response } from "express";
 import { ApiError } from "./errors.js";
 
 export async function getTenantPlan(tenantId: string): Promise<TenantPlan> {
-  const result = await pool.query<{ plan: string }>(
-    `select plan from governance.tenants where id = $1 and status = 'ACTIVE'`,
-    [tenantId],
+  const result = await runWithTenant(tenantId, () =>
+    pool.query<{ plan: string }>(
+      `select plan from governance.tenants where id = $1 and status = 'ACTIVE'`,
+      [tenantId],
+    ),
   );
   const row = result.rows[0];
   if (row === undefined) {

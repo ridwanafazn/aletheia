@@ -317,6 +317,23 @@ export const MeProfileSchema = z
   .strict();
 export type MeProfile = z.infer<typeof MeProfileSchema>;
 
+const MAX_REIMBURSEMENT_AMOUNT = 1_000_000_000;
+
+function isValidCalendarDate(value: string): boolean {
+  const [year, month, day] = value.split("-").map(Number);
+  if (year === undefined || month === undefined || day === undefined) {
+    return false;
+  }
+  const date = new Date(Date.UTC(year, month - 1, day));
+  return (
+    date.getUTCFullYear() === year && date.getUTCMonth() === month - 1 && date.getUTCDate() === day
+  );
+}
+
+function jakartaToday(): string {
+  return new Date(Date.now() + 7 * 60 * 60 * 1000).toISOString().slice(0, 10);
+}
+
 export const ReimbursementCreateSchema = z
   .object({
     category: ReimbursementCategorySchema,
@@ -326,7 +343,19 @@ export const ReimbursementCreateSchema = z
     receipt_url: z.string().url().max(2048).optional(),
     receipt_public_id: z.string().max(255).optional(),
   })
-  .strict();
+  .strict()
+  .refine((value) => Number(value.amount) > 0 && Number(value.amount) <= MAX_REIMBURSEMENT_AMOUNT, {
+    path: ["amount"],
+    message: "Nominal reimburse harus lebih dari 0 dan maksimal 1 miliar",
+  })
+  .refine(
+    (value) => isValidCalendarDate(value.expense_date) && value.expense_date <= jakartaToday(),
+    { path: ["expense_date"], message: "Tanggal pengeluaran tidak valid atau di masa depan" },
+  )
+  .refine((value) => value.category !== "MEDICAL" || value.receipt_url !== undefined, {
+    path: ["receipt_url"],
+    message: "Reimburse medis wajib memiliki bukti",
+  });
 export type ReimbursementCreate = z.infer<typeof ReimbursementCreateSchema>;
 
 export const ReimbursementSchema = z

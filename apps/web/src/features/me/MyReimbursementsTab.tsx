@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { ReceiptText, Upload } from "lucide-react";
-import { useState, type ChangeEvent, type FormEvent } from "react";
+import { useState, useEffect, useRef, type ChangeEvent, type FormEvent } from "react";
 
 import type { ReimbursementCreate, ReimbursementUploadSignature } from "@aletheia/shared-contracts";
 
@@ -14,7 +14,7 @@ import {
   SkeletonTable,
   StatusBadge,
 } from "../../shared/ui";
-import { formatDate, reimbursementCategoryLabel } from "../../shared/lib/format";
+import { formatDate, formatMoney, reimbursementCategoryLabel } from "../../shared/lib/format";
 import {
   createMyReimbursement,
   listMyReimbursements,
@@ -34,6 +34,8 @@ async function uploadToCloudinary(
   body.append("signature", signature.signature);
   body.append("folder", signature.folder);
   body.append("public_id", signature.public_id);
+  body.append("allowed_formats", signature.allowed_formats.join(","));
+  body.append("max_file_size", String(signature.max_file_size));
   const response = await fetch(
     `https://api.cloudinary.com/v1_1/${signature.cloud_name}/auto/upload`,
     { method: "POST", body },
@@ -59,6 +61,11 @@ export function MyReimbursementsTab() {
   const [description, setDescription] = useState("");
   const [receiptUrl, setReceiptUrl] = useState("");
   const [receiptPublicId, setReceiptPublicId] = useState("");
+  const idempotencyKeyRef = useRef(crypto.randomUUID());
+
+  useEffect(() => {
+    idempotencyKeyRef.current = crypto.randomUUID();
+  }, [category, expenseDate, amount, description, receiptUrl]);
 
   const query = useQuery({
     queryKey: ["my-reimbursements"],
@@ -67,7 +74,8 @@ export function MyReimbursementsTab() {
   const items = query.data?.data.items ?? [];
 
   const createMutation = useMutation({
-    mutationFn: (input: ReimbursementCreate) => createMyReimbursement(input),
+    mutationFn: ({ input, key }: { input: ReimbursementCreate; key: string }) =>
+      createMyReimbursement(input, key),
     onSuccess: () => {
       setError(null);
       setNotice("Reimburse tersimpan dan menunggu keputusan.");
@@ -76,6 +84,7 @@ export function MyReimbursementsTab() {
       setDescription("");
       setReceiptUrl("");
       setReceiptPublicId("");
+      idempotencyKeyRef.current = crypto.randomUUID();
       void queryClient.invalidateQueries({ queryKey: ["my-reimbursements"] });
     },
     onError: (caught) => {
@@ -87,12 +96,17 @@ export function MyReimbursementsTab() {
   const submit = (event: FormEvent) => {
     event.preventDefault();
     createMutation.mutate({
-      category,
-      expense_date: expenseDate,
-      amount,
-      description,
-      ...(receiptUrl.trim().length === 0 ? {} : { receipt_url: receiptUrl.trim() }),
-      ...(receiptPublicId.trim().length === 0 ? {} : { receipt_public_id: receiptPublicId.trim() }),
+      input: {
+        category,
+        expense_date: expenseDate,
+        amount,
+        description,
+        ...(receiptUrl.trim().length === 0 ? {} : { receipt_url: receiptUrl.trim() }),
+        ...(receiptPublicId.trim().length === 0
+          ? {}
+          : { receipt_public_id: receiptPublicId.trim() }),
+      },
+      key: idempotencyKeyRef.current,
     });
   };
 
@@ -185,6 +199,11 @@ export function MyReimbursementsTab() {
                   placeholder="150000.00"
                   required
                 />
+                <span className="field__hint">
+                  {amount.trim().length === 0
+                    ? "Gunakan titik desimal, contoh 150000.00"
+                    : `Terbaca: ${formatMoney(amount)}`}
+                </span>
               </div>
             </div>
             <div className="field">

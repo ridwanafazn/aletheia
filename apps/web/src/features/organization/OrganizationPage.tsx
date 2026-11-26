@@ -44,6 +44,9 @@ export default function OrganizationPage() {
   if (tenantQuery.isPending) {
     return <SkeletonTable rows={6} />;
   }
+  if (tenantQuery.isError) {
+    return <ErrorState error={tenantQuery.error} onRetry={() => void tenantQuery.refetch()} />;
+  }
 
   if (!hasFeature(tenantQuery.data?.data, "ORGANIZATION")) {
     return (

@@ -44,7 +44,7 @@ export const tenants = governance.table(
     code: varchar("code", { length: 24 }).notNull().unique(),
     name: varchar("name", { length: 120 }).notNull(),
     status: varchar("status", { length: 16 }).notNull().default("ACTIVE"),
-    plan: varchar("plan", { length: 16 }).notNull().default("ENTERPRISE"),
+    plan: varchar("plan", { length: 16 }).notNull().default("BASIC"),
     createdAt: createdAt(),
   },
   (table) => [
@@ -778,6 +778,10 @@ export const reimbursements = payroll.table(
       sql`${table.status} in ('PENDING','APPROVED','REJECTED','PAID')`,
     ),
     check("reimbursements_amount_check", sql`${table.amount} > 0`),
+    check(
+      "reimbursements_paid_sod_check",
+      sql`${table.status} <> 'PAID' OR (${table.paidBy} IS NOT NULL AND ${table.decidedBy} IS NOT NULL AND ${table.paidBy} <> ${table.decidedBy} AND ${table.paidAt} IS NOT NULL)`,
+    ),
     index("idx_reimbursements_tenant_status_date").on(
       table.tenantId,
       table.status,

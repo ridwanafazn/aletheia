@@ -44,7 +44,9 @@ test("employee submits reimbursement, HR approves, finance pays", async ({ page 
   await page.getByLabel("Deskripsi").fill(description);
   await page
     .getByLabel("Tautan bukti")
-    .fill("https://res.cloudinary.com/demo/image/upload/receipt.pdf");
+    .fill(
+      "https://res.cloudinary.com/aletheia-demo/image/upload/aletheia/019361a2-7c00-7000-8000-000000000001/reimbursements/receipt-e2e.pdf",
+    );
   await page.getByRole("button", { name: "Kirim reimburse" }).click();
   await expect(page.getByText("Reimburse tersimpan dan menunggu keputusan.")).toBeVisible();
   await expect(page.getByText(description)).toBeVisible();

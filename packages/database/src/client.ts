@@ -6,8 +6,12 @@ import { Pool, type PoolClient, type QueryConfig, type QueryResult, type QueryRe
 config({ path: ".env", quiet: true });
 config({ path: "../../.env", quiet: true });
 
+const appConnectionString = process.env.DATABASE_URL_APP;
+if (process.env.NODE_ENV === "production" && appConnectionString === undefined) {
+  throw new Error("DATABASE_URL_APP wajib diisi di production agar RLS aktif");
+}
 const connectionString =
-  process.env.DATABASE_URL_APP ??
+  appConnectionString ??
   process.env.DATABASE_URL ??
   "postgresql://aletheia:aletheia@localhost:5432/aletheia";
 

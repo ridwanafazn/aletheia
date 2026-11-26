@@ -33,8 +33,10 @@ import { appendAudit } from "../lib/audit.js";
 import { assertTrustedReceiptUrl, createReimbursementUploadSignature } from "../lib/cloudinary.js";
 import { isUniqueViolation } from "../lib/db-errors.js";
 import { ApiError } from "../lib/errors.js";
+import { beginIdempotency, completeIdempotency } from "../lib/idempotency.js";
 import { decodeCursor, encodeCursor } from "../lib/pagination.js";
 import { signFileToken, signedFilePath } from "../lib/files.js";
+import { idempotencyRequestHash, requireIdempotencyKey } from "../lib/request-idempotency.js";
 import { sendData } from "../lib/response.js";
 import { assertTenantFeature } from "../lib/tenant-plan.js";
 import {
@@ -592,13 +594,28 @@ meRouter.post("/reimbursements", async (request, response) => {
   const self = await selfOrThrow(auth.tenantId, auth.userId);
   const input = ReimbursementCreateSchema.parse(request.body);
   if (input.receipt_url !== undefined) {
-    assertTrustedReceiptUrl(input.receipt_url);
+    assertTrustedReceiptUrl(input.receipt_url, auth.tenantId, input.receipt_public_id);
   }
+  const key = requireIdempotencyKey(request);
+  const requestHash = idempotencyRequestHash(input);
   const id = randomUUID();
   const client = await pool.connect();
 
   try {
     await client.query("BEGIN");
+    const idempotency = await beginIdempotency(client, {
+      tenantId: auth.tenantId,
+      actorId: auth.userId,
+      scope: "POST:/api/v1/me/reimbursements",
+      key,
+      requestHash,
+    });
+    if (idempotency.kind === "replay") {
+      await client.query("ROLLBACK");
+      response.setHeader("x-idempotent-replay", "true");
+      sendData(response, idempotency.response.data, 200);
+      return;
+    }
     const result = await client.query<ReimbursementRow>(
       `insert into payroll.reimbursements
          (id, tenant_id, personnel_id, category, expense_date, amount, description,
@@ -641,8 +658,13 @@ meRouter.post("/reimbursements", async (request, response) => {
       },
       client,
     );
+    const reimbursement = toReimbursement(result.rows[0]!);
+    await completeIdempotency(client, idempotency.recordId, {
+      status: 201,
+      data: reimbursement as unknown as Record<string, unknown>,
+    });
     await client.query("COMMIT");
-    sendData(response, toReimbursement(result.rows[0]!), 201);
+    sendData(response, reimbursement, 201);
   } catch (error) {
     await client.query("ROLLBACK").catch(() => undefined);
     throw error;
