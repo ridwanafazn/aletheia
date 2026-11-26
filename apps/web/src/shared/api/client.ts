@@ -68,6 +68,13 @@ export function getAccessToken(): string | null {
   return accessToken;
 }
 
+export function absoluteApiUrl(path: string): string {
+  if (/^https?:\/\//.test(path)) {
+    return path;
+  }
+  return `${API_BASE}${path}`;
+}
+
 function notifyUnauthorized(): void {
   accessToken = null;
   window.dispatchEvent(new Event("aletheia:unauthorized"));
