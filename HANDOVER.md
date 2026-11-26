@@ -1,6 +1,6 @@
 # Aletheia — Handover
 
-* **Status:** M1 sampai M5.4 live. Web, edge, empat service Render, Neon, Upstash QStash, dan Cloudinary aktif; smoke production 15/15 lulus; async QStash/worker terverifikasi; login enam peran, UI web, serta rollback edge dan Pages terverifikasi. M6.2 live dengan monitoring 24 jam berjalan via workflow Production Monitor.
+* **Status:** M1 sampai M5.4 live. Web, edge, empat service Render, Neon, Upstash QStash, dan Cloudinary aktif; smoke production 15/15 lulus; async QStash/worker terverifikasi; login enam peran, UI web, serta rollback edge, Pages, dan Render terverifikasi. M6.2 live dengan monitoring 24 jam berjalan via workflow Production Monitor.
 * **Tanggal handover:** 26 November 2026
 * **Data:** seluruhnya sintetis. Tidak ada uang nyata atau PII nyata.
 * **Server demo:** dihentikan. Nyalakan ulang dengan `bash scripts/dev-up.sh`.
@@ -23,7 +23,7 @@ Aletheia adalah platform governance pencairan klaim dan payroll dengan:
 
 **Yang belum selesai:**
 
-* M6.2 finalisasi: monitoring 24 jam (Production Monitor tiap 6 jam), rollback Render/Pages drill, dan sign-off akhir.
+* M6.2 finalisasi: monitoring 24 jam (Production Monitor tiap 6 jam), freeze deploy, dan sign-off akhir.
 * Cold start Render free tier; mitigasi `pnpm warm:production`. Jalankan `pnpm deploy:check`, lalu ikuti `docs/runbooks/m6.2-launch.md`.
 * UI payslip dan laporan. API-nya sudah ada dan diverifikasi di M3.4.
 * Edge preview live perlu deploy ulang.
@@ -318,11 +318,10 @@ Jalankan `bash scripts/dev-up.sh`; skrip memilih container 55432 atau Compose 54
 
 M6.1 selesai: lihat `README.md`, `docs/evidence/m6.1-verification.md`, dan `docs/evidence/m6.1/aletheia-demo.webm`.
 
-M5.4 live, smoke 15/15, dan async QStash lulus. Sisa M6.2:
+M5.4 live, smoke 15/15, async QStash lulus, dan rollback edge/Pages/Render sudah diuji. Sisa M6.2:
 
 1. Monitoring 24 jam: `.github/workflows/production-monitor.yml` berjalan setiap 6 jam; butuh minimal 4 run sukses.
-2. Rollback Render/Pages drill (edge rollback sudah diuji).
-3. Freeze deploy dan sign-off akhir.
-4. Tandai M6.2 selesai hanya setelah seluruh bukti terisi di `docs/evidence/m6.2-verification.md`.
+2. Freeze deploy dan sign-off akhir.
+3. Tandai M6.2 selesai hanya setelah seluruh bukti terisi di `docs/evidence/m6.2-verification.md`.
 
 Untuk demo, jalankan `pnpm warm:production` lebih dulu.

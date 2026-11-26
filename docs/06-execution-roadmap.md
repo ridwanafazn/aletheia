@@ -2,7 +2,7 @@
 
 * **Status Dokumen:** Peta Jalan Eksekusi (*Single Source of Truth* untuk Agen OpenCode)
 * **Strategi:** *Contract-First, Vertical Slice, Evidence-Driven, Zero Context Drift*
-* **Kondisi Saat Ini:** Fase 0, M1.1–M1.3, M2.1–M2.3, M3.1–M3.4, M4.1, M4.2, M5.1–M5.4, dan M6.1 selesai. M5.4 live di Render, Neon, Upstash, Cloudinary, dan Cloudflare; smoke production 15/15, async QStash/worker ~5 detik, login enam peran, UI web, serta rollback edge dan Pages terverifikasi. M6.2 live dengan monitoring 24 jam via workflow Production Monitor; sisa rollback Render service, freeze deploy, dan sign-off. Render free tier memiliki cold start; jalankan `pnpm warm:production` sebelum demo. Bukti: `docs/evidence/m5.4-verification.md`, `docs/evidence/m6.1-verification.md`, `docs/evidence/m6.2-verification.md`.
+* **Kondisi Saat Ini:** Fase 0, M1.1–M1.3, M2.1–M2.3, M3.1–M3.4, M4.1, M4.2, M5.1–M5.4, dan M6.1 selesai. M5.4 live di Render, Neon, Upstash, Cloudinary, dan Cloudflare; smoke production 15/15, async QStash/worker ~5 detik, login enam peran, UI web, serta rollback edge, Pages, dan Render terverifikasi. M6.2 live dengan monitoring 24 jam via workflow Production Monitor; sisa monitoring 24 jam, freeze deploy, dan sign-off. Render free tier memiliki cold start; jalankan `pnpm warm:production` sebelum demo. Bukti: `docs/evidence/m5.4-verification.md`, `docs/evidence/m6.1-verification.md`, `docs/evidence/m6.2-verification.md`.
 
 ## 1. Protokol Kerja Agen
 
@@ -172,7 +172,7 @@
 * **Gerbang:** 21/21 lulus dua run berturut-turut; 0 flaky; axe 0 serious/critical; coverage domain 96,26% lines; integration 27/36/34 lulus; Go race lulus.
 
 #### `TASK-18` — CI/CD Production & Deployment
-* **Status:** selesai live 26 November 2026. Render menjalankan governance, claims, payroll, dan worker; Neon production aktif; Upstash QStash dan Cloudinary aktif; edge Workers dan web Pages live. Smoke production 15/15; async QStash/worker ~5 detik; web UI 3 peran; rollback edge dan Pages diuji. Monitoring 24 jam berjalan di M6.2.
+* **Status:** selesai live 26 November 2026. Render menjalankan governance, claims, payroll, dan worker; Neon production aktif; Upstash QStash dan Cloudinary aktif; edge Workers dan web Pages live. Smoke production 15/15; async QStash/worker ~5 detik; web UI 3 peran; rollback edge, Pages, dan Render diuji. Monitoring 24 jam berjalan di M6.2.
 * **Konteks Wajib:** `docs/05`, `docs/12`.
 * **Cakupan:** pipeline deploy, Cloudflare Pages/Workers, Koyeb/Render, Neon/Upstash/Cloudinary, smoke test, rollback.
 * **Gerbang:** `/readyz` 200; demo live; rollback diuji; tidak ada secret.

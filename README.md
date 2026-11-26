@@ -4,7 +4,7 @@
 
 Aletheia (Greek: *unconcealment*) is a reference implementation for governed money movement: customer claims, payroll, agent commissions, tax withholding, and cross-domain risk intelligence — built around **versioned policy references**, **zero double-disbursement**, and an **immutable audit trail**.
 
-> **Status:** M1 sampai M5.4 live. Web, edge, empat service Render, Neon, Upstash QStash, dan Cloudinary aktif; smoke production **15/15 lulus**, async QStash/worker terverifikasi, login enam peran dan UI web terverifikasi, serta rollback edge dan Pages diuji. M6.1 portofolio siap (README, 8 screenshot, video 2:16, CHANGELOG). M6.2 live dengan monitoring 24 jam berjalan via `.github/workflows/production-monitor.yml`. Render free tier memiliki cold start; jalankan `pnpm warm:production` sebelum demo. Baca [`HANDOVER.md`](HANDOVER.md) sebelum melanjutkan.
+> **Status:** M1 sampai M5.4 live. Web, edge, empat service Render, Neon, Upstash QStash, dan Cloudinary aktif; smoke production **15/15 lulus**, async QStash/worker terverifikasi, login enam peran dan UI web terverifikasi, serta rollback edge, Pages, dan Render diuji. M6.1 portofolio siap (README, 8 screenshot, video 2:16, CHANGELOG). M6.2 live dengan monitoring 24 jam berjalan via `.github/workflows/production-monitor.yml`. Render free tier memiliki cold start; jalankan `pnpm warm:production` sebelum demo. Baca [`HANDOVER.md`](HANDOVER.md) sebelum melanjutkan.
 
 ## Why this exists
 
@@ -103,7 +103,7 @@ flowchart TB
 | [`CHANGELOG.md`](CHANGELOG.md) | Riwayat rilis dan perubahan |
 | [`docs/evidence/m6.1-verification.md`](docs/evidence/m6.1-verification.md) | Verifikasi portofolio M6.1 |
 | [`docs/runbooks/m6.2-launch.md`](docs/runbooks/m6.2-launch.md) | Runbook launch, smoke, rollback, monitoring M6.2 |
-| [`docs/evidence/m6.2-verification.md`](docs/evidence/m6.2-verification.md) | Bukti smoke production, web UI, rollback edge/Pages, cold start, monitoring |
+| [`docs/evidence/m6.2-verification.md`](docs/evidence/m6.2-verification.md) | Bukti smoke production, web UI, rollback edge/Pages/Render, cold start, monitoring |
 
 ## Getting started
 
