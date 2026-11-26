@@ -37,6 +37,9 @@ Semua perubahan penting pada Aletheia. Format mengikuti [Keep a Changelog](https
 - M6.6: policy `PAYROLL_COST_POLICY` dan laporan `PAYROLL_COST_INVOICE` per cabang dengan BJO, management fee, pembulatan, checksum, dan audit.
 - M6.6: halaman laporan menampilkan total invoice dan opsi unduhan CSV.
 - Bukti M6.6: `docs/evidence/m6.6-verification.md` dan screenshot invoice biaya payroll.
+- Desain fase 1–4: Quiet Ledger, Ikhtisar, Reports v2, Organization v2, payroll/workforce/self-service, klaim, MIS, audit ledger, motion, dan mobile polish.
+- Production deploy 27 November 2026: migrasi `0012`–`0017`, empat service Render, edge Worker, dan Pages berada di commit `5d231c1`; smoke production 15/15 dan async QStash lulus.
+- Bukti deploy: `docs/evidence/design-phases-production-deploy.md` dan screenshot production MIS.
 - Hardening review: default paket tenant menjadi BASIC, invoice dicek ulang saat unduhan, reimburse memakai idempotency key dan SoD decider/payer, bukti Cloudinary divalidasi per tenant, dan app role tidak dapat menghapus baris reimburse.
 
 ### Changed

@@ -2,7 +2,7 @@
 
 - **Status:** Selesai 27 November 2026.
 - **Lingkungan:** lokal, web 5173, edge 8787, payroll 4103, governance 4101, worker 4004.
-- **Production:** tidak ada deploy atau request production. Freeze M6.2 tetap aktif.
+- **Production saat fase ini:** tidak ada deploy. Deploy production dilakukan 27 November 2026 setelah freeze dicabut; lihat `design-phases-production-deploy.md`.
 
 ## 1. Yang dibangun
 

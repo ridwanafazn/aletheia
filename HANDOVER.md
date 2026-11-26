@@ -1,6 +1,6 @@
 # Aletheia — Handover
 
-* **Status:** M1–M5.4 live di production. Web, edge, empat service Render, Neon, Upstash QStash, dan Cloudinary aktif; smoke production 15/15 lulus; async QStash/worker terverifikasi; login tujuh peran, UI web, serta rollback edge, Pages, dan Render terverifikasi. M6.2 live dengan monitoring 24 jam berjalan via workflow Production Monitor. M6.3 menambahkan pusat slip gaji dan laporan di web. M6.4 menambahkan employee self-service, e-cuti, dan e-lembur. M6.5 menambahkan reimburse dan struktur organisasi. M6.6 menambahkan paket tenant dan invoice biaya payroll.
+* **Status:** M1–M5.4 live di production. Web, edge, empat service Render, Neon, Upstash QStash, dan Cloudinary aktif; smoke production 15/15 lulus; async QStash/worker terverifikasi; login tujuh peran, UI web, serta rollback edge, Pages, dan Render terverifikasi. M6.2 live dengan monitoring 24 jam berjalan via workflow Production Monitor. M6.3 menambahkan pusat slip gaji dan laporan di web. M6.4 menambahkan employee self-service, e-cuti, dan e-lembur. M6.5 menambahkan reimburse dan struktur organisasi. M6.6 menambahkan paket tenant dan invoice biaya payroll. **Freeze deploy dicabut 27 November 2026; M6.3–M6.6 dan desain fase 1–4 live di commit `5d231c1` dengan smoke production 15/15.**
 * **Tanggal handover:** 26 November 2026
 * **Data:** seluruhnya sintetis. Tidak ada uang nyata atau PII nyata.
 * **Server demo:** dihentikan. Nyalakan ulang dengan `bash scripts/dev-up.sh`.
@@ -23,7 +23,7 @@ Aletheia adalah platform governance pencairan klaim dan payroll dengan:
 
 **Yang belum selesai:**
 
-* M6.2 finalisasi: monitoring 24 jam (Production Monitor tiap 6 jam; 2 run hijau sejauh ini), freeze deploy, dan sign-off akhir.
+* Monitoring production berkelanjutan; Production Monitor berjalan tiap 6 jam.
 * Cold start Render free tier; mitigasi `pnpm warm:production`. `pnpm deploy:check` sudah lulus; runbook ada di `docs/runbooks/m6.2-launch.md`.
 * Performance review, CRUD organisasi dan org chart visual, kebijakan reimburse, serta integrasi cuti ke attendance summary payroll. Ini modul HRIS berikutnya.
 * RUM LCP/INP, exporter span edge, dan label Prometheus kardinalitas tinggi.
@@ -328,11 +328,13 @@ Jalankan `bash scripts/dev-up.sh`; skrip memilih container 55432 atau Compose 54
 
 M6.1 selesai: lihat `README.md`, `docs/evidence/m6.1-verification.md`, dan `docs/evidence/m6.1/aletheia-demo.webm`. M6.3 selesai: lihat `docs/evidence/m6.3-verification.md`. M6.4 selesai: lihat `docs/evidence/m6.4-verification.md`. M6.5 selesai: lihat `docs/evidence/m6.5-verification.md`. M6.6 selesai: lihat `docs/evidence/m6.6-verification.md`.
 
-M5.4 live, smoke 15/15, async QStash lulus, dan rollback edge/Pages/Render sudah diuji. Sisa M6.2:
+M5.4 live, smoke 15/15, async QStash lulus, dan rollback edge/Pages/Render sudah diuji. M6.2 selesai dan freeze deploy sudah dicabut pada 27 November 2026.
 
-1. Monitoring 24 jam: `.github/workflows/production-monitor.yml` berjalan setiap 6 jam; butuh minimal 4 run sukses.
-2. Freeze deploy dan sign-off akhir.
-3. Tandai M6.2 selesai hanya setelah seluruh bukti terisi di `docs/evidence/m6.2-verification.md`.
-4. Setelah freeze dicabut, deploy M6.3–M6.6, lalu lanjut ke performance review, CRUD organisasi, pengaturan paket, dan integrasi cuti ke payroll.
+Status deploy terbaru:
+
+1. M6.3–M6.6 dan desain fase 1–4 live di commit `5d231c1`.
+2. Production Monitor tetap berjalan setiap 6 jam.
+3. Bukti deploy: `docs/evidence/design-phases-production-deploy.md`.
+4. Langkah berikutnya: performance review, CRUD organisasi, pengaturan paket, dan integrasi cuti ke payroll.
 
 Untuk demo, jalankan `pnpm warm:production` lebih dulu.
