@@ -30,6 +30,7 @@ Folder ini menyimpan bukti yang dapat diperiksa reviewer: verifikasi milestone, 
 | `m6.6-verification.md` | Paket tenant, feature gating, invoice biaya payroll, E2E, axe | Selesai 27 November 2026 |
 | `design-phase1-verification.md` | Quiet Ledger foundation, tokens, shell, komponen, E2E, axe | Selesai 27 November 2026 |
 | `design-phase2-verification.md` | Overview, reports v2, organization v2, charts, E2E, axe | Selesai 27 November 2026 |
+| `design-phase3-verification.md` | Payroll, employees, workforce, ruang saya, claims, E2E, axe | Selesai 27 November 2026 |
 
 ## Load test
 
@@ -81,6 +82,7 @@ Hasil utama: daftar klaim per cabang 5,853 ms menjadi 1,183 ms; daftar klaim per
 * `m6.6/` — screenshot invoice biaya payroll dan badge paket tenant.
 * `design-phase1/` — screenshot Quiet Ledger foundation: login, payroll, reports, organization, mobile reports.
 * `design-phase2/` — screenshot overview, reports v2, organization v2, dan mobile overview.
+* `design-phase3/` — screenshot payroll, karyawan, workforce, reimburse, klaim, ruang saya, dan mobile.
 
 ## Metadata
 

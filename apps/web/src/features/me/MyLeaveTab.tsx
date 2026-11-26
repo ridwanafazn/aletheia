@@ -11,7 +11,6 @@ import {
   EmptyState,
   ErrorState,
   SkeletonTable,
-  Stat,
   StatusBadge,
 } from "../../shared/ui";
 import { formatDate, formatNumber, leaveTypeLabel } from "../../shared/lib/format";
@@ -128,17 +127,33 @@ export function MyLeaveTab() {
         </Banner>
       )}
 
-      <div className="stat-grid">
-        {balances.map((balance) => (
-          <Stat
-            key={balance.id}
-            label={leaveTypeLabel(balance.leave_type)}
-            value={`${formatNumber(balance.remaining_days)} hari`}
-            meta={`Hak ${formatNumber(balance.entitlement_days)} · terpakai ${formatNumber(
-              balance.used_days,
-            )} · pending ${formatNumber(balance.pending_days)}`}
-          />
-        ))}
+      <div className="leave-balance-grid">
+        {balances.map((balance) => {
+          const entitlement = Number(balance.entitlement_days);
+          const used = Number(balance.used_days);
+          const pending = Number(balance.pending_days);
+          const usedPct = entitlement === 0 ? 0 : Math.min(100, (used / entitlement) * 100);
+          const pendingPct =
+            entitlement === 0 ? 0 : Math.min(100 - usedPct, (pending / entitlement) * 100);
+          return (
+            <article className="leave-balance-card" key={balance.id}>
+              <div className="leave-balance-card__top">
+                <span className="leave-balance-card__label">
+                  {leaveTypeLabel(balance.leave_type)}
+                </span>
+                <strong>{formatNumber(balance.remaining_days)} hari</strong>
+              </div>
+              <div className="leave-balance-card__track" aria-hidden="true">
+                <span className="leave-balance-card__used" style={{ width: `${usedPct}%` }} />
+                <span className="leave-balance-card__pending" style={{ width: `${pendingPct}%` }} />
+              </div>
+              <div className="leave-balance-card__meta">
+                Hak {formatNumber(balance.entitlement_days)} · terpakai {formatNumber(used)} ·
+                pending {formatNumber(pending)}
+              </div>
+            </article>
+          );
+        })}
       </div>
 
       <div className="grid-sidebar">

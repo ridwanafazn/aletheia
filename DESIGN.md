@@ -120,6 +120,7 @@
 - Empty state inside table body, not a separate page.
 - Pagination: cursor-based "Muat lebih banyak" or page controls; show total if cheap.
 - Column visibility menu; saved views.
+- Person/entity column: 32px initial avatar, name, secondary code or NIK masked; keep the row action accessible name equal to the person name.
 
 ### Badges
 - 4px radius, 11px/14 medium, padding 2px 8px.
@@ -130,6 +131,8 @@
 - Title 12px uppercase muted; value 24px tabular; delta with arrow + sign.
 - Delta must state comparison period.
 - Sparkline optional, 32px height, no axes.
+- Identity card: 58px initial avatar, name, code + branch, then 4 facts aligned in a grid.
+- Balance card: remaining value, used/pending progress track, and entitlement/used/pending text; never encode meaning in color alone.
 
 ### Dialogs / Drawers
 - Dialog for confirmation/decision; drawer for detail/audit.
@@ -140,6 +143,7 @@
 ### Tabs
 - Underline tabs for page sections; segmented control for view modes.
 - URL-synced; no more than 6 tabs.
+- On narrow screens, wrap tabs onto a second row instead of hiding them behind horizontal scroll.
 
 ### Toast
 - Bottom-right, 4s, one action max.

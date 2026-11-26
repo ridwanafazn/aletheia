@@ -16,7 +16,12 @@ import {
   StatusBadge,
 } from "../../shared/ui";
 import { listBranches } from "../../shared/api/reference";
-import { employmentLabel, formatMoney, personnelTypeLabel } from "../../shared/lib/format";
+import {
+  employmentLabel,
+  formatMoney,
+  initials,
+  personnelTypeLabel,
+} from "../../shared/lib/format";
 import { listEmployees } from "./api";
 import { EmployeeDrawer } from "./EmployeeDrawer";
 import type { EmployeeSearch } from "./search";
@@ -249,12 +254,18 @@ export default function EmployeesPage() {
                       <td>
                         <button
                           type="button"
-                          className="table__primary link-button"
+                          className="entity-cell entity-cell--button"
+                          aria-label={employee.full_name}
                           onClick={() => setSelected(employee)}
                         >
-                          {employee.full_name}
+                          <span className="entity-avatar" aria-hidden="true">
+                            {initials(employee.full_name)}
+                          </span>
+                          <span className="entity-copy">
+                            <span className="entity-name">{employee.full_name}</span>
+                            <span className="entity-meta mono">{employee.personnel_code}</span>
+                          </span>
                         </button>
-                        <div className="table__secondary mono">{employee.personnel_code}</div>
                       </td>
                       <td className="col-hide-sm">{personnelTypeLabel(employee.personnel_type)}</td>
                       <td className="col-hide-sm">{branchLabel(employee.branch_id, branches)}</td>

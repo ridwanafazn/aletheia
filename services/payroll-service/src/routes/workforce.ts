@@ -193,7 +193,7 @@ employeeRouter.get(
   async (request, response) => {
     const auth = request.auth!;
     const query = EmployeeListQuerySchema.parse(request.query);
-    const conditions = ["tenant_id = $1"];
+    const conditions = ["tenant_id = $1", "personnel_code not like 'LOAD-%'"];
     const values: unknown[] = [auth.tenantId];
     if (auth.role === "BRANCH_MANAGER") {
       values.push(auth.branchId);

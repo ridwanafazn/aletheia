@@ -19,6 +19,7 @@ import {
   formatDate,
   formatMoney,
   formatNumber,
+  initials,
   leaveTypeLabel,
   reimbursementCategoryLabel,
 } from "../../shared/lib/format";
@@ -321,11 +322,18 @@ export default function WorkforcePage() {
                   {leaveItems.map((leave) => (
                     <tr key={leave.id}>
                       <td>
-                        <div className="table__primary">{employeeName(leave.personnel_id)}</div>
-                        <div className="table__secondary mono">
-                          {branchName(
-                            employees.find((e) => e.id === leave.personnel_id)?.branch_id ?? "",
-                          )}
+                        <div className="entity-cell">
+                          <span className="entity-avatar" aria-hidden="true">
+                            {initials(employeeName(leave.personnel_id))}
+                          </span>
+                          <span className="entity-copy">
+                            <span className="entity-name">{employeeName(leave.personnel_id)}</span>
+                            <span className="entity-meta mono">
+                              {branchName(
+                                employees.find((e) => e.id === leave.personnel_id)?.branch_id ?? "",
+                              )}
+                            </span>
+                          </span>
                         </div>
                       </td>
                       <td>{leaveTypeLabel(leave.leave_type)}</td>
@@ -409,11 +417,18 @@ export default function WorkforcePage() {
                   {overtimeItems.map((item) => (
                     <tr key={item.id}>
                       <td>
-                        <div className="table__primary">{employeeName(item.personnel_id)}</div>
-                        <div className="table__secondary mono">
-                          {branchName(
-                            employees.find((e) => e.id === item.personnel_id)?.branch_id ?? "",
-                          )}
+                        <div className="entity-cell">
+                          <span className="entity-avatar" aria-hidden="true">
+                            {initials(employeeName(item.personnel_id))}
+                          </span>
+                          <span className="entity-copy">
+                            <span className="entity-name">{employeeName(item.personnel_id)}</span>
+                            <span className="entity-meta mono">
+                              {branchName(
+                                employees.find((e) => e.id === item.personnel_id)?.branch_id ?? "",
+                              )}
+                            </span>
+                          </span>
                         </div>
                       </td>
                       <td>{formatDate(item.work_date)}</td>
@@ -499,12 +514,19 @@ export default function WorkforcePage() {
                   {reimbursementItems.map((item) => (
                     <tr key={item.id}>
                       <td>
-                        <div className="table__primary">{employeeName(item.personnel_id)}</div>
-                        <div className="table__secondary mono">
-                          {branchName(
-                            employees.find((employee) => employee.id === item.personnel_id)
-                              ?.branch_id ?? "",
-                          )}
+                        <div className="entity-cell">
+                          <span className="entity-avatar" aria-hidden="true">
+                            {initials(employeeName(item.personnel_id))}
+                          </span>
+                          <span className="entity-copy">
+                            <span className="entity-name">{employeeName(item.personnel_id)}</span>
+                            <span className="entity-meta mono">
+                              {branchName(
+                                employees.find((employee) => employee.id === item.personnel_id)
+                                  ?.branch_id ?? "",
+                              )}
+                            </span>
+                          </span>
                         </div>
                       </td>
                       <td>{formatDate(item.expense_date)}</td>

@@ -3,7 +3,7 @@ import { CalendarDays, FileText, ReceiptText, Wallet } from "lucide-react";
 import { useState } from "react";
 
 import { ErrorState, PageHeader, SkeletonTable } from "../../shared/ui";
-import { employmentLabel, formatDate, personnelTypeLabel } from "../../shared/lib/format";
+import { employmentLabel, formatDate, initials, personnelTypeLabel } from "../../shared/lib/format";
 import { useAuth } from "../auth/AuthProvider";
 import { hasFeature, useTenantProfile } from "../tenant/api";
 import { getMyProfile } from "./api";
@@ -62,29 +62,34 @@ export default function MePage() {
         description={`${profile.full_name} · ${profile.personnel_code} · ${profile.branch_name}`}
       />
 
-      <section className="panel">
-        <div className="panel__body">
-          <div className="summary-list">
-            <div>
-              <div className="summary-list__label">Tipe personel</div>
-              <div className="summary-list__value">
-                {personnelTypeLabel(profile.personnel_type)}
-              </div>
+      <section className="panel profile-card">
+        <div className="profile-card__identity">
+          <span className="profile-avatar" aria-hidden="true">
+            {initials(profile.full_name)}
+          </span>
+          <div>
+            <div className="profile-card__name">{profile.full_name}</div>
+            <div className="profile-card__meta">
+              {profile.personnel_code} · {profile.branch_name}
             </div>
-            <div>
-              <div className="summary-list__label">Status kepegawaian</div>
-              <div className="summary-list__value">
-                {employmentLabel(profile.employment_status)}
-              </div>
-            </div>
-            <div>
-              <div className="summary-list__label">Status pajak</div>
-              <div className="summary-list__value mono">{profile.ptkp_status}</div>
-            </div>
-            <div>
-              <div className="summary-list__label">Bergabung</div>
-              <div className="summary-list__value">{formatDate(profile.join_date)}</div>
-            </div>
+          </div>
+        </div>
+        <div className="profile-facts">
+          <div>
+            <div className="profile-fact__label">Tipe personel</div>
+            <div className="profile-fact__value">{personnelTypeLabel(profile.personnel_type)}</div>
+          </div>
+          <div>
+            <div className="profile-fact__label">Status kepegawaian</div>
+            <div className="profile-fact__value">{employmentLabel(profile.employment_status)}</div>
+          </div>
+          <div>
+            <div className="profile-fact__label">Status pajak</div>
+            <div className="profile-fact__value mono">{profile.ptkp_status}</div>
+          </div>
+          <div>
+            <div className="profile-fact__label">Bergabung</div>
+            <div className="profile-fact__value">{formatDate(profile.join_date)}</div>
           </div>
         </div>
       </section>

@@ -13,7 +13,13 @@ import {
   Stat,
   StatusBadge,
 } from "../../shared/ui";
-import { ageLabel, categoryLabel, formatMoney, statusLabel } from "../../shared/lib/format";
+import {
+  ageLabel,
+  categoryLabel,
+  formatMoney,
+  initials,
+  statusLabel,
+} from "../../shared/lib/format";
 import { listClaims } from "./api";
 import type { ClaimsSearch } from "./search";
 
@@ -234,8 +240,15 @@ export default function ClaimsPage() {
                         <div className="table__secondary">{claim.policy_version_tag}</div>
                       </td>
                       <td>
-                        <div className="table__primary">{claim.claimant_name}</div>
-                        <div className="table__secondary mono">{claim.claimant_nik_masked}</div>
+                        <div className="entity-cell">
+                          <span className="entity-avatar" aria-hidden="true">
+                            {initials(claim.claimant_name)}
+                          </span>
+                          <span className="entity-copy">
+                            <span className="entity-name">{claim.claimant_name}</span>
+                            <span className="entity-meta mono">{claim.claimant_nik_masked}</span>
+                          </span>
+                        </div>
                       </td>
                       <td className="col-hide-sm">{categoryLabel(claim.claim_category)}</td>
                       <td className="numeric">{formatMoney(claim.requested_amount)}</td>
