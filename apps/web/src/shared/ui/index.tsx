@@ -108,6 +108,51 @@ export function Stat({ label, value, meta }: { label: string; value: ReactNode; 
   );
 }
 
+export function Sparkline({
+  values,
+  tone = "jade",
+  label = "Tren singkat",
+}: {
+  values: number[];
+  tone?: "jade" | "amber" | "danger";
+  label?: string;
+}) {
+  const first = values[0] ?? 0;
+  const safe = values.length > 1 ? values : values.length === 1 ? [first, first] : [0, 0];
+  const max = Math.max(...safe);
+  const min = Math.min(...safe);
+  const range = max - min || 1;
+  const flat = max === min;
+  const points = safe
+    .map((value, index) => {
+      const x = (index / (safe.length - 1)) * 112 + 4;
+      const y = flat ? 17 : 30 - ((value - min) / range) * 24;
+      return `${x.toFixed(1)},${y.toFixed(1)}`;
+    })
+    .join(" ");
+  const area = `4,32 ${points} 116,32`;
+
+  return (
+    <svg
+      className={`sparkline sparkline--${tone}`}
+      viewBox="0 0 120 34"
+      role="img"
+      aria-label={label}
+      preserveAspectRatio="none"
+    >
+      <polygon points={area} className="sparkline__area" />
+      <polyline
+        points={points}
+        fill="none"
+        className="sparkline__line"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
 export function EmptyState({
   title,
   body,

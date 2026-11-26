@@ -385,7 +385,7 @@ export function AppShell() {
           <div className="topbar__spacer" />
           <div className="topbar__action">
             {hasRole("COMPLIANCE_ADMIN") ? (
-              <span className="chip">
+              <span className="chip chip--compliance">
                 <ShieldCheck size={12} aria-hidden="true" />
                 Kepatuhan aktif
               </span>
@@ -400,7 +400,9 @@ export function AppShell() {
         </header>
 
         <main id="main-content" className="content" tabIndex={-1}>
-          <Outlet />
+          <div className="route-enter" key={pathname}>
+            <Outlet />
+          </div>
         </main>
       </div>
     </div>

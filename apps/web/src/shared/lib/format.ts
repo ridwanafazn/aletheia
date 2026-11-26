@@ -50,6 +50,31 @@ export function formatNumber(value: number | string): string {
   return numberFormatter.format(Number(value));
 }
 
+export function formatCompactMoney(value: number | string | null | undefined): string {
+  if (value === null || value === undefined) {
+    return "—";
+  }
+  const number = Number(value);
+  if (!Number.isFinite(number)) {
+    return "—";
+  }
+  if (Math.abs(number) >= 1_000_000_000) {
+    return `Rp ${(number / 1_000_000_000).toLocaleString("id-ID", {
+      maximumFractionDigits: 2,
+    })} M`;
+  }
+  if (Math.abs(number) >= 1_000_000) {
+    return `Rp ${(number / 1_000_000).toLocaleString("id-ID", {
+      maximumFractionDigits: 1,
+    })} jt`;
+  }
+  return `Rp ${number.toLocaleString("id-ID", { maximumFractionDigits: 0 })}`;
+}
+
+export function formatCompactNumber(value: number | string): string {
+  return Number(value).toLocaleString("id-ID", { maximumFractionDigits: 0 });
+}
+
 export function formatPeriod(value: string | null | undefined): string {
   if (value === null || value === undefined) {
     return "Belum ada";

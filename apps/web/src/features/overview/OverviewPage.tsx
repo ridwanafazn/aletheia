@@ -16,9 +16,17 @@ import type { ReactNode } from "react";
 
 import type { ClaimSummary } from "@aletheia/shared-contracts";
 
-import { statusClass, statusLabel } from "../../shared/lib/format";
-import { formatDate, formatMoney, formatPeriod, currentPeriod } from "../../shared/lib/format";
-import { ErrorState, SkeletonTable } from "../../shared/ui";
+import {
+  currentPeriod,
+  formatCompactMoney,
+  formatCompactNumber,
+  formatDate,
+  formatMoney,
+  formatPeriod,
+  statusClass,
+  statusLabel,
+} from "../../shared/lib/format";
+import { ErrorState, SkeletonTable, Sparkline } from "../../shared/ui";
 import { useAuth } from "../auth/AuthProvider";
 import { listClaims } from "../claims/api";
 import { fetchMisDashboard } from "../mis/api";
@@ -29,15 +37,7 @@ import {
   listWorkforceOvertime,
   listWorkforceReimbursements,
 } from "../workforce/api";
-import {
-  ClaimsStatusChart,
-  MonthlyBreakdown,
-  PayrollTrendChart,
-  Sparkline,
-  formatCompactMoney,
-  formatCompactNumber,
-  type TrendPoint,
-} from "./charts";
+import { ClaimsStatusChart, MonthlyBreakdown, PayrollTrendChart, type TrendPoint } from "./charts";
 
 interface Kpi {
   label: string;

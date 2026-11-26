@@ -179,6 +179,13 @@
 - Top row: 4–6 KPI cards; second row: trend + breakdown; third row: table.
 - Every chart has a text summary and accessible table alternative.
 - Filters global at top; show active filter chips.
+- If only one period exists, replace the trend plot with a month snapshot and keep the raw table available. Never fabricate a trend line from a single point.
+
+### Audit ledger
+- Integrity panel states the current chain status, loaded row count, domain count, and latest event time.
+- Rows show time, actor, action, domain, entity, and hash; decision context expands inline as a definition list.
+- Hash and entity values use mono chips with the full value in the title.
+- On mobile, the table becomes a ledger card list; verification stays reachable above the filters.
 
 ### Payslip
 - Header: period, employee masked, net pay large.
@@ -188,9 +195,10 @@
 
 ## 8. Motion
 
-- Duration: 120ms (micro), 180ms (dialogs/drawers), 240ms (page transition max).
-- Easing: `cubic-bezier(0.2, 0, 0, 1)`.
+- Duration: 120ms (micro), 180ms (dialogs/drawers), 220ms (route arrival), 240ms (page transition max).
+- Easing: `cubic-bezier(0.2, 0, 0, 1)`; route arrival uses a fast exponential ease-out.
 - Animate opacity/transform only; never animate money values or table row heights.
+- One authored route arrival, not a staggered entrance on every section.
 - Respect `prefers-reduced-motion: reduce`; disable non-essential motion.
 - No confetti, bouncing, or attention-seeking loops.
 

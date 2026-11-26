@@ -11,76 +11,14 @@ import {
   YAxis,
 } from "recharts";
 
+import { formatCompactMoney, formatCompactNumber } from "../../shared/lib/format";
+
 const JADE = "#0f6b5c";
 const JADE_SOFT = "#8bd8c0";
 const AMBER = "#b7791f";
 const DANGER = "#a8323e";
 const INK = "#34433f";
 const GRID = "#e3dccf";
-
-export function formatCompactMoney(value: number): string {
-  if (!Number.isFinite(value)) {
-    return "—";
-  }
-  if (Math.abs(value) >= 1_000_000_000) {
-    return `Rp ${(value / 1_000_000_000).toLocaleString("id-ID", {
-      maximumFractionDigits: 2,
-    })} M`;
-  }
-  if (Math.abs(value) >= 1_000_000) {
-    return `Rp ${(value / 1_000_000).toLocaleString("id-ID", {
-      maximumFractionDigits: 1,
-    })} jt`;
-  }
-  return `Rp ${value.toLocaleString("id-ID", { maximumFractionDigits: 0 })}`;
-}
-
-export function formatCompactNumber(value: number): string {
-  return value.toLocaleString("id-ID", { maximumFractionDigits: 0 });
-}
-
-export function Sparkline({
-  values,
-  tone = "jade",
-}: {
-  values: number[];
-  tone?: "jade" | "amber" | "danger";
-}) {
-  const safe = values.length > 1 ? values : [0, 1];
-  const max = Math.max(...safe);
-  const min = Math.min(...safe);
-  const range = max - min || 1;
-  const points = safe
-    .map((value, index) => {
-      const x = (index / (safe.length - 1)) * 112 + 4;
-      const y = 30 - ((value - min) / range) * 24;
-      return `${x.toFixed(1)},${y.toFixed(1)}`;
-    })
-    .join(" ");
-  const area = `4,32 ${points} 116,32`;
-  const stroke = tone === "amber" ? AMBER : tone === "danger" ? DANGER : JADE;
-  const fill = tone === "amber" ? "#f5dfbb" : tone === "danger" ? "#f4d2d4" : "#cfe8de";
-
-  return (
-    <svg
-      className="sparkline"
-      viewBox="0 0 120 34"
-      role="img"
-      aria-label="Tren singkat"
-      preserveAspectRatio="none"
-    >
-      <polygon points={area} fill={fill} opacity="0.55" />
-      <polyline
-        points={points}
-        fill="none"
-        stroke={stroke}
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
-}
 
 export interface TrendPoint {
   label: string;

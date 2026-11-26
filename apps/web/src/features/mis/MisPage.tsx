@@ -1,24 +1,56 @@
 import { useQuery } from "@tanstack/react-query";
 import { Link, useNavigate, useSearch } from "@tanstack/react-router";
-import { ArrowUpRight, FlaskConical, RefreshCw, TrendingUp } from "lucide-react";
+import {
+  ArrowDownRight,
+  ArrowUpRight,
+  BadgeCheck,
+  Building2,
+  Clock3,
+  FileText,
+  FlaskConical,
+  ReceiptText,
+  RefreshCw,
+  TrendingDown,
+  TrendingUp,
+  Wallet,
+} from "lucide-react";
+import type { ReactNode } from "react";
 
 import type { BranchKpi } from "../mis/api";
 import { fetchMisDashboard } from "../mis/api";
 import {
   currentPeriod,
+  formatCompactMoney,
   formatMoney,
   formatNumber,
   formatPeriod,
   periodEndDate,
 } from "../../shared/lib/format";
 import { listBranches } from "../../shared/api/reference";
-import { Button, EmptyState, ErrorState, PageHeader, SkeletonTable, Stat } from "../../shared/ui";
+import {
+  Button,
+  EmptyState,
+  ErrorState,
+  PageHeader,
+  SkeletonTable,
+  Sparkline,
+} from "../../shared/ui";
 import type { MisSearch } from "./search";
 
 interface TrendMonth {
   month: string;
   payroll: number;
   claims: number;
+  pph21: number;
+  submitted: number;
+}
+
+interface HealthMetric {
+  label: string;
+  value: string;
+  meta: string;
+  tone?: "jade" | "amber" | "danger";
+  meter?: number;
 }
 
 function sum(rows: BranchKpi[], field: keyof BranchKpi): number {
@@ -32,77 +64,138 @@ function aggregateTrend(rows: BranchKpi[]): TrendMonth[] {
       month: row.reportMonth,
       payroll: 0,
       claims: 0,
+      pph21: 0,
+      submitted: 0,
     };
     entry.payroll += Number(row.totalPayrollDisbursed);
     entry.claims += Number(row.totalClaimsApprovedAmount);
+    entry.pph21 += Number(row.totalPph21Collected);
+    entry.submitted += Number(row.totalClaimsSubmitted);
     months.set(row.reportMonth, entry);
   }
   return [...months.values()].sort((left, right) => left.month.localeCompare(right.month));
 }
 
-function TrendChart({ months }: { months: TrendMonth[] }) {
-  const maximum = Math.max(1, ...months.flatMap((month) => [month.payroll, month.claims]));
+function TrendTable({ months }: { months: TrendMonth[] }) {
   return (
-    <div className="trend-chart">
-      <div className="trend-chart__legend">
-        <span className="trend-chart__legend-item trend-chart__legend-item--claims">
-          Klaim disetujui
-        </span>
-        <span className="trend-chart__legend-item trend-chart__legend-item--payroll">
-          Payroll dicairkan
-        </span>
-      </div>
-      <div
-        className="trend-chart__plot"
-        role="img"
-        aria-label={`Tren ${months.length} bulan. Nilai tertinggi ${formatMoney(String(maximum))}.`}
-      >
-        {months.map((month) => (
-          <div className="trend-chart__month" key={month.month}>
-            <div className="trend-chart__bars" aria-hidden="true">
-              <span
-                className="trend-chart__bar trend-chart__bar--claims"
-                style={{ height: `${Math.max(2, (month.claims / maximum) * 100)}%` }}
-                title={`Klaim ${formatMoney(String(month.claims))}`}
-              />
-              <span
-                className="trend-chart__bar trend-chart__bar--payroll"
-                style={{ height: `${Math.max(2, (month.payroll / maximum) * 100)}%` }}
-                title={`Payroll ${formatMoney(String(month.payroll))}`}
-              />
-            </div>
-            <div className="trend-chart__label">{formatPeriod(month.month).split(" ")[0]}</div>
-          </div>
-        ))}
-      </div>
-      <details className="trend-chart__data">
-        <summary>Lihat data tren</summary>
-        <div className="table-wrap" tabIndex={0} aria-label="Data tren klaim dan payroll per bulan">
-          <table className="table">
-            <caption className="sr-only">Data tren klaim dan payroll per bulan</caption>
-            <thead>
-              <tr>
-                <th scope="col">Bulan</th>
-                <th scope="col" className="numeric">
-                  Klaim disetujui
-                </th>
-                <th scope="col" className="numeric">
-                  Payroll dicairkan
-                </th>
+    <details className="trend-chart__data">
+      <summary>Lihat data tren</summary>
+      <div className="table-wrap" tabIndex={0} aria-label="Data tren klaim dan payroll per bulan">
+        <table className="table">
+          <caption className="sr-only">Data tren klaim dan payroll per bulan</caption>
+          <thead>
+            <tr>
+              <th scope="col">Bulan</th>
+              <th scope="col" className="numeric">
+                Diajukan
+              </th>
+              <th scope="col" className="numeric">
+                Klaim disetujui
+              </th>
+              <th scope="col" className="numeric">
+                Payroll dicairkan
+              </th>
+              <th scope="col" className="numeric">
+                PPh 21
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {months.map((month) => (
+              <tr key={month.month}>
+                <td>{formatPeriod(month.month)}</td>
+                <td className="numeric">{formatMoney(String(month.submitted))}</td>
+                <td className="numeric">{formatMoney(String(month.claims))}</td>
+                <td className="numeric">{formatMoney(String(month.payroll))}</td>
+                <td className="numeric">{formatMoney(String(month.pph21))}</td>
               </tr>
-            </thead>
-            <tbody>
-              {months.map((month) => (
-                <tr key={month.month}>
-                  <td>{formatPeriod(month.month)}</td>
-                  <td className="numeric">{formatMoney(String(month.claims))}</td>
-                  <td className="numeric">{formatMoney(String(month.payroll))}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </details>
+  );
+}
+
+function TrendChart({ months }: { months: TrendMonth[] }) {
+  const latest = months[months.length - 1];
+  const maximum = Math.max(1, ...months.flatMap((month) => [month.payroll, month.claims]));
+
+  if (months.length < 2 && latest !== undefined) {
+    return (
+      <div className="mis-trend">
+        <div
+          className="mis-snapshot"
+          role="img"
+          aria-label={`Tren ${months.length} bulan. ${formatPeriod(latest.month)}: klaim disetujui ${formatMoney(
+            String(latest.claims),
+          )}, payroll dicairkan ${formatMoney(String(latest.payroll))}.`}
+        >
+          <div className="mis-snapshot__intro">
+            <span className="mis-snapshot__period">{formatPeriod(latest.month)}</span>
+            <p>
+              Data baru tersedia untuk satu periode. Grafik tren muncul otomatis setelah dua bulan
+              atau lebih.
+            </p>
+          </div>
+          <div className="mis-snapshot__grid">
+            <div>
+              <span>Klaim disetujui</span>
+              <strong>{formatMoney(String(latest.claims))}</strong>
+              <small>{latest.submitted} pengajuan</small>
+            </div>
+            <div>
+              <span>Payroll dicairkan</span>
+              <strong>{formatMoney(String(latest.payroll))}</strong>
+              <small>Batch disbursed dan partial</small>
+            </div>
+            <div>
+              <span>PPh 21 terkumpul</span>
+              <strong>{formatMoney(String(latest.pph21))}</strong>
+              <small>Potongan karyawan</small>
+            </div>
+          </div>
         </div>
-      </details>
+        <TrendTable months={months} />
+      </div>
+    );
+  }
+
+  return (
+    <div className="mis-trend">
+      <div className="trend-chart">
+        <div className="trend-chart__legend">
+          <span className="trend-chart__legend-item">Klaim disetujui</span>
+          <span className="trend-chart__legend-item trend-chart__legend-item--payroll">
+            Payroll dicairkan
+          </span>
+          <span className="trend-chart__legend-note">Puncak {formatCompactMoney(maximum)}</span>
+        </div>
+        <div
+          className="trend-chart__plot"
+          role="img"
+          aria-label={`Tren ${months.length} bulan. Nilai tertinggi ${formatMoney(String(maximum))}.`}
+        >
+          {months.map((month) => (
+            <div className="trend-chart__month" key={month.month}>
+              <div className="trend-chart__bars" aria-hidden="true">
+                <span
+                  className="trend-chart__bar trend-chart__bar--claims"
+                  style={{ height: `${Math.max(2, (month.claims / maximum) * 100)}%` }}
+                  title={`Klaim ${formatMoney(String(month.claims))}`}
+                />
+                <span
+                  className="trend-chart__bar trend-chart__bar--payroll"
+                  style={{ height: `${Math.max(2, (month.payroll / maximum) * 100)}%` }}
+                  title={`Payroll ${formatMoney(String(month.payroll))}`}
+                />
+              </div>
+              <div className="trend-chart__label">{formatPeriod(month.month).split(" ")[0]}</div>
+            </div>
+          ))}
+        </div>
+        <TrendTable months={months} />
+      </div>
     </div>
   );
 }
@@ -152,6 +245,75 @@ export default function MisPage() {
     summary.length === 0
       ? 0
       : summary.reduce((total, row) => total + row.momVariancePct, 0) / summary.length;
+
+  const kpis: Array<{
+    label: string;
+    value: string;
+    meta: string;
+    trend: number[];
+    tone: "jade" | "amber";
+    icon: ReactNode;
+  }> = [
+    {
+      label: "Klaim diajukan",
+      value: formatNumber(totalSubmitted),
+      meta: `${summary.length} cabang`,
+      trend: trend.map((month) => month.submitted),
+      tone: "jade",
+      icon: <FileText size={15} />,
+    },
+    {
+      label: "Klaim disetujui",
+      value: formatMoney(String(totalApprovedAmount)),
+      meta: `${formatNumber(approvalRate)}% approval rate`,
+      trend: trend.map((month) => month.claims),
+      tone: "jade",
+      icon: <BadgeCheck size={15} />,
+    },
+    {
+      label: "Payroll dicairkan",
+      value: formatMoney(String(totalPayroll)),
+      meta: "Batch disbursed",
+      trend: trend.map((month) => month.payroll),
+      tone: "jade",
+      icon: <Wallet size={15} />,
+    },
+    {
+      label: "PPh 21 terkumpul",
+      value: formatMoney(String(totalTax)),
+      meta: "Potongan karyawan",
+      trend: trend.map((month) => month.pph21),
+      tone: "amber",
+      icon: <ReceiptText size={15} />,
+    },
+  ];
+
+  const health: HealthMetric[] = [
+    {
+      label: "Approval rate",
+      value: `${formatNumber(approvalRate)}%`,
+      meta: "Rata-rata cabang",
+      meter: Math.max(0, Math.min(100, approvalRate)),
+    },
+    {
+      label: "Turnaround",
+      value: `${formatNumber(turnaround)} jam`,
+      meta: "Rata-rata keputusan",
+      tone: "jade",
+    },
+    {
+      label: "Utilisasi anggaran",
+      value: `${formatNumber(budget)}%`,
+      meta: "Dari plafon periode",
+      meter: Math.max(0, Math.min(100, budget)),
+    },
+    {
+      label: "Varians MoM",
+      value: `${variance > 0 ? "+" : ""}${formatNumber(variance)}%`,
+      meta: "Dibanding bulan sebelumnya",
+      tone: variance < 0 ? "amber" : "jade",
+    },
+  ];
 
   const updateFilter = (key: keyof MisSearch, value: string) => {
     void navigate({
@@ -252,46 +414,66 @@ export default function MisPage() {
         />
       ) : (
         <>
-          <div className="stat-grid">
-            <Stat label="Klaim diajukan" value={totalSubmitted} meta="Seluruh cabang terlihat" />
-            <Stat
-              label="Klaim disetujui"
-              value={formatMoney(String(totalApprovedAmount))}
-              meta="Nominal final"
-            />
-            <Stat
-              label="Payroll dicairkan"
-              value={formatMoney(String(totalPayroll))}
-              meta="Batch disbursed dan partial"
-            />
-            <Stat
-              label="PPh 21 terkumpul"
-              value={formatMoney(String(totalTax))}
-              meta="Potongan karyawan"
-            />
+          <div className="kpi-grid">
+            {kpis.map((kpi) => (
+              <article className="kpi-card" key={kpi.label}>
+                <div className="kpi-card__top">
+                  <span className="kpi-card__label">{kpi.label}</span>
+                  <span className={`kpi-card__icon kpi-card__icon--${kpi.tone}`}>{kpi.icon}</span>
+                </div>
+                <div className="kpi-card__value">{kpi.value}</div>
+                <div className="kpi-card__footer">
+                  <span>{kpi.meta}</span>
+                  {kpi.trend.length > 1 ? (
+                    <Sparkline
+                      values={kpi.trend}
+                      tone={kpi.tone}
+                      label={`Tren ${kpi.label.toLowerCase()}`}
+                    />
+                  ) : (
+                    <span className="kpi-card__period">1 periode</span>
+                  )}
+                </div>
+              </article>
+            ))}
           </div>
 
-          <div className="metric-strip">
-            <div>
-              <span className="micro">Approval rate</span>
-              <strong>{formatNumber(approvalRate)} persen</strong>
-            </div>
-            <div>
-              <span className="micro">Turnaround</span>
-              <strong>{formatNumber(turnaround)} jam</strong>
-            </div>
-            <div>
-              <span className="micro">Utilisasi anggaran</span>
-              <strong>{formatNumber(budget)} persen</strong>
-            </div>
-            <div>
-              <span className="micro">Varians MoM</span>
-              <strong className={variance < 0 ? "variance__down" : undefined}>
-                {variance > 0 ? "+" : ""}
-                {formatNumber(variance)} persen
-              </strong>
-            </div>
-          </div>
+          <section className="mis-health" aria-label="Kesehatan operasional">
+            {health.map((metric) => (
+              <div className="mis-health__item" key={metric.label}>
+                <div className="mis-health__head">
+                  <span className="mis-health__label">{metric.label}</span>
+                  {metric.label === "Turnaround" ? (
+                    <Clock3 size={14} aria-hidden="true" />
+                  ) : metric.label === "Varians MoM" ? (
+                    variance < 0 ? (
+                      <ArrowDownRight size={14} aria-hidden="true" />
+                    ) : (
+                      <ArrowUpRight size={14} aria-hidden="true" />
+                    )
+                  ) : null}
+                </div>
+                <strong
+                  className={metric.tone === "amber" ? "mis-health__value--amber" : undefined}
+                >
+                  {metric.value}
+                </strong>
+                {metric.meter === undefined ? (
+                  <span className="mis-health__meta">{metric.meta}</span>
+                ) : (
+                  <>
+                    <span className="mis-health__meter" aria-hidden="true">
+                      <span
+                        className="mis-health__meter-fill"
+                        style={{ width: `${Math.max(2, metric.meter)}%` }}
+                      />
+                    </span>
+                    <span className="mis-health__meta">{metric.meta}</span>
+                  </>
+                )}
+              </div>
+            ))}
+          </section>
 
           <div className="stack">
             <section className="panel">
@@ -342,14 +524,31 @@ export default function MisPage() {
                     {summary.map((row) => (
                       <tr key={row.branchId}>
                         <td>
-                          <div className="table__primary">{row.branchCode}</div>
-                          <div className="table__secondary">{row.branchName}</div>
+                          <div className="branch-cell">
+                            <span className="branch-mark" aria-hidden="true">
+                              <Building2 size={14} />
+                            </span>
+                            <span className="branch-copy">
+                              <span className="branch-name">{row.branchName}</span>
+                              <span className="branch-code mono">{row.branchCode}</span>
+                            </span>
+                          </div>
                         </td>
                         <td className="numeric">{row.totalClaimsSubmitted}</td>
                         <td className="numeric col-hide-sm">
                           {formatMoney(row.totalClaimsApprovedAmount)}
                         </td>
-                        <td className="numeric">{formatNumber(row.claimApprovalRatePct)}%</td>
+                        <td className="approval-cell">
+                          <span>{formatNumber(row.claimApprovalRatePct)}%</span>
+                          <span className="approval-meter" aria-hidden="true">
+                            <span
+                              className="approval-meter__fill"
+                              style={{
+                                width: `${Math.max(2, Math.min(100, row.claimApprovalRatePct))}%`,
+                              }}
+                            />
+                          </span>
+                        </td>
                         <td className="numeric col-hide-sm">
                           {formatNumber(row.avgTurnaroundHours)} jam
                         </td>
@@ -360,8 +559,15 @@ export default function MisPage() {
                         <td
                           className={`numeric col-hide-sm ${row.momVariancePct < 0 ? "variance__down" : ""}`}
                         >
-                          {row.momVariancePct > 0 ? "+" : ""}
-                          {formatNumber(row.momVariancePct)}%
+                          <span className="variance-cell">
+                            {row.momVariancePct < 0 ? (
+                              <TrendingDown size={12} aria-hidden="true" />
+                            ) : row.momVariancePct > 0 ? (
+                              <TrendingUp size={12} aria-hidden="true" />
+                            ) : null}
+                            {row.momVariancePct > 0 ? "+" : ""}
+                            {formatNumber(row.momVariancePct)}%
+                          </span>
                         </td>
                         <td>
                           <div className="row" style={{ justifyContent: "flex-end" }}>
@@ -397,8 +603,18 @@ export default function MisPage() {
                 {summary.map((row) => (
                   <div className="mis-card" key={row.branchId}>
                     <div className="mis-card__top">
-                      <span className="mis-card__code">{row.branchCode}</span>
-                      <span className="small muted">{row.branchName}</span>
+                      <div className="branch-cell">
+                        <span className="branch-mark" aria-hidden="true">
+                          <Building2 size={14} />
+                        </span>
+                        <span className="branch-copy">
+                          <span className="branch-name">{row.branchName}</span>
+                          <span className="branch-code mono">{row.branchCode}</span>
+                        </span>
+                      </div>
+                      <span className="small muted">
+                        {formatNumber(row.claimApprovalRatePct)}% approval
+                      </span>
                     </div>
                     <div className="mis-card__grid">
                       <div>
