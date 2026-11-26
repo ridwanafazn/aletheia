@@ -5,6 +5,7 @@ import {
   ArrowLeft,
   Calculator,
   CheckCircle2,
+  FileText,
   RefreshCw,
   ShieldCheck,
   Wallet,
@@ -33,6 +34,7 @@ import {
 } from "../../shared/lib/format";
 import { useAuth } from "../auth/AuthProvider";
 import { listAllEmployees } from "../employees/api";
+import { requestPayslips } from "../reports/api";
 import {
   approvePayrollBatch,
   calculatePayrollBatch,
@@ -64,6 +66,7 @@ export default function PayrollBatchPage() {
 
   const [notice, setNotice] = useState<string | null>(null);
   const [calculateError, setCalculateError] = useState<unknown>(null);
+  const [payslipError, setPayslipError] = useState<unknown>(null);
   const [approveOpen, setApproveOpen] = useState(false);
   const [disburseOpen, setDisburseOpen] = useState(false);
   const [approveKey, setApproveKey] = useState("");
@@ -157,6 +160,21 @@ export default function PayrollBatchPage() {
     },
   });
 
+  const payslipMutation = useMutation({
+    mutationFn: (idempotencyKey: string) => requestPayslips(batchId, idempotencyKey),
+    onSuccess: (result) => {
+      setPayslipError(null);
+      setNotice(
+        `Slip gaji masuk antrean untuk ${result.data.item_count} personel. Buka menu Slip Gaji untuk melihat hasilnya.`,
+      );
+      void queryClient.invalidateQueries({ queryKey: ["payslips"] });
+    },
+    onError: (error) => {
+      setNotice(null);
+      setPayslipError(error);
+    },
+  });
+
   if (batchQuery.isPending) {
     return <SkeletonTable rows={7} />;
   }
@@ -200,6 +218,8 @@ export default function PayrollBatchPage() {
   const canCalculate = hasRole("HR_SPECIALIST") && batch!.status === "DRAFT";
   const canApprove = hasRole("FINANCE_MANAGER") && batch!.status === "READY_FOR_APPROVAL" && !maker;
   const canDisburse = hasRole("FINANCE_MANAGER") && batch!.status === "APPROVED";
+  const canRequestPayslips =
+    hasRole("HR_SPECIALIST") && ["APPROVED", "DISBURSED"].includes(batch!.status);
   const currentStep = STEPS.findIndex((step) => step.statuses.includes(batch!.status));
   const failed = ["FAILED", "PARTIAL", "REJECTED", "CANCELLED"].includes(batch!.status);
 
@@ -270,6 +290,13 @@ export default function PayrollBatchPage() {
         <Banner tone="danger" title="Kalkulasi gagal dimulai">
           {calculateError instanceof ApiError
             ? calculateError.message
+            : "Periksa koneksi lalu coba lagi"}
+        </Banner>
+      )}
+      {payslipError === null ? null : (
+        <Banner tone="danger" title="Slip gaji gagal dibuat">
+          {payslipError instanceof ApiError
+            ? payslipError.message
             : "Periksa koneksi lalu coba lagi"}
         </Banner>
       )}
@@ -526,6 +553,16 @@ export default function PayrollBatchPage() {
                   }}
                 >
                   Cairkan batch
+                </Button>
+              ) : null}
+              {canRequestPayslips ? (
+                <Button
+                  variant="secondary"
+                  icon={<FileText size={15} />}
+                  loading={payslipMutation.isPending}
+                  onClick={() => payslipMutation.mutate(crypto.randomUUID())}
+                >
+                  Buat slip gaji
                 </Button>
               ) : null}
               {batch!.status === "READY_FOR_APPROVAL" && maker && hasRole("FINANCE_MANAGER") ? (
