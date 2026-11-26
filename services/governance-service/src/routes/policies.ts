@@ -5,6 +5,7 @@ import {
   ApprovePolicyRequestSchema,
   ClaimsPolicySchema,
   IsoDateTimeSchema,
+  PayrollCostPolicySchema,
   PayrollPolicySchema,
   PolicyDomainSchema,
   PolicyListQuerySchema,
@@ -24,7 +25,7 @@ import { requireRoles } from "../middleware/authorize.js";
 interface PolicyRow {
   id: string;
   tenant_id: string;
-  domain: "CLAIMS_POLICY" | "PAYROLL_TAX_POLICY";
+  domain: "CLAIMS_POLICY" | "PAYROLL_TAX_POLICY" | "PAYROLL_COST_POLICY";
   version_tag: string;
   status: "DRAFT" | "ACTIVE" | "ARCHIVED";
   rules_payload: Record<string, unknown>;
@@ -115,7 +116,12 @@ policyRouter.get("/active/:domain", async (request, response) => {
 policyRouter.post("/", requireRoles("COMPLIANCE_ADMIN"), async (request, response) => {
   const auth = request.auth!;
   const input = CreatePolicyEnvelopeSchema.parse(request.body);
-  const rulesSchema = input.domain === "CLAIMS_POLICY" ? ClaimsPolicySchema : PayrollPolicySchema;
+  const rulesSchema =
+    input.domain === "CLAIMS_POLICY"
+      ? ClaimsPolicySchema
+      : input.domain === "PAYROLL_COST_POLICY"
+        ? PayrollCostPolicySchema
+        : PayrollPolicySchema;
   const rulesResult = rulesSchema.safeParse(input.rules_payload);
   if (!rulesResult.success) {
     const firstIssue = rulesResult.error.issues[0];

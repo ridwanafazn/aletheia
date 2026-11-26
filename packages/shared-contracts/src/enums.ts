@@ -11,7 +11,11 @@ export const RoleSchema = z.enum([
 ]);
 export type Role = z.infer<typeof RoleSchema>;
 
-export const PolicyDomainSchema = z.enum(["CLAIMS_POLICY", "PAYROLL_TAX_POLICY"]);
+export const PolicyDomainSchema = z.enum([
+  "CLAIMS_POLICY",
+  "PAYROLL_TAX_POLICY",
+  "PAYROLL_COST_POLICY",
+]);
 export type PolicyDomain = z.infer<typeof PolicyDomainSchema>;
 
 export const PolicyStatusSchema = z.enum(["DRAFT", "ACTIVE", "ARCHIVED"]);
@@ -122,8 +126,21 @@ export const ReportTypeSchema = z.enum([
   "BPJS_MONTHLY",
   "BANK_FILE",
   "PAYROLL_VARIANCE",
+  "PAYROLL_COST_INVOICE",
 ]);
 export type ReportType = z.infer<typeof ReportTypeSchema>;
+
+export const TenantPlanSchema = z.enum(["BASIC", "HRIS_PLUS", "HRIS_PRO", "ENTERPRISE"]);
+export type TenantPlan = z.infer<typeof TenantPlanSchema>;
+
+export const TenantFeatureSchema = z.enum([
+  "PAYROLL_CORE",
+  "EMPLOYEE_SELF_SERVICE",
+  "REIMBURSEMENT",
+  "ORGANIZATION",
+  "PAYROLL_COST_INVOICE",
+]);
+export type TenantFeature = z.infer<typeof TenantFeatureSchema>;
 
 export const ReportStatusSchema = z.enum(["QUEUED", "GENERATING", "READY", "FAILED"]);
 export type ReportStatus = z.infer<typeof ReportStatusSchema>;

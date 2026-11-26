@@ -20,7 +20,8 @@ import {
 } from "lucide-react";
 
 import { useAuth } from "../features/auth/AuthProvider";
-import { roleLabel, initials } from "../shared/lib/format";
+import { hasFeature, useTenantProfile } from "../features/tenant/api";
+import { roleLabel, initials, tenantPlanLabel } from "../shared/lib/format";
 import { Button } from "../shared/ui";
 
 interface NavItem {
@@ -40,6 +41,7 @@ interface NavItem {
   label: string;
   icon: typeof LayoutList;
   roles: string[];
+  feature?: "ORGANIZATION";
 }
 
 interface NavGroup {
@@ -126,6 +128,7 @@ const NAV_GROUPS: NavGroup[] = [
           "COMPLIANCE_ADMIN",
           "MIS_ANALYST",
         ],
+        feature: "ORGANIZATION",
       },
     ],
   },
@@ -226,6 +229,8 @@ function titleFor(pathname: string): string {
 
 export function AppShell() {
   const { status, user, logout, hasRole } = useAuth();
+  const tenantQuery = useTenantProfile(status === "authenticated");
+  const tenant = tenantQuery.data?.data;
   const navigate = useNavigate();
   const pathname = useRouterState({ select: (state) => state.location.pathname });
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -245,7 +250,11 @@ export function AppShell() {
 
   const visibleGroups = NAV_GROUPS.map((group) => ({
     ...group,
-    items: group.items.filter((item) => item.roles.includes(user.role)),
+    items: group.items.filter(
+      (item) =>
+        item.roles.includes(user.role) &&
+        (item.feature === undefined || hasFeature(tenant, item.feature)),
+    ),
   })).filter((group) => group.items.length > 0);
 
   return (
@@ -357,6 +366,11 @@ export function AppShell() {
                 Kepatuhan aktif
               </span>
             ) : null}
+            {tenant === undefined ? null : (
+              <span className="chip" title="Paket tenant">
+                {tenantPlanLabel(tenant.plan)}
+              </span>
+            )}
             <span className="chip">{roleLabel(user.role)}</span>
           </div>
         </header>

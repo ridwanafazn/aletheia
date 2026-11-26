@@ -1,6 +1,11 @@
 import type { QueryResult, QueryResultRow } from "pg";
 
-import { PayrollPolicySchema, type PayrollPolicy } from "@aletheia/shared-contracts";
+import {
+  PayrollCostPolicySchema,
+  PayrollPolicySchema,
+  type PayrollCostPolicy,
+  type PayrollPolicy,
+} from "@aletheia/shared-contracts";
 
 import { ApiError } from "./errors.js";
 
@@ -15,6 +20,12 @@ export interface BoundPayrollPolicy {
   id: string;
   versionTag: string;
   rules: PayrollPolicy;
+}
+
+export interface BoundPayrollCostPolicy {
+  id: string;
+  versionTag: string;
+  rules: PayrollCostPolicy;
 }
 
 interface PolicyRow {
@@ -57,6 +68,37 @@ export async function getActivePayrollPolicy(
     [tenantId],
   );
   return parsePolicy(result.rows[0]);
+}
+
+export async function getActivePayrollCostPolicy(
+  queryable: Queryable,
+  tenantId: string,
+): Promise<BoundPayrollCostPolicy> {
+  const result = await queryable.query<PolicyRow>(
+    `select id, version_tag, rules_payload
+       from governance.policy_versions
+      where tenant_id = $1
+        and domain = 'PAYROLL_COST_POLICY'
+        and status = 'ACTIVE'
+      limit 1`,
+    [tenantId],
+  );
+  const row = result.rows[0];
+  if (row === undefined) {
+    throw ApiError.policyViolation("Kebijakan biaya payroll tidak ditemukan");
+  }
+  const parsed = PayrollCostPolicySchema.safeParse(row.rules_payload);
+  if (!parsed.success) {
+    const issue = parsed.error.issues[0];
+    const location =
+      issue === undefined || issue.path.length === 0
+        ? "rules_payload"
+        : `rules_payload.${issue.path.join(".")}`;
+    throw ApiError.policyViolation(
+      `Kebijakan biaya payroll tidak lengkap atau tidak valid pada ${location}`,
+    );
+  }
+  return { id: row.id, versionTag: row.version_tag, rules: parsed.data };
 }
 
 export async function getBoundPayrollPolicy(

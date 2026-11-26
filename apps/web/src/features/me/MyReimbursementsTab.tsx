@@ -129,7 +129,7 @@ export function MyReimbursementsTab() {
         </Banner>
       )}
 
-      <div className="grid-sidebar">
+      <div className="grid-sidebar reimburse-layout">
         <section className="panel">
           <div className="panel__header">
             <div>
@@ -277,9 +277,6 @@ export function MyReimbursementsTab() {
                     <th scope="col" className="numeric">
                       Nominal
                     </th>
-                    <th scope="col" className="col-hide-sm">
-                      Deskripsi
-                    </th>
                     <th scope="col">Status</th>
                   </tr>
                 </thead>
@@ -287,11 +284,13 @@ export function MyReimbursementsTab() {
                   {items.map((item) => (
                     <tr key={item.id}>
                       <td>{formatDate(item.expense_date)}</td>
-                      <td>{reimbursementCategoryLabel(item.category)}</td>
+                      <td>
+                        <div>{reimbursementCategoryLabel(item.category)}</div>
+                        <div className="table__secondary small">{item.description}</div>
+                      </td>
                       <td className="numeric">
                         <Money value={item.amount} />
                       </td>
-                      <td className="col-hide-sm small">{item.description}</td>
                       <td>
                         <StatusBadge status={item.status} />
                       </td>

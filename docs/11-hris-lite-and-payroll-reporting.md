@@ -20,6 +20,8 @@
 | Reporting | PPh 21 bulanan/tahunan, BPJS, bank file, variance | BI self-service, data warehouse |
 | Reimburse | pengajuan, bukti, approval, pembayaran mock | integrasi bank/accounting |
 | Organisasi | departemen, posisi, penugasan, halaman read-only | org chart interaktif dan CRUD penuh |
+| Paket tenant | BASIC, HRIS+, HRIS Pro, Enterprise dan feature gating | billing dan self-service plan management |
+| Invoice biaya | BJO, management fee, pembulatan, CSV per cabang | jurnal akuntansi dan integrasi bank |
 | Multi-tenant | `tenant_id` + RLS | billing tenant, self-service signup |
 
 **Alasan:** cukup untuk memenuhi makna "HRIS & payroll" di lowongan, tanpa tenggelam dalam absensi/shift yang tidak diminta.
@@ -396,6 +398,7 @@ Semua mutasi finansial memakai `Idempotency-Key`; semua endpoint memakai tenant/
 - [x] Semua perhitungan memakai policy version yang terikat.
 - [x] Employee self-service untuk slip, absensi, saldo cuti, e-cuti, dan e-lembur (M6.4).
 - [x] Reimburse dan struktur organisasi read-only (M6.5).
+- [x] Paket tenant dan invoice biaya payroll (M6.6).
 - [ ] Persetujuan cuti otomatis memperbarui attendance summary payroll.
 - [x] Tidak ada PII mentah di UI/log/ekspor.
 - [ ] Test U-01..U-20 + I-08..I-10 lulus.

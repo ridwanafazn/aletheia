@@ -7,6 +7,7 @@ import {
 import { Router, type Router as RouterType } from "express";
 
 import { sendData } from "../lib/response.js";
+import { requireTenantFeature } from "../lib/tenant-plan.js";
 import { requireRoles } from "../middleware/authorize.js";
 
 interface DepartmentRow {
@@ -46,6 +47,8 @@ function toPerson(row: PersonnelRow): OrganizationPerson {
 
 export const organizationRouter: RouterType = Router();
 
+organizationRouter.use(requireTenantFeature("ORGANIZATION"));
+
 organizationRouter.get(
   "/",
   requireRoles(
@@ -74,8 +77,9 @@ organizationRouter.get(
            from payroll.personnel
           where tenant_id = $1 and is_active = true
             and personnel_code not like 'LOAD-%'
+            and ($2::uuid is null or branch_id = $2)
           order by full_name asc`,
-        [auth.tenantId],
+        [auth.tenantId, auth.role === "BRANCH_MANAGER" ? auth.branchId : null],
       ),
     ]);
 

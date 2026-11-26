@@ -14,6 +14,7 @@ export const REPORT_TYPE_OPTIONS: ReadonlyArray<ReportTypeOption> = [
   { value: "BPJS_MONTHLY", label: "BPJS bulanan", periodMode: "month" },
   { value: "BANK_FILE", label: "Berkas transfer bank", periodMode: "month" },
   { value: "PAYROLL_VARIANCE", label: "Varians payroll", periodMode: "month" },
+  { value: "PAYROLL_COST_INVOICE", label: "Invoice biaya payroll", periodMode: "month" },
 ];
 
 export function reportPeriod(input: { reportType: ReportType; month: string; year: string }): {

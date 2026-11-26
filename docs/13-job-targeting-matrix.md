@@ -16,7 +16,7 @@
 | Target setelah implementasi | 120%+ | 120%+ |
 | Gap yang tidak bisa ditutup proyek | Pengalaman formal 2 tahun | — |
 
-**Kesimpulan:** seluruh requirement teknis dan preferred qualification sudah diimplementasikan dengan artefak yang dapat diperiksa: kode, test, screenshot, video 2:16, load test, query plan, security evidence, live URL production, dan Neon production. J1-R1 (gelar) dan J1-R2 (pengalaman formal 2 tahun) tetap `N/A` dan dikompensasi dengan portfolio. UI payslip dan laporan selesai di M6.3. Employee self-service, e-cuti, dan e-lembur selesai di M6.4. Reimburse dan struktur organisasi selesai di M6.5. Gap berikutnya adalah **performance review, CRUD organisasi, dan integrasi cuti ke attendance summary**; itu dicatat sebagai backlog, bukan diklaim sebagai fitur yang sudah ada.
+**Kesimpulan:** seluruh requirement teknis dan preferred qualification sudah diimplementasikan dengan artefak yang dapat diperiksa: kode, test, screenshot, video 2:16, load test, query plan, security evidence, live URL production, dan Neon production. J1-R1 (gelar) dan J1-R2 (pengalaman formal 2 tahun) tetap `N/A` dan dikompensasi dengan portfolio. UI payslip dan laporan selesai di M6.3. Employee self-service, e-cuti, dan e-lembur selesai di M6.4. Reimburse dan struktur organisasi selesai di M6.5. Paket tenant dan invoice biaya payroll selesai di M6.6. Gap berikutnya adalah **performance review, CRUD organisasi, pengaturan paket, dan integrasi cuti ke attendance summary**; itu dicatat sebagai backlog, bukan diklaim sebagai fitur yang sudah ada.
 
 ## 1. Metode Penilaian
 
@@ -49,7 +49,7 @@
 | J1-P3 | **Large-scale & anti-duplikasi** | Goroutine pool, idempotency, `FOR UPDATE` | `02`, `04` | 4 | Go worker pool, idempotency, constraint, dan row lock live; batch 500 dalam 214 ms |
 | J1-P4 | **Docker/CI-CD/cloud** | Multi-stage, GH Actions, deploy | `05`, `12` | 3 | Docker multi-stage, image scan, CI/Security hijau, Cloudflare Pages/Workers, 4 service Render, Neon production; smoke 15/15 dan rollback drills lulus |
 
-**Kesimpulan Job 1:** implementasi dan bukti sudah mencakup **semua** requirement teknis; HRIS-lite menutup gap "HRIS". Live URL production aktif. UI payslip dan laporan selesai di M6.3. ESS, e-cuti, dan e-lembur selesai di M6.4. Reimburse dan struktur organisasi selesai di M6.5. Residual gap: performance review, org chart visual, dan integrasi cuti ke attendance summary.
+**Kesimpulan Job 1:** implementasi dan bukti sudah mencakup **semua** requirement teknis; HRIS-lite menutup gap "HRIS". Live URL production aktif. UI payslip dan laporan selesai di M6.3. ESS, e-cuti, dan e-lembur selesai di M6.4. Reimburse dan struktur organisasi selesai di M6.5. Paket tenant dan invoice biaya payroll selesai di M6.6. Residual gap: performance review, org chart visual, pengaturan paket, dan integrasi cuti ke attendance summary.
 
 ### 2A. Cakupan Opsi Stack (Job 1)
 
@@ -121,6 +121,7 @@ Lowongan memakai frasa "at least one of" dan "one of", jadi pilihan berikut seng
 | ~~P1~~ | ~~UI payslip dan laporan~~ | Selesai 26 November 2026, M6.3 | `/payslips`, `/reports`, dan tombol buat slip di detail batch |
 | ~~P1~~ | ~~Employee self-service, e-cuti, e-lembur~~ | Selesai 26 November 2026, M6.4 | `/me`, `/workforce`, saldo cuti, dan pengajuan lembur; bukti `docs/evidence/m6.4-verification.md` |
 | ~~P1~~ | ~~Reimburse dan organization management~~ | Selesai 27 November 2026, M6.5 | Tab Reimburse, `/organization`, tabel departemen/posisi; bukti `docs/evidence/m6.5-verification.md` |
+| ~~P1~~ | ~~Paket tenant dan invoice biaya payroll~~ | Selesai 27 November 2026, M6.6 | Plan badge, feature gating, report `PAYROLL_COST_INVOICE`; bukti `docs/evidence/m6.6-verification.md` |
 | P1 | Integrasi cuti ke attendance summary | Persetujuan cuti belum otomatis mengubah ringkasan absensi payroll | Recompute paid/unpaid leave saat keputusan cuti |
 | P2 | Performance review dan org chart visual | Modul HRIS+ PRO dan BASIC belum lengkap | Bangun setelah core payroll stabil |
 | P1 | Video MP4/narasi | WebM diterima, tetapi MP4 lebih universal | Konversi dengan ffmpeg + narasi opsional |

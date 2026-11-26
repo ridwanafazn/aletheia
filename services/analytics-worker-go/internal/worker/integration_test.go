@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"log/slog"
 	"os"
+	"strings"
 	"testing"
 	"time"
 
@@ -20,6 +21,7 @@ const (
 	testClaimsPolicy    = "019361a2-7c00-7000-8000-000000000956"
 	testClaimsThreshold = "019361a2-7c00-7000-8000-000000000957"
 	testBulkBranch      = "019361a2-7c00-7000-8000-000000000958"
+	testCostPolicy      = "019361a2-7c00-7000-8000-000000000959"
 	testSiti            = "019361a2-7c00-7000-8000-000000000960"
 	testBudi            = "019361a2-7c00-7000-8000-000000000961"
 	testAgus            = "019361a2-7c00-7000-8000-000000000962"
@@ -142,6 +144,12 @@ const claimsPolicyJSON = `{
   }
 }`
 
+const costPolicyJSON = `{
+  "bjo_rate": "0.0250",
+  "management_fee_rate": "0.0500",
+  "invoice_rounding": "UP_1000"
+}`
+
 func integrationPool(t *testing.T) *pgxpool.Pool {
 	t.Helper()
 	if os.Getenv("RUN_WORKER_INTEGRATION") != "true" {
@@ -244,6 +252,18 @@ func seedTenant(t *testing.T, pool *pgxpool.Pool) {
 		testFinance,
 		testClaimsPolicy,
 		claimsPolicyJSON,
+	)
+	mustExec(t, pool,
+		`insert into governance.policy_versions
+		   (id, tenant_id, domain, version_tag, status, rules_payload, checksum_sha256,
+		    effective_from, published_by, approved_by)
+		 values ($1,$2,'PAYROLL_COST_POLICY','v2026.11.cost.worker','ACTIVE',$3,repeat('c',64),
+		         '2026-11-01T00:00:00Z',$4,$5)`,
+		testCostPolicy,
+		testTenant,
+		costPolicyJSON,
+		testHR,
+		testFinance,
 	)
 
 	hashes := func(seed string) string {
@@ -1020,5 +1040,91 @@ func TestIntegrationReportGenerate(t *testing.T) {
 	})
 	if err != nil || replay["skipped"] != true {
 		t.Fatalf("replay report %v %v", replay, err)
+	}
+}
+
+func TestIntegrationCostInvoiceReport(t *testing.T) {
+	pool := integrationPool(t)
+	defer pool.Close()
+	cleanupTenant(t, pool)
+	seedTenant(t, pool)
+	analyticsWorker := newTestWorker(t, pool)
+
+	if _, err := analyticsWorker.Handle(context.Background(), Event{
+		EventID:       "019361a2-7c00-7000-8000-0000000009c1",
+		EventType:     EventBatchCalculate,
+		TenantID:      testTenant,
+		CorrelationID: testCorrelation,
+		RequestedBy:   testHR,
+		BatchID:       testBatch,
+	}); err != nil {
+		t.Fatalf("batch calculate gagal: %v", err)
+	}
+	mustExec(t, pool, `update payroll.batches set status = 'DISBURSED' where tenant_id = $1 and id = $2`, testTenant, testBatch)
+	const reportID = "019361a2-7c00-7000-8000-0000000009c0"
+	mustExec(t, pool,
+		`insert into payroll.tax_reports
+		   (id, tenant_id, report_type, branch_id, policy_version_id, period_start, period_end,
+		    version, status, totals, generated_by)
+		 values ($1,$2,'PAYROLL_COST_INVOICE',$3,$4,'2026-11-01','2026-11-30',1,'QUEUED','{}',$5)`,
+		reportID, testTenant, testBranch, testCostPolicy, testHR,
+	)
+
+	result, err := analyticsWorker.Handle(context.Background(), Event{
+		EventID:       "019361a2-7c00-7000-8000-0000000009c2",
+		EventType:     EventReportGenerate,
+		TenantID:      testTenant,
+		CorrelationID: testCorrelation,
+		RequestedBy:   testHR,
+		ReportID:      reportID,
+		ReportType:    "PAYROLL_COST_INVOICE",
+	})
+	if err != nil {
+		t.Fatalf("cost invoice generate gagal: %v", err)
+	}
+	if result["status"] != "READY" {
+		t.Fatalf("status report %v", result["status"])
+	}
+
+	var totalsRaw []byte
+	if err := pool.QueryRow(
+		context.Background(),
+		`select totals from payroll.tax_reports where tenant_id = $1 and id = $2`,
+		testTenant, reportID,
+	).Scan(&totalsRaw); err != nil {
+		t.Fatal(err)
+	}
+	var fileName string
+	var fileSize int
+	var content []byte
+	if err := pool.QueryRow(
+		context.Background(),
+		`select file_name, file_size, content from payroll.generated_files
+		  where tenant_id = $1 and entity_id = $2`,
+		testTenant, reportID,
+	).Scan(&fileName, &fileSize, &content); err != nil {
+		t.Fatal(err)
+	}
+	var totals map[string]string
+	if err := json.Unmarshal(totalsRaw, &totals); err != nil {
+		t.Fatal(err)
+	}
+	if totals["bjo"] == "" || totals["management_fee"] == "" || totals["total_invoice"] == "" {
+		t.Fatalf("totals invoice tidak lengkap: %v", totals)
+	}
+	if !strings.HasSuffix(totals["total_invoice"], "000.00") {
+		t.Fatalf("invoice tidak dibulatkan ke 1000: %s", totals["total_invoice"])
+	}
+	text := string(content)
+	if !strings.Contains(text, "M32-01") ||
+		!strings.Contains(text, "total_invoice") ||
+		!strings.Contains(text, "# bjo_rate,0.0250") {
+		t.Fatalf("isi invoice tidak sesuai: %s", text)
+	}
+	if fileSize != len(content) || len(content) < 200 {
+		t.Fatalf("file invoice size=%d content=%d", fileSize, len(content))
+	}
+	if fileName != "payroll-cost-invoice-2026-11-v1.csv" {
+		t.Fatalf("nama file invoice %s", fileName)
 	}
 }

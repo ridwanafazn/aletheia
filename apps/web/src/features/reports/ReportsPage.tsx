@@ -25,6 +25,7 @@ import {
   reportTypeLabel,
 } from "../../shared/lib/format";
 import { useAuth } from "../auth/AuthProvider";
+import { hasFeature, useTenantProfile } from "../tenant/api";
 import { downloadReport, generateReport, listReports } from "./api";
 import { REPORT_TYPE_OPTIONS, reportPeriod } from "./model";
 import type { ReportSearch } from "./search";
@@ -48,14 +49,23 @@ function reportPeriodLabel(report: TaxReport): string {
 
 export default function ReportsPage() {
   const { hasRole } = useAuth();
+  const tenantQuery = useTenantProfile();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const search = useSearch({ strict: false }) as ReportSearch;
   const [notice, setNotice] = useState<string | null>(null);
   const [actionError, setActionError] = useState<unknown>(null);
 
-  const reportType = (search.type ?? "PPH21_MONTHLY") as ReportType;
-  const option = REPORT_TYPE_OPTIONS.find((item) => item.value === reportType);
+  const allowedOptions = REPORT_TYPE_OPTIONS.filter(
+    (item) =>
+      item.value !== "PAYROLL_COST_INVOICE" ||
+      hasFeature(tenantQuery.data?.data, "PAYROLL_COST_INVOICE"),
+  );
+  const requestedType = (search.type ?? "PPH21_MONTHLY") as ReportType;
+  const reportType = allowedOptions.some((item) => item.value === requestedType)
+    ? requestedType
+    : "PPH21_MONTHLY";
+  const option = allowedOptions.find((item) => item.value === reportType);
   const month = search.period ?? currentPeriod();
   const year = search.year ?? String(new Date().getFullYear());
   const period = reportPeriod({ reportType, month, year });
@@ -164,7 +174,7 @@ export default function ReportsPage() {
     <div className="stack">
       <PageHeader
         title="Laporan dan Ekspor"
-        description="Buat dan unduh PPh 21 bulanan dan tahunan, BPJS bulanan, berkas transfer bank, serta varians payroll."
+        description="Buat dan unduh PPh 21 bulanan dan tahunan, BPJS bulanan, berkas transfer bank, varians payroll, serta invoice biaya payroll."
         actions={
           <Button
             variant="secondary"
@@ -224,7 +234,7 @@ export default function ReportsPage() {
                   value={reportType}
                   onChange={(event) => updateFilter("type", event.target.value)}
                 >
-                  {REPORT_TYPE_OPTIONS.map((item) => (
+                  {allowedOptions.map((item) => (
                     <option key={item.value} value={item.value}>
                       {item.label}
                     </option>
@@ -349,7 +359,7 @@ export default function ReportsPage() {
                       Headcount
                     </th>
                     <th scope="col" className="numeric col-hide-sm">
-                      PPh 21
+                      {reportType === "PAYROLL_COST_INVOICE" ? "Total invoice" : "PPh 21"}
                     </th>
                     <th scope="col" className="col-hide-sm">
                       Checksum
@@ -379,7 +389,12 @@ export default function ReportsPage() {
                           <StatusBadge status={report.status} />
                         </td>
                         <td className="numeric col-hide-sm">{report.headcount}</td>
-                        <td className="numeric col-hide-sm">{formatMoney(report.total_pph21)}</td>
+                        <td className="numeric col-hide-sm">
+                          {report.report_type === "PAYROLL_COST_INVOICE" &&
+                          typeof report.totals.total_invoice === "string"
+                            ? formatMoney(report.totals.total_invoice)
+                            : formatMoney(report.total_pph21)}
+                        </td>
                         <td className="col-hide-sm mono small">
                           {report.file_checksum_sha256 === null
                             ? "Belum ada"

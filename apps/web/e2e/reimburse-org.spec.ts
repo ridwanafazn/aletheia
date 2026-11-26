@@ -90,9 +90,17 @@ test("organization structure shows departments, positions, and personnel", async
   await expect(page.getByText("Claims Operations").first()).toBeVisible();
   expect(await accessibilityViolations(page)).toEqual([]);
   await page.screenshot({ path: `${EVIDENCE}/organization.png`, fullPage: true });
+
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.reload();
+  await expect(page.getByRole("heading", { name: "Struktur Organisasi" })).toBeVisible();
+  await expect(page.getByText("Siti Aminah").first()).toBeVisible();
+  expect(await accessibilityViolations(page)).toEqual([]);
 });
 
-test("reimbursement route is hidden from employee and org is mobile usable", async ({ page }) => {
+test("reimbursement route is hidden from employee and mobile reimbursement is usable", async ({
+  page,
+}) => {
   await login(page, "Karyawan", "employee.siti@aletheia.id", "Ruang Saya");
   await expect(page.getByRole("link", { name: "Struktur Organisasi" })).toHaveCount(0);
 

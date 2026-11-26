@@ -24,6 +24,7 @@ import {
 } from "../../shared/lib/format";
 import { useAuth } from "../auth/AuthProvider";
 import { listAllEmployees } from "../employees/api";
+import { hasFeature, useTenantProfile } from "../tenant/api";
 import { DecisionDialog } from "./DecisionDialog";
 import {
   decideLeave,
@@ -39,6 +40,8 @@ type Tab = "leave" | "overtime" | "reimbursements";
 
 export default function WorkforcePage() {
   const { hasRole, user } = useAuth();
+  const tenantQuery = useTenantProfile();
+  const showReimbursements = hasFeature(tenantQuery.data?.data, "REIMBURSEMENT");
   const queryClient = useQueryClient();
   const [tab, setTab] = useState<Tab>("leave");
   const [branchId, setBranchId] = useState("");
@@ -89,6 +92,7 @@ export default function WorkforcePage() {
       listWorkforceReimbursements({
         ...(branchId.length === 0 ? {} : { branch_id: branchId }),
       }),
+    enabled: showReimbursements,
   });
 
   const leaveItems = leaveQuery.data?.data.items ?? [];
@@ -258,20 +262,22 @@ export default function WorkforcePage() {
             Lembur ({overtimeItems.length})
           </span>
         </button>
-        <button
-          type="button"
-          role="tab"
-          id="workforce-tab-reimbursements"
-          aria-selected={tab === "reimbursements"}
-          aria-controls="workforce-panel-reimbursements"
-          className="tabs__item"
-          onClick={() => setTab("reimbursements")}
-        >
-          <span className="row" style={{ gap: 6 }}>
-            <ReceiptText size={14} aria-hidden="true" />
-            Reimburse ({reimbursementItems.length})
-          </span>
-        </button>
+        {showReimbursements ? (
+          <button
+            type="button"
+            role="tab"
+            id="workforce-tab-reimbursements"
+            aria-selected={tab === "reimbursements"}
+            aria-controls="workforce-panel-reimbursements"
+            className="tabs__item"
+            onClick={() => setTab("reimbursements")}
+          >
+            <span className="row" style={{ gap: 6 }}>
+              <ReceiptText size={14} aria-hidden="true" />
+              Reimburse ({reimbursementItems.length})
+            </span>
+          </button>
+        ) : null}
       </div>
 
       {tab === "leave" ? (
@@ -448,7 +454,7 @@ export default function WorkforcePage() {
             </div>
           )}
         </section>
-      ) : (
+      ) : showReimbursements ? (
         <section
           className="panel"
           role="tabpanel"
@@ -556,7 +562,7 @@ export default function WorkforcePage() {
             </div>
           )}
         </section>
-      )}
+      ) : null}
 
       <DecisionDialog
         open={leaveTarget !== null}

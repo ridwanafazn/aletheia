@@ -289,7 +289,20 @@ export const PayrollPolicySchema = z
   .strict();
 export type PayrollPolicy = z.infer<typeof PayrollPolicySchema>;
 
-export const PolicyRulesSchema = z.union([ClaimsPolicySchema, PayrollPolicySchema]);
+export const PayrollCostPolicySchema = z
+  .object({
+    bjo_rate: DecimalRateSchema,
+    management_fee_rate: DecimalRateSchema,
+    invoice_rounding: z.enum(["NONE", "UP_1000", "NEAREST_1000"]),
+  })
+  .strict();
+export type PayrollCostPolicy = z.infer<typeof PayrollCostPolicySchema>;
+
+export const PolicyRulesSchema = z.union([
+  ClaimsPolicySchema,
+  PayrollPolicySchema,
+  PayrollCostPolicySchema,
+]);
 export type PolicyRules = z.infer<typeof PolicyRulesSchema>;
 
 const PolicyVersionBaseSchema = z.object({
@@ -314,9 +327,15 @@ export const PayrollPolicyVersionSchema = PolicyVersionBaseSchema.extend({
   rules_payload: PayrollPolicySchema,
 }).strict();
 
+export const PayrollCostPolicyVersionSchema = PolicyVersionBaseSchema.extend({
+  domain: z.literal("PAYROLL_COST_POLICY"),
+  rules_payload: PayrollCostPolicySchema,
+}).strict();
+
 export const PolicyVersionSchema = z.discriminatedUnion("domain", [
   ClaimsPolicyVersionSchema,
   PayrollPolicyVersionSchema,
+  PayrollCostPolicyVersionSchema,
 ]);
 export type PolicyVersion = z.infer<typeof PolicyVersionSchema>;
 
@@ -334,6 +353,14 @@ export const CreatePolicyRequestSchema = z.discriminatedUnion("domain", [
       domain: z.literal("PAYROLL_TAX_POLICY"),
       version_tag: z.string().min(3).max(32),
       rules_payload: PayrollPolicySchema,
+      effective_from: IsoDateTimeSchema,
+    })
+    .strict(),
+  z
+    .object({
+      domain: z.literal("PAYROLL_COST_POLICY"),
+      version_tag: z.string().min(3).max(32),
+      rules_payload: PayrollCostPolicySchema,
       effective_from: IsoDateTimeSchema,
     })
     .strict(),

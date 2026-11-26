@@ -12,6 +12,7 @@ import { auditRouter } from "./routes/audit.js";
 import { authRouter } from "./routes/auth.js";
 import { healthRouter } from "./routes/health.js";
 import { policyRouter } from "./routes/policies.js";
+import { tenantRouter } from "./routes/tenant.js";
 
 export function createApp(): express.Express {
   const app = express();
@@ -35,6 +36,7 @@ export function createApp(): express.Express {
   app.use(healthRouter);
   app.use("/api/v1/auth", authRouter);
   app.use("/api/v1/policies", policyRouter);
+  app.use("/api/v1/tenant", tenantRouter);
   app.use("/api/v1/audit-logs", auditRouter);
   app.use("/internal/v1/analytics", analyticsRouter);
   app.use("/api/v1/analytics", analyticsRouter);

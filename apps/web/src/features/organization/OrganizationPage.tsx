@@ -4,10 +4,12 @@ import { Building2, RefreshCw, Users } from "lucide-react";
 import { Button, EmptyState, ErrorState, PageHeader, SkeletonTable, Stat } from "../../shared/ui";
 import { employmentLabel, formatNumber, personnelTypeLabel } from "../../shared/lib/format";
 import { useAuth } from "../auth/AuthProvider";
+import { hasFeature, useTenantProfile } from "../tenant/api";
 import { getOrganization } from "./api";
 
 export default function OrganizationPage() {
   const { hasRole } = useAuth();
+  const tenantQuery = useTenantProfile();
   const query = useQuery({
     queryKey: ["organization"],
     queryFn: getOrganization,
@@ -34,6 +36,21 @@ export default function OrganizationPage() {
         <div className="panel__body">
           <h1>Akses terbatas</h1>
           <p className="muted">Struktur organisasi hanya tersedia untuk peran operasional.</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (tenantQuery.isPending) {
+    return <SkeletonTable rows={6} />;
+  }
+
+  if (!hasFeature(tenantQuery.data?.data, "ORGANIZATION")) {
+    return (
+      <div className="panel">
+        <div className="panel__body">
+          <h1>Fitur belum tersedia</h1>
+          <p className="muted">Struktur organisasi tersedia pada paket HRIS+ atau lebih tinggi.</p>
         </div>
       </div>
     );

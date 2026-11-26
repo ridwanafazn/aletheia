@@ -13,6 +13,7 @@ import { appendAudit } from "../lib/audit.js";
 import { ApiError } from "../lib/errors.js";
 import { decodeCursor, encodeCursor } from "../lib/pagination.js";
 import { sendData } from "../lib/response.js";
+import { requireTenantFeature } from "../lib/tenant-plan.js";
 import { requireRoles } from "../middleware/authorize.js";
 
 const IdParamSchema = z.string().uuid();
@@ -59,6 +60,8 @@ const SELECT_COLUMNS = `
   paid_at, created_at`;
 
 export const reimbursementRouter: RouterType = Router();
+
+reimbursementRouter.use(requireTenantFeature("REIMBURSEMENT"));
 
 reimbursementRouter.get(
   "/",
@@ -131,12 +134,12 @@ reimbursementRouter.post(
     try {
       await client.query("BEGIN");
       const existing = await client.query<
-        ReimbursementRow & { user_id: string | null; branch_id: string }
+        ReimbursementRow & { user_id: string | null; created_by: string; branch_id: string }
       >(
         `select r.id, r.personnel_id, r.category, r.expense_date::text as expense_date,
                 r.amount::text as amount, r.description, r.receipt_url, r.status,
                 r.decided_by, r.decided_at, r.decision_notes, r.paid_by, r.paid_at,
-                r.created_at, p.user_id, p.branch_id
+                r.created_at, r.created_by, p.user_id, p.branch_id
            from payroll.reimbursements r
            join payroll.personnel p on p.id = r.personnel_id and p.tenant_id = r.tenant_id
           where r.tenant_id = $1 and r.id = $2
@@ -150,7 +153,7 @@ reimbursementRouter.post(
       if (auth.role === "BRANCH_MANAGER" && row.branch_id !== auth.branchId) {
         throw ApiError.notFound("Reimburse tidak ditemukan");
       }
-      if (row.user_id !== null && row.user_id === auth.userId) {
+      if ((row.user_id !== null && row.user_id === auth.userId) || row.created_by === auth.userId) {
         throw new ApiError(403, "ERR_SOD_VIOLATION", "Tidak dapat memutuskan reimburse sendiri");
       }
       if (row.status !== "PENDING") {
@@ -206,16 +209,25 @@ reimbursementRouter.post("/:id/pay", requireRoles("FINANCE_MANAGER"), async (req
 
   try {
     await client.query("BEGIN");
-    const existing = await client.query<ReimbursementRow>(
-      `select ${SELECT_COLUMNS}
-           from payroll.reimbursements
-          where tenant_id = $1 and id = $2
-          for update`,
+    const existing = await client.query<
+      ReimbursementRow & { user_id: string | null; created_by: string; branch_id: string }
+    >(
+      `select r.id, r.personnel_id, r.category, r.expense_date::text as expense_date,
+              r.amount::text as amount, r.description, r.receipt_url, r.status,
+              r.decided_by, r.decided_at, r.decision_notes, r.paid_by, r.paid_at,
+              r.created_at, r.created_by, p.user_id, p.branch_id
+         from payroll.reimbursements r
+         join payroll.personnel p on p.id = r.personnel_id and p.tenant_id = r.tenant_id
+        where r.tenant_id = $1 and r.id = $2
+        for update of r`,
       [auth.tenantId, id],
     );
     const row = existing.rows[0];
     if (row === undefined) {
       throw ApiError.notFound("Reimburse tidak ditemukan");
+    }
+    if ((row.user_id !== null && row.user_id === auth.userId) || row.created_by === auth.userId) {
+      throw new ApiError(403, "ERR_SOD_VIOLATION", "Tidak dapat membayar reimburse sendiri");
     }
     if (row.status !== "APPROVED") {
       throw new ApiError(409, "ERR_PAYMENT_STATE_CONFLICT", "Reimburse belum disetujui");

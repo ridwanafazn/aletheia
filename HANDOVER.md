@@ -1,6 +1,6 @@
 # Aletheia — Handover
 
-* **Status:** M1–M5.4 live di production. Web, edge, empat service Render, Neon, Upstash QStash, dan Cloudinary aktif; smoke production 15/15 lulus; async QStash/worker terverifikasi; login tujuh peran, UI web, serta rollback edge, Pages, dan Render terverifikasi. M6.2 live dengan monitoring 24 jam berjalan via workflow Production Monitor. M6.3 menambahkan pusat slip gaji dan laporan di web. M6.4 menambahkan employee self-service, e-cuti, dan e-lembur. M6.5 menambahkan reimburse dan struktur organisasi.
+* **Status:** M1–M5.4 live di production. Web, edge, empat service Render, Neon, Upstash QStash, dan Cloudinary aktif; smoke production 15/15 lulus; async QStash/worker terverifikasi; login tujuh peran, UI web, serta rollback edge, Pages, dan Render terverifikasi. M6.2 live dengan monitoring 24 jam berjalan via workflow Production Monitor. M6.3 menambahkan pusat slip gaji dan laporan di web. M6.4 menambahkan employee self-service, e-cuti, dan e-lembur. M6.5 menambahkan reimburse dan struktur organisasi. M6.6 menambahkan paket tenant dan invoice biaya payroll.
 * **Tanggal handover:** 26 November 2026
 * **Data:** seluruhnya sintetis. Tidak ada uang nyata atau PII nyata.
 * **Server demo:** dihentikan. Nyalakan ulang dengan `bash scripts/dev-up.sh`.
@@ -19,7 +19,7 @@ Aletheia adalah platform governance pencairan klaim dan payroll dengan:
 * OpenTelemetry, Prometheus, Grafana, dan Jaeger untuk observability.
 * k6 untuk load test dan Playwright untuk E2E.
 
-**Yang sudah selesai:** M1 fondasi, M2 governance dan claims, M3 payroll dan disbursement, M4 MIS, M5.1 security hardening, M5.2 observability dan load test, M5.3 E2E/accessibility/final QA, M5.4 production live di Render/Neon/Cloudflare/Upstash/Cloudinary, M6.1 README/screenshot/video/CHANGELOG/job matrix, M6.3 pusat slip gaji dan laporan di web, M6.4 employee self-service, e-cuti, serta e-lembur, dan M6.5 reimburse serta struktur organisasi.
+**Yang sudah selesai:** M1 fondasi, M2 governance dan claims, M3 payroll dan disbursement, M4 MIS, M5.1 security hardening, M5.2 observability dan load test, M5.3 E2E/accessibility/final QA, M5.4 production live di Render/Neon/Cloudflare/Upstash/Cloudinary, M6.1 README/screenshot/video/CHANGELOG/job matrix, M6.3 pusat slip gaji dan laporan di web, M6.4 employee self-service, e-cuti, serta e-lembur, M6.5 reimburse serta struktur organisasi, dan M6.6 paket tenant serta invoice biaya payroll.
 
 **Yang belum selesai:**
 
@@ -266,6 +266,7 @@ Indeks lengkap ada di `docs/evidence/README.md`. Mulai dari:
 
 * `docs/evidence/m6.4-verification.md` — employee self-service, e-cuti, e-lembur, E2E, axe.
 * `docs/evidence/m6.5-verification.md` — reimburse, struktur organisasi, E2E, axe.
+* `docs/evidence/m6.6-verification.md` — paket tenant, feature gating, invoice biaya payroll, E2E, axe.
 * `docs/evidence/m6.3-verification.md` — pusat slip gaji, laporan, E2E, axe, bundle.
 * `docs/evidence/m6.1-verification.md` — README, screenshot, video 2:16, CHANGELOG, job matrix.
 * `docs/evidence/m5.3-verification.md` — E2E, axe, coverage, race.
@@ -287,6 +288,7 @@ Indeks lengkap ada di `docs/evidence/README.md`. Mulai dari:
 | UI payslip dan laporan | Selesai M6.3 | `/payslips`, `/reports`, dan tombol buat slip di detail batch; bukti `docs/evidence/m6.3-verification.md` |
 | Employee self-service, e-cuti, e-lembur | Selesai M6.4 | `/me` dan `/workforce`; bukti `docs/evidence/m6.4-verification.md` |
 | Reimburse dan struktur organisasi | Selesai M6.5 | `/me` tab Reimburse, `/workforce` tab Reimburse, dan `/organization`; bukti `docs/evidence/m6.5-verification.md` |
+| Paket tenant dan invoice biaya payroll | Selesai M6.6 | Plan BASIC/HRIS+/HRIS Pro/Enterprise, badge topbar, feature gating API, report `PAYROLL_COST_INVOICE`; bukti `docs/evidence/m6.6-verification.md` |
 | Performance review dan org chart visual | Terbuka | Modul HRIS berikutnya; jangan diklaim sebagai fitur yang sudah ada |
 | Integrasi cuti ke attendance summary | Terbuka | Persetujuan cuti belum otomatis mengubah ringkasan absensi payroll |
 | RUM LCP/INP belum ada | Terbuka | Tambah web-vitals atau RUM di task lanjutan |
@@ -324,13 +326,13 @@ Jalankan `bash scripts/dev-up.sh`; skrip memilih container 55432 atau Compose 54
 
 ## 12. Langkah berikutnya
 
-M6.1 selesai: lihat `README.md`, `docs/evidence/m6.1-verification.md`, dan `docs/evidence/m6.1/aletheia-demo.webm`. M6.3 selesai: lihat `docs/evidence/m6.3-verification.md`. M6.4 selesai: lihat `docs/evidence/m6.4-verification.md`. M6.5 selesai: lihat `docs/evidence/m6.5-verification.md`.
+M6.1 selesai: lihat `README.md`, `docs/evidence/m6.1-verification.md`, dan `docs/evidence/m6.1/aletheia-demo.webm`. M6.3 selesai: lihat `docs/evidence/m6.3-verification.md`. M6.4 selesai: lihat `docs/evidence/m6.4-verification.md`. M6.5 selesai: lihat `docs/evidence/m6.5-verification.md`. M6.6 selesai: lihat `docs/evidence/m6.6-verification.md`.
 
 M5.4 live, smoke 15/15, async QStash lulus, dan rollback edge/Pages/Render sudah diuji. Sisa M6.2:
 
 1. Monitoring 24 jam: `.github/workflows/production-monitor.yml` berjalan setiap 6 jam; butuh minimal 4 run sukses.
 2. Freeze deploy dan sign-off akhir.
 3. Tandai M6.2 selesai hanya setelah seluruh bukti terisi di `docs/evidence/m6.2-verification.md`.
-4. Setelah freeze dicabut, deploy M6.3–M6.5, lalu lanjut ke performance review, CRUD organisasi, dan integrasi cuti ke payroll.
+4. Setelah freeze dicabut, deploy M6.3–M6.6, lalu lanjut ke performance review, CRUD organisasi, pengaturan paket, dan integrasi cuti ke payroll.
 
 Untuk demo, jalankan `pnpm warm:production` lebih dulu.

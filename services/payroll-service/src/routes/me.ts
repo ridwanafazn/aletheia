@@ -36,6 +36,7 @@ import { ApiError } from "../lib/errors.js";
 import { decodeCursor, encodeCursor } from "../lib/pagination.js";
 import { signFileToken, signedFilePath } from "../lib/files.js";
 import { sendData } from "../lib/response.js";
+import { assertTenantFeature } from "../lib/tenant-plan.js";
 import {
   leaveYear,
   lockLeaveBalance,
@@ -553,6 +554,7 @@ meRouter.get("/overtime-requests", async (request, response) => {
 
 meRouter.post("/reimbursements/upload-signature", async (request, response) => {
   const auth = request.auth!;
+  await assertTenantFeature(auth.tenantId, "REIMBURSEMENT");
   const self = await selfOrThrow(auth.tenantId, auth.userId);
   ReimbursementUploadSignatureRequestSchema.parse(request.body);
   const signature = createReimbursementUploadSignature({
@@ -564,6 +566,7 @@ meRouter.post("/reimbursements/upload-signature", async (request, response) => {
 
 meRouter.get("/reimbursements", async (request, response) => {
   const auth = request.auth!;
+  await assertTenantFeature(auth.tenantId, "REIMBURSEMENT");
   const self = await selfOrThrow(auth.tenantId, auth.userId);
   const result = await pool.query<ReimbursementRow>(
     `select id, personnel_id, category, expense_date::text as expense_date,
@@ -585,6 +588,7 @@ meRouter.get("/reimbursements", async (request, response) => {
 
 meRouter.post("/reimbursements", async (request, response) => {
   const auth = request.auth!;
+  await assertTenantFeature(auth.tenantId, "REIMBURSEMENT");
   const self = await selfOrThrow(auth.tenantId, auth.userId);
   const input = ReimbursementCreateSchema.parse(request.body);
   if (input.receipt_url !== undefined) {

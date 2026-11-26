@@ -44,9 +44,16 @@ export const tenants = governance.table(
     code: varchar("code", { length: 24 }).notNull().unique(),
     name: varchar("name", { length: 120 }).notNull(),
     status: varchar("status", { length: 16 }).notNull().default("ACTIVE"),
+    plan: varchar("plan", { length: 16 }).notNull().default("ENTERPRISE"),
     createdAt: createdAt(),
   },
-  (table) => [check("tenants_status_check", sql`${table.status} in ('ACTIVE','SUSPENDED')`)],
+  (table) => [
+    check("tenants_status_check", sql`${table.status} in ('ACTIVE','SUSPENDED')`),
+    check(
+      "tenants_plan_check",
+      sql`${table.plan} in ('BASIC','HRIS_PLUS','HRIS_PRO','ENTERPRISE')`,
+    ),
+  ],
 );
 
 export const branches = governance.table(
@@ -153,7 +160,7 @@ export const policyVersions = governance.table(
     ),
     check(
       "policy_versions_domain_check",
-      sql`${table.domain} in ('CLAIMS_POLICY','PAYROLL_TAX_POLICY')`,
+      sql`${table.domain} in ('CLAIMS_POLICY','PAYROLL_TAX_POLICY','PAYROLL_COST_POLICY')`,
     ),
     check("policy_versions_status_check", sql`${table.status} in ('DRAFT','ACTIVE','ARCHIVED')`),
     check(
@@ -855,7 +862,7 @@ export const taxReports = payroll.table(
     ),
     check(
       "tax_reports_type_check",
-      sql`${table.reportType} in ('PPH21_MONTHLY','PPH21_ANNUAL','BPJS_MONTHLY','BANK_FILE','PAYROLL_VARIANCE')`,
+      sql`${table.reportType} in ('PPH21_MONTHLY','PPH21_ANNUAL','BPJS_MONTHLY','BANK_FILE','PAYROLL_VARIANCE','PAYROLL_COST_INVOICE')`,
     ),
     check(
       "tax_reports_status_check",

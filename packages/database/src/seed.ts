@@ -41,6 +41,7 @@ const U_EMPLOYEE = uid(28);
 const P_CLAIMS_OLD = uid(100);
 const P_CLAIMS_ACTIVE = uid(101);
 const P_PAYROLL_ACTIVE = uid(102);
+const P_PAYROLL_COST = uid(103);
 
 const PERSON_SITI = uid(200);
 const PERSON_BUDI = uid(201);
@@ -68,6 +69,7 @@ const PAYMENT_BUDI = uid(411);
 const PAYMENT_AGUS = uid(412);
 const PAYSLIP_SITI = uid(420);
 const REPORT_PPH21 = uid(430);
+const REPORT_COST = uid(431);
 const RECON_SITI = uid(440);
 const WHATIF = uid(450);
 const AUDIT_POLICY = uid(460);
@@ -75,6 +77,7 @@ const AUDIT_CLAIM = uid(461);
 const AUDIT_BATCH = uid(462);
 const FILE_PAYSLIP_SITI = uid(470);
 const FILE_REPORT_PPH21 = uid(471);
+const FILE_REPORT_COST = uid(472);
 const DEPT_FINANCE = uid(500);
 const DEPT_HR = uid(501);
 const DEPT_CLAIMS = uid(502);
@@ -98,6 +101,21 @@ const demoReportContent = Buffer.from(
   ].join("\n"),
 );
 const demoReportChecksum = sha256(demoReportContent);
+const demoCostInvoiceContent = Buffer.from(
+  [
+    "# report_type PAYROLL_COST_INVOICE",
+    "# period_start 2026-11-01",
+    "# period_end 2026-11-30",
+    "# policy v2026.11.cost",
+    "# bjo_rate 0.0250",
+    "# management_fee_rate 0.0500",
+    "# invoice_rounding UP_1000",
+    "branch_code,branch_name,headcount,gross,employer_bpjs,bjo,management_fee,total_invoice",
+    "BDG-01,Bandung,3,31000000.00,1926446.00,775000.00,1685072.30,35387000.00",
+    "",
+  ].join("\n"),
+);
+const demoCostInvoiceChecksum = sha256(demoCostInvoiceContent);
 
 const claimsPolicy = {
   approval_tiers: {
@@ -223,6 +241,12 @@ const payrollPolicy = {
   },
 };
 
+const costPolicy = {
+  bjo_rate: "0.0250",
+  management_fee_rate: "0.0500",
+  invoice_rounding: "UP_1000",
+};
+
 async function upsert(
   client: PoolClient,
   table: string,
@@ -286,12 +310,14 @@ async function main(): Promise<void> {
       code: "SAU",
       name: "Siaga Abdi Utama Demo",
       status: "ACTIVE",
+      plan: "HRIS_PRO",
     });
     await upsert(client, "governance.tenants", {
       id: T_BPUI,
       code: "BPUI",
       name: "BPUI Demo",
       status: "ACTIVE",
+      plan: "BASIC",
     });
 
     await upsert(client, "governance.branches", {
@@ -454,7 +480,7 @@ async function main(): Promise<void> {
       `update governance.policy_versions
           set status = 'ARCHIVED'
         where tenant_id = $1
-          and domain in ('CLAIMS_POLICY','PAYROLL_TAX_POLICY')
+          and domain in ('CLAIMS_POLICY','PAYROLL_TAX_POLICY','PAYROLL_COST_POLICY')
           and status = 'ACTIVE'`,
       [T_SAU],
     );
@@ -491,6 +517,18 @@ async function main(): Promise<void> {
       status: "ACTIVE",
       rules_payload: payrollPolicy,
       checksum_sha256: sha256(JSON.stringify(payrollPolicy)),
+      effective_from: "2026-11-01T00:00:00.000Z",
+      published_by: U_COMPLIANCE,
+      approved_by: U_FINANCE,
+    });
+    await upsert(client, "governance.policy_versions", {
+      id: P_PAYROLL_COST,
+      tenant_id: T_SAU,
+      domain: "PAYROLL_COST_POLICY",
+      version_tag: "v2026.11.cost",
+      status: "ACTIVE",
+      rules_payload: costPolicy,
+      checksum_sha256: sha256(JSON.stringify(costPolicy)),
       effective_from: "2026-11-01T00:00:00.000Z",
       published_by: U_COMPLIANCE,
       approved_by: U_FINANCE,
@@ -1265,6 +1303,52 @@ async function main(): Promise<void> {
       file_size: demoReportContent.length,
       content: demoReportContent,
       checksum_sha256: demoReportChecksum,
+    });
+
+    await upsert(client, "payroll.tax_reports", {
+      id: REPORT_COST,
+      tenant_id: T_SAU,
+      report_type: "PAYROLL_COST_INVOICE",
+      branch_id: BR_BDG,
+      policy_version_id: P_PAYROLL_COST,
+      period_start: "2026-11-01",
+      period_end: "2026-11-30",
+      version: 1,
+      status: "READY",
+      file_url: "https://res.cloudinary.com/demo/raw/upload/payroll-cost-invoice-2026-11.csv",
+      snapshot_hash_sha256: sha256("payroll-cost-invoice-2026-11-snapshot"),
+      file_checksum_sha256: demoCostInvoiceChecksum,
+      total_gross: "31000000.00",
+      total_employee_bpjs: "750423.00",
+      total_employer_bpjs: "1926446.00",
+      total_pph21: "740000.00",
+      total_net: "29509577.00",
+      headcount: 3,
+      reconciliation_delta: "0.00",
+      totals: {
+        branch_code: "BDG-01",
+        period: "2026-11",
+        bjo: "775000.00",
+        management_fee: "1685072.30",
+        total_invoice: "35387000.00",
+        bjo_rate: "0.0250",
+        management_fee_rate: "0.0500",
+        invoice_rounding: "UP_1000",
+      },
+      generated_by: U_FINANCE,
+      generated_at: "2026-11-24T10:05:00.000Z",
+    });
+
+    await upsert(client, "payroll.generated_files", {
+      id: FILE_REPORT_COST,
+      tenant_id: T_SAU,
+      kind: "REPORT",
+      entity_id: REPORT_COST,
+      file_name: "payroll-cost-invoice-2026-11.csv",
+      mime_type: "text/csv",
+      file_size: demoCostInvoiceContent.length,
+      content: demoCostInvoiceContent,
+      checksum_sha256: demoCostInvoiceChecksum,
     });
 
     await upsert(client, "payroll.tax_reconciliations", {

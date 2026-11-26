@@ -208,6 +208,13 @@ Route guard memeriksa `role`, `branch_id`, dan `tenant_id` dari sesi. Guard UI *
 - Reimburse memakai status `PENDING`, `APPROVED`, `REJECTED`, `PAID`; maker tidak dapat menyetujui pengajuannya sendiri.
 - Struktur organisasi memakai tabel `departments`, `positions`, dan kolom penugasan pada `personnel`.
 
+### 6.11 Paket Tenant dan Invoice Biaya Payroll
+
+- Badge paket tenant tampil di topbar: `Basic`, `HRIS+`, `HRIS Pro`, atau `Enterprise`.
+- Feature gating menyembunyikan tab Reimburse dan navigasi organisasi bila paket tidak mencakup fitur tersebut; API tetap menjadi otoritas dengan `ERR_PLAN_FEATURE_UNAVAILABLE`.
+- Halaman `/reports` menambahkan opsi `Invoice biaya payroll`, kolom total invoice, dan unduhan CSV.
+- Invoice memakai policy `PAYROLL_COST_POLICY` dan menampilkan BJO, management fee, serta pembulatan per cabang.
+
 ## 7. Form & Validasi
 
 - Semua schema berasal dari `packages/shared-contracts`; tidak ada duplikasi Zod di FE.

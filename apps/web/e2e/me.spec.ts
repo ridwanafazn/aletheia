@@ -200,7 +200,12 @@ test("HR workforce queue is accessible and mobile usable", async ({ page }) => {
   await login(page, "Spesialis SDM", "hr.ops@aletheia.id", "Konsol Payroll");
   await page.getByRole("link", { name: "Cuti dan Lembur" }).click();
   await expect(page.getByRole("heading", { name: "Cuti dan Lembur" })).toBeVisible();
-  await expect(page.getByRole("tab", { name: /Reimburse/ })).toBeVisible();
+  const reimburseTab = page.getByRole("tab", { name: /Reimburse/ });
+  await expect(reimburseTab).toBeVisible();
+  await reimburseTab.click();
+  await expect(reimburseTab).toHaveAttribute("aria-selected", "true");
+  expect(await accessibilityViolations(page)).toEqual([]);
+  await page.getByRole("tab", { name: /Cuti/ }).click();
   expect(await accessibilityViolations(page)).toEqual([]);
   await page.screenshot({ path: `${EVIDENCE}/workforce.png`, fullPage: true });
 

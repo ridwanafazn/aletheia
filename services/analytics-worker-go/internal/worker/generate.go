@@ -10,6 +10,7 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
+	"sort"
 	"strings"
 	"time"
 
@@ -483,6 +484,8 @@ type reportRow struct {
 	PTKPStatus       string
 	BankCode         string
 	BankMasked       string
+	BranchCode       string
+	BranchName       string
 	Gross            string
 	BPJSKesehatan    string
 	BPJSJHT          string
@@ -532,7 +535,7 @@ func (w *Worker) handleReportGenerate(ctx context.Context, event Event) (map[str
 	rows, err := w.pool.Query(
 		ctx,
 		`select p.id::text, p.personnel_code, p.full_name, p.nik_masked, p.ptkp_status,
-		        p.bank_code, p.bank_account_masked,
+		        p.bank_code, p.bank_account_masked, br.code, br.name,
 		        i.gross_income::text, i.bpjs_kesehatan_deduction::text,
 		        i.bpjs_jht_deduction::text, i.bpjs_jp_deduction::text,
 		        i.bpjs_kesehatan_employer::text, i.bpjs_jht_employer::text,
@@ -542,6 +545,7 @@ func (w *Worker) handleReportGenerate(ctx context.Context, event Event) (map[str
 		   from payroll.items i
 		   join payroll.batches b on b.id = i.batch_id and b.tenant_id = i.tenant_id
 		   join payroll.personnel p on p.id = i.personnel_id and p.tenant_id = i.tenant_id
+		   join governance.branches br on br.id = b.branch_id and br.tenant_id = i.tenant_id
 		  where i.tenant_id = $1
 		    and b.status in ('APPROVED','DISBURSING','DISBURSED','PARTIAL')
 		    and b.period_start <= $3::date
@@ -561,7 +565,8 @@ func (w *Worker) handleReportGenerate(ctx context.Context, event Event) (map[str
 		var row reportRow
 		if err := rows.Scan(
 			&row.PersonnelID, &row.PersonnelCode, &row.FullName, &row.NIKMasked, &row.PTKPStatus,
-			&row.BankCode, &row.BankMasked, &row.Gross, &row.BPJSKesehatan, &row.BPJSJHT,
+			&row.BankCode, &row.BankMasked, &row.BranchCode, &row.BranchName,
+			&row.Gross, &row.BPJSKesehatan, &row.BPJSJHT,
 			&row.BPJSJP, &row.BPJSKesehatanER, &row.BPJSJHTEr, &row.BPJSJPEr, &row.BPJSJKKEr,
 			&row.BPJSJKMEr, &row.PPH21, &row.Net, &row.TaxableIncome,
 		); err != nil {
@@ -586,6 +591,7 @@ func (w *Worker) handleReportGenerate(ctx context.Context, event Event) (map[str
 
 	var fileBytes []byte
 	var fileName string
+	var invoiceTotals map[string]string
 	switch source.ReportType {
 	case "PPH21_MONTHLY":
 		fileBytes, err = buildPPh21Report(source, data)
@@ -602,6 +608,9 @@ func (w *Worker) handleReportGenerate(ctx context.Context, event Event) (map[str
 	case "PAYROLL_VARIANCE":
 		fileBytes, err = w.buildVarianceReport(ctx, event.TenantID, source, data)
 		fileName = fmt.Sprintf("payroll-variance-%s-v%d.csv", source.PeriodStart.Format("2006-01"), source.Version)
+	case "PAYROLL_COST_INVOICE":
+		fileBytes, invoiceTotals, err = w.buildCostInvoiceReport(ctx, event.TenantID, source, data)
+		fileName = fmt.Sprintf("payroll-cost-invoice-%s-v%d.csv", source.PeriodStart.Format("2006-01"), source.Version)
 	default:
 		return nil, fmt.Errorf("report_type %s tidak didukung", source.ReportType)
 	}
@@ -611,6 +620,13 @@ func (w *Worker) handleReportGenerate(ctx context.Context, event Event) (map[str
 	fileChecksum := sha256Hex(fileBytes)
 	snapshotHash := reportSnapshotHash(source, data)
 	totals := reportTotals(data)
+	for key, value := range invoiceTotals {
+		totals[key] = value
+	}
+	totalsJSON, err := json.Marshal(totals)
+	if err != nil {
+		return nil, err
+	}
 	fileURL := fmt.Sprintf("/api/v1/reports/%s/download", source.ID)
 
 	tx, err := w.pool.Begin(ctx)
@@ -626,7 +642,7 @@ func (w *Worker) handleReportGenerate(ctx context.Context, event Event) (map[str
 		        file_checksum_sha256 = $5, total_gross = $6, total_employee_bpjs = $7,
 		        total_employer_bpjs = $8, total_pph21 = $9, total_net = $10,
 		        headcount = $11, generated_at = now(), error_message = null,
-		        source_event_id = $12
+		        source_event_id = $12, totals = $13
 		  where tenant_id = $1 and id = $2`,
 		event.TenantID,
 		source.ID,
@@ -640,6 +656,7 @@ func (w *Worker) handleReportGenerate(ctx context.Context, event Event) (map[str
 		totals["net"],
 		len(data),
 		event.EventID,
+		totalsJSON,
 	); err != nil {
 		return nil, err
 	}
@@ -871,6 +888,142 @@ func buildBankFile(source reportSource, data []reportRow) ([]byte, error) {
 		return nil, err
 	}
 	return buffer.Bytes(), nil
+}
+
+type costInvoicePolicy struct {
+	BjoRate           string `json:"bjo_rate"`
+	ManagementFeeRate string `json:"management_fee_rate"`
+	InvoiceRounding   string `json:"invoice_rounding"`
+}
+
+type costInvoiceBranch struct {
+	Code      string
+	Name      string
+	Headcount int
+	Gross     decimal.Decimal
+	Employer  decimal.Decimal
+}
+
+func (w *Worker) buildCostInvoiceReport(
+	ctx context.Context,
+	tenantID string,
+	source reportSource,
+	data []reportRow,
+) ([]byte, map[string]string, error) {
+	var rawPolicy []byte
+	if err := w.pool.QueryRow(
+		ctx,
+		`select rules_payload
+		   from governance.policy_versions
+		  where tenant_id = $1 and id = $2 and domain = 'PAYROLL_COST_POLICY'`,
+		tenantID,
+		source.PolicyVersionID,
+	).Scan(&rawPolicy); err != nil {
+		return nil, nil, fmt.Errorf("kebijakan biaya payroll tidak ditemukan: %w", err)
+	}
+	var policy costInvoicePolicy
+	if err := json.Unmarshal(rawPolicy, &policy); err != nil {
+		return nil, nil, err
+	}
+	bjoRate, err := decimal.NewFromString(policy.BjoRate)
+	if err != nil {
+		return nil, nil, fmt.Errorf("bjo_rate tidak valid: %w", err)
+	}
+	managementFeeRate, err := decimal.NewFromString(policy.ManagementFeeRate)
+	if err != nil {
+		return nil, nil, fmt.Errorf("management_fee_rate tidak valid: %w", err)
+	}
+
+	branches := map[string]*costInvoiceBranch{}
+	for _, row := range data {
+		branch := branches[row.BranchCode]
+		if branch == nil {
+			branch = &costInvoiceBranch{
+				Code:     row.BranchCode,
+				Name:     row.BranchName,
+				Gross:    decimal.Zero,
+				Employer: decimal.Zero,
+			}
+			branches[row.BranchCode] = branch
+		}
+		branch.Headcount++
+		branch.Gross = branch.Gross.Add(mustDecimal(row.Gross))
+		branch.Employer = branch.Employer.
+			Add(mustDecimal(row.BPJSKesehatanER)).
+			Add(mustDecimal(row.BPJSJHTEr)).
+			Add(mustDecimal(row.BPJSJPEr)).
+			Add(mustDecimal(row.BPJSJKKEr)).
+			Add(mustDecimal(row.BPJSJKMEr))
+	}
+
+	codes := make([]string, 0, len(branches))
+	for code := range branches {
+		codes = append(codes, code)
+	}
+	sort.Strings(codes)
+
+	buffer, writer := newCSV()
+	writeMetadata(writer, source)
+	_ = writer.Write([]string{"# bjo_rate", policy.BjoRate})
+	_ = writer.Write([]string{"# management_fee_rate", policy.ManagementFeeRate})
+	_ = writer.Write([]string{"# invoice_rounding", policy.InvoiceRounding})
+	_ = writer.Write([]string{
+		"branch_code", "branch_name", "headcount", "gross", "employer_bpjs",
+		"bjo", "management_fee", "total_invoice",
+	})
+
+	totalGross, totalEmployer := decimal.Zero, decimal.Zero
+	totalBjo, totalFee, totalInvoice := decimal.Zero, decimal.Zero, decimal.Zero
+	for _, code := range codes {
+		branch := branches[code]
+		bjo := branch.Gross.Mul(bjoRate).Round(2)
+		fee := branch.Gross.Add(branch.Employer).Add(bjo).Mul(managementFeeRate).Round(2)
+		invoice := roundInvoiceTotal(
+			branch.Gross.Add(branch.Employer).Add(bjo).Add(fee),
+			policy.InvoiceRounding,
+		)
+		totalGross = totalGross.Add(branch.Gross)
+		totalEmployer = totalEmployer.Add(branch.Employer)
+		totalBjo = totalBjo.Add(bjo)
+		totalFee = totalFee.Add(fee)
+		totalInvoice = totalInvoice.Add(invoice)
+		_ = writer.Write([]string{
+			branch.Code,
+			branch.Name,
+			fmt.Sprintf("%d", branch.Headcount),
+			branch.Gross.StringFixed(2),
+			branch.Employer.StringFixed(2),
+			bjo.StringFixed(2),
+			fee.StringFixed(2),
+			invoice.StringFixed(2),
+		})
+	}
+	writer.Flush()
+	if err := writer.Error(); err != nil {
+		return nil, nil, err
+	}
+	totals := map[string]string{
+		"gross":               totalGross.StringFixed(2),
+		"employer_bpjs":       totalEmployer.StringFixed(2),
+		"bjo":                 totalBjo.StringFixed(2),
+		"management_fee":      totalFee.StringFixed(2),
+		"total_invoice":       totalInvoice.StringFixed(2),
+		"bjo_rate":            policy.BjoRate,
+		"management_fee_rate": policy.ManagementFeeRate,
+		"invoice_rounding":    policy.InvoiceRounding,
+	}
+	return buffer.Bytes(), totals, nil
+}
+
+func roundInvoiceTotal(value decimal.Decimal, mode string) decimal.Decimal {
+	switch mode {
+	case "UP_1000":
+		return value.Div(decimal.NewFromInt(1000)).Ceil().Mul(decimal.NewFromInt(1000))
+	case "NEAREST_1000":
+		return value.Div(decimal.NewFromInt(1000)).Round(0).Mul(decimal.NewFromInt(1000))
+	default:
+		return value.Round(2)
+	}
 }
 
 func (w *Worker) buildVarianceReport(ctx context.Context, tenantID string, source reportSource, data []reportRow) ([]byte, error) {

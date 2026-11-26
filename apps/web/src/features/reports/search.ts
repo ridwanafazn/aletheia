@@ -12,7 +12,14 @@ export type PayslipSearch = z.infer<typeof payslipSearchSchema>;
 
 export const reportSearchSchema = z.object({
   type: z
-    .enum(["PPH21_MONTHLY", "PPH21_ANNUAL", "BPJS_MONTHLY", "BANK_FILE", "PAYROLL_VARIANCE"])
+    .enum([
+      "PPH21_MONTHLY",
+      "PPH21_ANNUAL",
+      "BPJS_MONTHLY",
+      "BANK_FILE",
+      "PAYROLL_VARIANCE",
+      "PAYROLL_COST_INVOICE",
+    ])
     .optional(),
   period: periodSchema.optional(),
   year: yearSchema.optional(),

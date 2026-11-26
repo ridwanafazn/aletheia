@@ -4,7 +4,7 @@
 
 Aletheia (Greek: *unconcealment*) is a reference implementation for governed money movement: customer claims, payroll, agent commissions, tax withholding, and cross-domain risk intelligence — built around **versioned policy references**, **zero double-disbursement**, and an **immutable audit trail**.
 
-> **Status:** M1–M5.4 live di production. Web, edge, empat service Render, Neon, Upstash QStash, dan Cloudinary aktif; smoke production **15/15 lulus**, async QStash/worker terverifikasi, login tujuh peran dan UI web terverifikasi, serta rollback edge, Pages, dan Render diuji. M6.1 portofolio siap (README, 8 screenshot, video 2:16, CHANGELOG). M6.2 live dengan monitoring 24 jam berjalan via `.github/workflows/production-monitor.yml`. M6.3 menambahkan pusat slip gaji dan layar laporan PPh 21/BPJS. M6.4 menambahkan employee self-service, e-cuti, dan e-lembur. M6.5 menambahkan reimburse dan struktur organisasi. Render free tier memiliki cold start; jalankan `pnpm warm:production` sebelum demo. Baca [`HANDOVER.md`](HANDOVER.md) sebelum melanjutkan.
+> **Status:** M1–M5.4 live di production. Web, edge, empat service Render, Neon, Upstash QStash, dan Cloudinary aktif; smoke production **15/15 lulus**, async QStash/worker terverifikasi, login tujuh peran dan UI web terverifikasi, serta rollback edge, Pages, dan Render diuji. M6.1 portofolio siap (README, 8 screenshot, video 2:16, CHANGELOG). M6.2 live dengan monitoring 24 jam berjalan via `.github/workflows/production-monitor.yml`. M6.3 menambahkan pusat slip gaji dan layar laporan PPh 21/BPJS. M6.4 menambahkan employee self-service, e-cuti, dan e-lembur. M6.5 menambahkan reimburse dan struktur organisasi. M6.6 menambahkan paket tenant dan invoice biaya payroll. Render free tier memiliki cold start; jalankan `pnpm warm:production` sebelum demo. Baca [`HANDOVER.md`](HANDOVER.md) sebelum melanjutkan.
 
 ## Why this exists
 
@@ -19,7 +19,7 @@ Aletheia separates:
 
 - **Claims operations** — submission, document upload, risk scoring, tiered approval/escalation, disbursement.
 - **Payroll & incentives** — employee/agent master, attendance/leave summary, payroll console, batch calculation, breakdown, variance, approval, disbursement, PPh 21 TER, BPJS employee/employer, agent commission tiers.
-- **HRIS-lite** — payslip PDF, PPh 21 monthly and annual reports, BPJS reports, bank transfer files, payroll variance, annual reconciliation, layar Slip Gaji dan Laporan dan Ekspor, employee self-service untuk slip, absensi, e-cuti, dan e-lembur, serta reimburse dan struktur organisasi.
+- **HRIS-lite** — payslip PDF, PPh 21 monthly and annual reports, BPJS reports, bank transfer files, payroll variance, annual reconciliation, layar Slip Gaji dan Laporan dan Ekspor, employee self-service untuk slip, absensi, e-cuti, dan e-lembur, serta reimburse, struktur organisasi, paket tenant, dan invoice biaya payroll.
 - **MIS intelligence** — cross-branch KPIs, tren, materialized views, cache dan invalidasi, What-If policy simulation read-only melalui GraphQL.
 - **Governance** — versioned policies with checksums, RBAC, segregation of duties, hash-chained audit, tenant-ready schema.
 - **Payments** — provider-agnostic adapter, idempotent webhook, reversal, retry with attempt numbers, and a mock provider for demos.
@@ -41,6 +41,8 @@ Aletheia separates:
 | <img src="docs/evidence/m6.4/me-payslips.png" alt="Ruang Saya karyawan" width="100%"> | <img src="docs/evidence/m6.4/me-leave.png" alt="Pengajuan cuti dan lembur" width="100%"> |
 | **Reimburse** | **Struktur organisasi** |
 | <img src="docs/evidence/m6.5/me-reimbursements.png" alt="Reimburse karyawan" width="100%"> | <img src="docs/evidence/m6.5/organization.png" alt="Struktur organisasi" width="100%"> |
+| **Invoice biaya payroll** | **Paket tenant** |
+| <img src="docs/evidence/m6.6/reports-cost-invoice.png" alt="Invoice biaya payroll" width="100%"> | Badge `HRIS Pro` tampil di topbar. Invoice memakai policy `PAYROLL_COST_POLICY`, menampilkan total invoice per cabang, dan dapat diunduh sebagai CSV bertanda tangan. |
 
 Mobile: [`claims`](docs/evidence/m6.1/mobile-claims.png) · [`payroll`](docs/evidence/m6.1/mobile-payroll.png) · [`MIS`](docs/evidence/m6.1/mobile-mis.png) · [`slip gaji`](docs/evidence/m6.3/payslips-mobile.png) · [`Ruang Saya`](docs/evidence/m6.4/me-mobile.png) · [`Reimburse`](docs/evidence/m6.5/me-reimbursements-mobile.png). Semua data sintetis. Indeks lengkap ada di [`docs/evidence/m6.1/screenshots.md`](docs/evidence/m6.1/screenshots.md).
 

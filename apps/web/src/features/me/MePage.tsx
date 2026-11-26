@@ -5,6 +5,7 @@ import { useState } from "react";
 import { ErrorState, PageHeader, SkeletonTable } from "../../shared/ui";
 import { employmentLabel, formatDate, personnelTypeLabel } from "../../shared/lib/format";
 import { useAuth } from "../auth/AuthProvider";
+import { hasFeature, useTenantProfile } from "../tenant/api";
 import { getMyProfile } from "./api";
 import { MyAttendanceTab } from "./MyAttendanceTab";
 import { MyLeaveTab } from "./MyLeaveTab";
@@ -22,7 +23,12 @@ const TABS: Array<{ id: Tab; label: string; icon: typeof FileText }> = [
 
 export default function MePage() {
   const { hasRole } = useAuth();
+  const tenantQuery = useTenantProfile();
+  const tenant = tenantQuery.data?.data;
   const [tab, setTab] = useState<Tab>("payslips");
+  const visibleTabs = TABS.filter(
+    (item) => item.id !== "reimbursements" || hasFeature(tenant, "REIMBURSEMENT"),
+  );
   const profileQuery = useQuery({
     queryKey: ["my-profile"],
     queryFn: getMyProfile,
@@ -84,7 +90,7 @@ export default function MePage() {
       </section>
 
       <div className="tabs" role="tablist" aria-label="Bagian Ruang Saya">
-        {TABS.map((item) => {
+        {visibleTabs.map((item) => {
           const Icon = item.icon;
           return (
             <button

@@ -695,6 +695,8 @@ This phase closes the remaining BASIC and HRIS+ modules.
 
 ## 7. Phase 4 — SAU Managed-Service Layer
 
+> **Status:** Selesai 27 November 2026. Bukti: `docs/evidence/m6.6-verification.md`.
+
 This phase is optional and only for SAU-specific differentiation.
 
 ### Tenant plan and feature gating

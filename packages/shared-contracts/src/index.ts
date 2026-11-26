@@ -4,6 +4,7 @@ export * from "./primitives.js";
 export * from "./errors.js";
 export * from "./api.js";
 export * from "./auth.js";
+export * from "./tenant.js";
 export * from "./policy.js";
 export * from "./claims.js";
 export * from "./payroll.js";

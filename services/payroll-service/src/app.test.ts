@@ -21,6 +21,7 @@ const MANAGER = "019361a2-7c00-7000-8000-000000000945";
 const COMPLIANCE = "019361a2-7c00-7000-8000-000000000946";
 const MIS = "019361a2-7c00-7000-8000-000000000947";
 const POLICY = "019361a2-7c00-7000-8000-000000000948";
+const COST_POLICY = "019361a2-7c00-7000-8000-000000000949";
 
 interface Identity {
   userId: string;
@@ -186,6 +187,8 @@ describe.skipIf(!integrationEnabled)("payroll service integration", () => {
        on conflict (id) do nothing`,
       [TENANT],
     );
+    await pool.query(`delete from governance.users where tenant_id = $1`, [TENANT]);
+    await pool.query(`delete from governance.branches where tenant_id = $1`, [TENANT]);
     await pool.query(
       `insert into governance.branches (id, tenant_id, code, name, region, monthly_disbursement_cap)
        values ($1, $2, 'M31-01', 'M3.1 Branch', 'Test', '1000000000.00')
@@ -219,6 +222,26 @@ describe.skipIf(!integrationEnabled)("payroll service integration", () => {
         TENANT,
         validPayrollPolicy,
         createHash("sha256").update(JSON.stringify(validPayrollPolicy)).digest("hex"),
+        COMPLIANCE,
+        FINANCE,
+      ],
+    );
+    const costPolicy = {
+      bjo_rate: "0.0250",
+      management_fee_rate: "0.0500",
+      invoice_rounding: "UP_1000",
+    };
+    await pool.query(
+      `insert into governance.policy_versions
+        (id, tenant_id, domain, version_tag, status, rules_payload, checksum_sha256,
+         effective_from, published_by, approved_by)
+       values ($1,$2,'PAYROLL_COST_POLICY','v2026.11.cost','ACTIVE',$3,$4,
+               '2026-11-01T00:00:00.000Z',$5,$6)`,
+      [
+        COST_POLICY,
+        TENANT,
+        costPolicy,
+        createHash("sha256").update(JSON.stringify(costPolicy)).digest("hex"),
         COMPLIANCE,
         FINANCE,
       ],
@@ -474,12 +497,12 @@ describe.skipIf(!integrationEnabled)("payroll service integration", () => {
         amount: "150000.00",
         description: "Perjalanan dinas Desember",
       },
-      finance,
+      manager,
     );
     expect(created.status).toBe(201);
     expect(created.body.data.status).toBe("PENDING");
 
-    const otherEmployee = await call("GET", "/api/v1/me/reimbursements", undefined, manager);
+    const otherEmployee = await call("GET", "/api/v1/me/reimbursements", undefined, finance);
     expect(otherEmployee.status).toBe(200);
     expect(
       otherEmployee.body.data.items.some(
@@ -491,7 +514,7 @@ describe.skipIf(!integrationEnabled)("payroll service integration", () => {
       "POST",
       `/api/v1/reimbursements/${created.body.data.id}/decide`,
       { decision: "APPROVED" },
-      finance,
+      manager,
     );
     expect(selfDecision.status).toBe(403);
     expect(selfDecision.body.error.code).toBe("ERR_SOD_VIOLATION");
@@ -509,7 +532,7 @@ describe.skipIf(!integrationEnabled)("payroll service integration", () => {
       "POST",
       `/api/v1/reimbursements/${created.body.data.id}/decide`,
       { decision: "REJECTED", notes: "Sudah diputuskan" },
-      manager,
+      hr,
     );
     expect(doubleDecision.status).toBe(409);
     expect(doubleDecision.body.error.code).toBe("ERR_CONCURRENT_LOCK");
@@ -541,7 +564,7 @@ describe.skipIf(!integrationEnabled)("payroll service integration", () => {
         amount: "90000.00",
         description: "Konsumsi rapat Desember",
       },
-      finance,
+      manager,
     );
     expect(rejected.status).toBe(201);
 
@@ -562,6 +585,126 @@ describe.skipIf(!integrationEnabled)("payroll service integration", () => {
     );
     expect(payRejected.status).toBe(409);
     expect(payRejected.body.error.code).toBe("ERR_PAYMENT_STATE_CONFLICT");
+
+    const financeOwn = await call(
+      "POST",
+      "/api/v1/me/reimbursements",
+      {
+        category: "MEDICAL",
+        expense_date: "2026-12-07",
+        amount: "120000.00",
+        description: "Klinik Desember",
+      },
+      finance,
+    );
+    expect(financeOwn.status).toBe(201);
+
+    const financeOwnApproved = await call(
+      "POST",
+      `/api/v1/reimbursements/${financeOwn.body.data.id}/decide`,
+      { decision: "APPROVED" },
+      hr,
+    );
+    expect(financeOwnApproved.status).toBe(200);
+
+    const selfPay = await call(
+      "POST",
+      `/api/v1/reimbursements/${financeOwn.body.data.id}/pay`,
+      undefined,
+      finance,
+    );
+    expect(selfPay.status).toBe(403);
+    expect(selfPay.body.error.code).toBe("ERR_SOD_VIOLATION");
+  });
+
+  it("membatasi struktur organisasi branch manager ke cabangnya", async () => {
+    const otherBranch = randomUUID();
+    await pool.query(
+      `insert into governance.branches
+        (id, tenant_id, code, name, region, monthly_disbursement_cap)
+       values ($1, $2, 'M31-99', 'Cabang Lain', 'Test', '1000000000.00')`,
+      [otherBranch, TENANT],
+    );
+    const other = await call(
+      "POST",
+      "/api/v1/employees",
+      {
+        branch_id: otherBranch,
+        personnel_code: "EMP-M31-099",
+        personnel_type: "EMPLOYEE",
+        full_name: "Karyawan Cabang Lain",
+        nik: "3273000000000944",
+        bank_account_number: "1234500094",
+        bank_code: "BCA",
+        bank_name: "Bank Central Asia",
+        ptkp_status: "TK/0",
+        risk_class: "I",
+        employment_status: "PERMANENT",
+        base_salary: "5000000.00",
+        fixed_allowance: "0.00",
+        join_date: "2025-03-01",
+      },
+      hr,
+    );
+    expect(other.status).toBe(201);
+
+    const managerView = await call("GET", "/api/v1/organization", undefined, manager);
+    expect(managerView.status).toBe(200);
+    expect(JSON.stringify(managerView.body.data)).toContain("Siti Test");
+    expect(JSON.stringify(managerView.body.data)).not.toContain("Karyawan Cabang Lain");
+
+    const hrView = await call("GET", "/api/v1/organization", undefined, hr);
+    expect(hrView.status).toBe(200);
+    expect(JSON.stringify(hrView.body.data)).toContain("Karyawan Cabang Lain");
+  });
+
+  it("membuat invoice biaya payroll dan menegakkan paket tenant", async () => {
+    await pool.query(`update governance.tenants set plan = 'HRIS_PRO' where id = $1`, [TENANT]);
+    try {
+      const created = await call(
+        "POST",
+        "/api/v1/reports",
+        {
+          report_type: "PAYROLL_COST_INVOICE",
+          period_start: "2026-12-01",
+          period_end: "2026-12-31",
+          branch_id: BRANCH,
+        },
+        hr,
+        `cost-${randomUUID()}`,
+      );
+      expect(created.status).toBe(202);
+      expect(created.body.data.report_type).toBe("PAYROLL_COST_INVOICE");
+      expect(created.body.data.policy_version_id).toBe(COST_POLICY);
+      expect(created.body.data.status).toBe("QUEUED");
+
+      await pool.query(`update governance.tenants set plan = 'BASIC' where id = $1`, [TENANT]);
+
+      const blockedReimbursement = await call("GET", "/api/v1/reimbursements", undefined, hr);
+      expect(blockedReimbursement.status).toBe(403);
+      expect(blockedReimbursement.body.error.code).toBe("ERR_PLAN_FEATURE_UNAVAILABLE");
+
+      const blockedOrganization = await call("GET", "/api/v1/organization", undefined, hr);
+      expect(blockedOrganization.status).toBe(403);
+      expect(blockedOrganization.body.error.code).toBe("ERR_PLAN_FEATURE_UNAVAILABLE");
+
+      const blockedReport = await call(
+        "POST",
+        "/api/v1/reports",
+        {
+          report_type: "PAYROLL_COST_INVOICE",
+          period_start: "2026-12-01",
+          period_end: "2026-12-31",
+          branch_id: BRANCH,
+        },
+        hr,
+        `cost-${randomUUID()}`,
+      );
+      expect(blockedReport.status).toBe(403);
+      expect(blockedReport.body.error.code).toBe("ERR_PLAN_FEATURE_UNAVAILABLE");
+    } finally {
+      await pool.query(`update governance.tenants set plan = 'ENTERPRISE' where id = $1`, [TENANT]);
+    }
   });
 
   it("membuat batch idempoten dan menolak periode ganda", async () => {

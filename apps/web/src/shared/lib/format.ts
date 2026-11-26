@@ -171,6 +171,14 @@ const REPORT_TYPE_LABELS: Record<string, string> = {
   BPJS_MONTHLY: "BPJS bulanan",
   BANK_FILE: "Berkas transfer bank",
   PAYROLL_VARIANCE: "Varians payroll",
+  PAYROLL_COST_INVOICE: "Invoice biaya payroll",
+};
+
+const TENANT_PLAN_LABELS: Record<string, string> = {
+  BASIC: "Basic",
+  HRIS_PLUS: "HRIS+",
+  HRIS_PRO: "HRIS Pro",
+  ENTERPRISE: "Enterprise",
 };
 
 const EMPLOYMENT_LABELS: Record<string, string> = {
@@ -247,6 +255,10 @@ export function employmentLabel(value: string): string {
 
 export function reportTypeLabel(value: string): string {
   return REPORT_TYPE_LABELS[value] ?? value;
+}
+
+export function tenantPlanLabel(value: string): string {
+  return TENANT_PLAN_LABELS[value] ?? value;
 }
 
 export function batchTypeLabel(value: string): string {

@@ -21,7 +21,8 @@ import { ApiError } from "../lib/errors.js";
 import { beginIdempotency, completeIdempotency } from "../lib/idempotency.js";
 import { decodeCursor, encodeCursor } from "../lib/pagination.js";
 import { signFileToken, signedFilePath } from "../lib/files.js";
-import { getActivePayrollPolicy } from "../lib/policy.js";
+import { getActivePayrollCostPolicy, getActivePayrollPolicy } from "../lib/policy.js";
+import { assertTenantFeature } from "../lib/tenant-plan.js";
 import {
   buildPayslipGenerateEvent,
   buildReportGenerateEvent,
@@ -139,7 +140,13 @@ reportRouter.post(
         return;
       }
 
-      const policy = await getActivePayrollPolicy(client, auth.tenantId);
+      const policy =
+        input.report_type === "PAYROLL_COST_INVOICE"
+          ? await (async () => {
+              await assertTenantFeature(auth.tenantId, "PAYROLL_COST_INVOICE");
+              return getActivePayrollCostPolicy(client, auth.tenantId);
+            })()
+          : await getActivePayrollPolicy(client, auth.tenantId);
       const branchId = input.branch_id ?? null;
       if (branchId !== null) {
         const branch = await client.query(
@@ -247,6 +254,9 @@ reportRouter.get(
   async (request, response) => {
     const auth = request.auth!;
     const query = ReportListQuerySchema.parse(request.query);
+    if (query.report_type === "PAYROLL_COST_INVOICE") {
+      await assertTenantFeature(auth.tenantId, "PAYROLL_COST_INVOICE");
+    }
     const conditions = ["tenant_id = $1"];
     const values: unknown[] = [auth.tenantId];
     if (query.report_type !== undefined) {
@@ -307,6 +317,9 @@ reportRouter.get(
     if (row === undefined) {
       throw ApiError.notFound("Laporan tidak ditemukan");
     }
+    if (row.report_type === "PAYROLL_COST_INVOICE") {
+      await assertTenantFeature(auth.tenantId, "PAYROLL_COST_INVOICE");
+    }
     sendData(response, toReport(row));
   },
 );
@@ -325,6 +338,9 @@ reportRouter.get(
     const row = result.rows[0];
     if (row === undefined) {
       throw ApiError.notFound("Laporan tidak ditemukan");
+    }
+    if (row.report_type === "PAYROLL_COST_INVOICE") {
+      await assertTenantFeature(auth.tenantId, "PAYROLL_COST_INVOICE");
     }
     if (row.status !== "READY" || row.file_url === null || row.file_checksum_sha256 === null) {
       throw new ApiError(409, "ERR_REPORT_NOT_READY", "Laporan belum selesai dibuat");

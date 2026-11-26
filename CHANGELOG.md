@@ -33,6 +33,10 @@ Semua perubahan penting pada Aletheia. Format mengikuti [Keep a Changelog](https
 - M6.5: departemen, posisi, penugasan personel, dan halaman Struktur Organisasi read-only.
 - M6.5: guard peran pada halaman payroll dan klaim, unique link personel-user, dan hardening overtime/leave.
 - Bukti M6.5: `docs/evidence/m6.5-verification.md` dan screenshot reimburse serta organisasi.
+- M6.6: paket tenant `BASIC`/`HRIS_PLUS`/`HRIS_PRO`/`ENTERPRISE`, badge paket, dan feature gating API.
+- M6.6: policy `PAYROLL_COST_POLICY` dan laporan `PAYROLL_COST_INVOICE` per cabang dengan BJO, management fee, pembulatan, checksum, dan audit.
+- M6.6: halaman laporan menampilkan total invoice dan opsi unduhan CSV.
+- Bukti M6.6: `docs/evidence/m6.6-verification.md` dan screenshot invoice biaya payroll.
 
 ### Changed
 

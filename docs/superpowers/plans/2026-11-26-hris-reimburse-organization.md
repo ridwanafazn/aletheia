@@ -1,5 +1,7 @@
 # Aletheia Reimburse and Organization Implementation Plan
 
+> **Status:** Selesai 27 November 2026. Bukti: `docs/evidence/m6.5-verification.md`.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Add an employee reimbursement workflow and a read-only organization structure so Aletheia covers the HRIS+ reimburse module and BASIC organization management.
