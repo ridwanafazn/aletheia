@@ -3,6 +3,8 @@ import { adminPool as pool, closeAdminDatabase } from "./admin.js";
 const expectedTables = [
   "governance.tenants",
   "governance.branches",
+  "governance.departments",
+  "governance.positions",
   "governance.users",
   "governance.policy_versions",
   "governance.audit_logs",
@@ -19,6 +21,9 @@ const expectedTables = [
   "payroll.items",
   "payroll.attendance_summaries",
   "payroll.leave_requests",
+  "payroll.leave_balances",
+  "payroll.overtime_requests",
+  "payroll.reimbursements",
   "payroll.payslips",
   "payroll.tax_reports",
   "payroll.tax_reconciliations",

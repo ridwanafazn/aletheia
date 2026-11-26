@@ -59,7 +59,8 @@ apps/web/
 | `/payslips` | Payslip Center | HR, Finance, Compliance | payslip per periode, unduh |
 | `/reports` | Reports & Exports | HR, Finance, Compliance | PPh 21, BPJS, bank file |
 | `/me` | Ruang Saya | `EMPLOYEE` | profil, slip sendiri, absensi, saldo cuti, e-cuti, e-lembur |
-| `/workforce` | Cuti dan Lembur | HR, Branch Manager, Finance | antrean dan keputusan cuti/lembur |
+| `/workforce` | Cuti dan Lembur | HR, Branch Manager, Finance | antrean dan keputusan cuti/lembur/reimburse |
+| `/organization` | Struktur Organisasi | HR, Branch Manager, Finance, Compliance, MIS | departemen, posisi, personel |
 | `/mis` | MIS Intelligence | `MIS_ANALYST` | KPI lintas cabang, tren, what-if |
 | `/mis/what-if` | What-If Sandbox | `MIS_ANALYST` | skenario, variance |
 | `/policy` | Policy Ledger | `COMPLIANCE_ADMIN` | versi kebijakan, publish |
@@ -198,6 +199,14 @@ Route guard memeriksa `role`, `branch_id`, dan `tenant_id` dari sesi. Guard UI *
 - Mobile tetap dapat membaca slip, absensi, dan mengajukan cuti/lembur.
 
 > **Status M6.4:** `/me` dan `/workforce` sudah berjalan. Persetujuan cuti belum otomatis memperbarui `attendance_summaries`; ringkasan absensi masih berasal dari impor HR.
+
+### 6.10 Reimburse dan Struktur Organisasi
+
+- `/me` tab Reimburse: kategori, tanggal, nominal, deskripsi, tautan bukti, unggah Cloudinary, dan riwayat.
+- `/workforce` tab Reimburse: antrean, setujui/tolak, dan tombol Bayar untuk Finance.
+- `/organization`: kartu departemen, posisi, personel, dan daftar belum ditempatkan. Read-only pada fase ini.
+- Reimburse memakai status `PENDING`, `APPROVED`, `REJECTED`, `PAID`; maker tidak dapat menyetujui pengajuannya sendiri.
+- Struktur organisasi memakai tabel `departments`, `positions`, dan kolom penugasan pada `personnel`.
 
 ## 7. Form & Validasi
 

@@ -18,6 +18,8 @@
 | BPJS | potongan karyawan + kontribusi employer, rekap | integrasi API BPJS |
 | Payslip | PDF per periode, verification code | portal employee penuh |
 | Reporting | PPh 21 bulanan/tahunan, BPJS, bank file, variance | BI self-service, data warehouse |
+| Reimburse | pengajuan, bukti, approval, pembayaran mock | integrasi bank/accounting |
+| Organisasi | departemen, posisi, penugasan, halaman read-only | org chart interaktif dan CRUD penuh |
 | Multi-tenant | `tenant_id` + RLS | billing tenant, self-service signup |
 
 **Alasan:** cukup untuk memenuhi makna "HRIS & payroll" di lowongan, tanpa tenggelam dalam absensi/shift yang tidak diminta.
@@ -393,6 +395,7 @@ Semua mutasi finansial memakai `Idempotency-Key`; semua endpoint memakai tenant/
 - [x] Laporan PPh 21 bulanan dan tahunan, BPJS, bank file, dan variance; checksum; audit unduhan.
 - [x] Semua perhitungan memakai policy version yang terikat.
 - [x] Employee self-service untuk slip, absensi, saldo cuti, e-cuti, dan e-lembur (M6.4).
+- [x] Reimburse dan struktur organisasi read-only (M6.5).
 - [ ] Persetujuan cuti otomatis memperbarui attendance summary payroll.
 - [x] Tidak ada PII mentah di UI/log/ekspor.
 - [ ] Test U-01..U-20 + I-08..I-10 lulus.

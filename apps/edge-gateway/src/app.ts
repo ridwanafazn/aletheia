@@ -346,6 +346,8 @@ export function createEdgeApp(config: EdgeConfig, deps: EdgeDependencies = {}) {
           path.startsWith("/api/v1/leave-requests") ||
           path.startsWith("/api/v1/leave-balances") ||
           path.startsWith("/api/v1/overtime-requests") ||
+          path.startsWith("/api/v1/reimbursements") ||
+          path.startsWith("/api/v1/organization") ||
           path.startsWith("/api/v1/me") ||
           path.startsWith("/api/v1/payslips") ||
           path.startsWith("/api/v1/reports")

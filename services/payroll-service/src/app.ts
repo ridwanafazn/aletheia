@@ -15,6 +15,8 @@ import {
 import { fileRouter } from "./routes/files.js";
 import { healthRouter } from "./routes/health.js";
 import { meRouter } from "./routes/me.js";
+import { organizationRouter } from "./routes/organization.js";
+import { reimbursementRouter } from "./routes/reimbursements.js";
 import { reconciliationRouter } from "./routes/reconciliations.js";
 import { payslipRequestRouter, payslipRouter, reportRouter } from "./routes/reports.js";
 import {
@@ -53,6 +55,8 @@ export function createApp(): express.Express {
   app.use("/api/v1/leave-requests", leaveRouter);
   app.use("/api/v1/leave-balances", leaveBalanceRouter);
   app.use("/api/v1/overtime-requests", overtimeRouter);
+  app.use("/api/v1/reimbursements", reimbursementRouter);
+  app.use("/api/v1/organization", organizationRouter);
   app.use("/api/v1/payroll/reconciliations", reconciliationRouter);
   app.use("/api/v1/payroll", payrollReferenceRouter);
   app.use("/api/v1/payroll/batches", payslipRequestRouter);

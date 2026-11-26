@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Navigate, Outlet, useNavigate, useRouterState } from "@tanstack/react-router";
 import {
   BarChart3,
+  Building2,
   CalendarDays,
   ClipboardList,
   FileSpreadsheet,
@@ -31,6 +32,7 @@ interface NavItem {
     | "/payslips"
     | "/reports"
     | "/workforce"
+    | "/organization"
     | "/me"
     | "/mis"
     | "/mis/what-if"
@@ -113,6 +115,18 @@ const NAV_GROUPS: NavGroup[] = [
         icon: CalendarDays,
         roles: ["HR_SPECIALIST", "BRANCH_MANAGER", "FINANCE_MANAGER"],
       },
+      {
+        to: "/organization",
+        label: "Struktur Organisasi",
+        icon: Building2,
+        roles: [
+          "HR_SPECIALIST",
+          "BRANCH_MANAGER",
+          "FINANCE_MANAGER",
+          "COMPLIANCE_ADMIN",
+          "MIS_ANALYST",
+        ],
+      },
     ],
   },
   {
@@ -154,6 +168,7 @@ const PAGE_TITLES: Record<string, string> = {
   "/payslips": "Slip Gaji",
   "/reports": "Laporan dan Ekspor",
   "/workforce": "Cuti dan Lembur",
+  "/organization": "Struktur Organisasi",
   "/me": "Ruang Saya",
   "/mis": "MIS Intelligence",
   "/mis/what-if": "What-If Sandbox",
@@ -169,7 +184,8 @@ function sectionFor(pathname: string): string {
     pathname.startsWith("/employees") ||
     pathname.startsWith("/payslips") ||
     pathname.startsWith("/reports") ||
-    pathname.startsWith("/workforce")
+    pathname.startsWith("/workforce") ||
+    pathname.startsWith("/organization")
   ) {
     return "Payroll";
   }

@@ -15,6 +15,7 @@ import {
   text,
   timestamp,
   unique,
+  uniqueIndex,
   uuid,
   varchar,
 } from "drizzle-orm/pg-core";
@@ -435,6 +436,9 @@ export const personnel = payroll.table(
   (table) => [
     unique("personnel_tenant_code_unique").on(table.tenantId, table.personnelCode),
     unique("personnel_tenant_nik_unique").on(table.tenantId, table.nikHash),
+    uniqueIndex("personnel_tenant_user_unique")
+      .on(table.tenantId, table.userId)
+      .where(sql`${table.userId} is not null`),
     check("personnel_type_check", sql`${table.personnelType} in ('EMPLOYEE','SALES_AGENT')`),
     check("personnel_ptkp_check", sql`${table.ptkpStatus} in ${ptkpValues}`),
     check("personnel_risk_class_check", sql`${table.riskClass} in ${riskClassValues}`),
@@ -628,6 +632,7 @@ export const leaveRequests = payroll.table(
     personnelId: uuid("personnel_id")
       .notNull()
       .references(() => personnel.id),
+    createdBy: uuid("created_by"),
     leaveType: varchar("leave_type", { length: 24 }).notNull(),
     startDate: date("start_date").notNull(),
     endDate: date("end_date").notNull(),

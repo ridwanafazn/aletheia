@@ -126,6 +126,7 @@
 | M6.2 | Launch (bagian dari TASK-19/18) | **Live, monitoring berjalan.** Smoke production 15/15, web UI 3 peran, async QStash/worker (~5 detik), rollback edge/Pages/Render, dan CSP lulus. Sisa: 4 run Production Monitor (24 jam), freeze deploy, sign-off. Runbook: `docs/runbooks/m6.2-launch.md`; bukti: `docs/evidence/m6.2-verification.md`. | Semua endpoint sehat; tidak ada P0; matrix ≥ 100% |
 | M6.3 | Follow-up HRIS surface | **Selesai 26 November 2026.** Pusat slip gaji `/payslips`, laporan `/reports`, tombol buat slip di detail batch, seed berkas demo, E2E, axe, dan bundle 143,7 KB. Bukti: `docs/evidence/m6.3-verification.md`. | Slip dan laporan dapat dibuat serta diunduh; E2E lulus |
 | M6.4 | Employee self-service | **Selesai 26 November 2026.** Role `EMPLOYEE`, `/me`, `/workforce`, saldo cuti, e-cuti, e-lembur, SoD, RLS, E2E, dan axe. Bukti: `docs/evidence/m6.4-verification.md`. | Karyawan dapat melihat data sendiri dan mengajukan cuti/lembur; HR dapat memutuskan |
+| M6.5 | Reimburse dan organisasi | **Selesai 27 November 2026.** Reimburse dengan Cloudinary, approval, pembayaran mock; departemen/posisi/personel read-only; E2E dan axe. Bukti: `docs/evidence/m6.5-verification.md`. | Karyawan dapat mengajukan reimburse; HR/Finance memutuskan; struktur organisasi terlihat |
 
 **Deploy final:** production demo di free-tier, dengan akun demo dan data sintetis.
 **Demo:** 6 role → claims → payroll → payslip/report → MIS → policy/audit.

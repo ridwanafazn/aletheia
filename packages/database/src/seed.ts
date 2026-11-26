@@ -75,6 +75,16 @@ const AUDIT_CLAIM = uid(461);
 const AUDIT_BATCH = uid(462);
 const FILE_PAYSLIP_SITI = uid(470);
 const FILE_REPORT_PPH21 = uid(471);
+const DEPT_FINANCE = uid(500);
+const DEPT_HR = uid(501);
+const DEPT_CLAIMS = uid(502);
+const DEPT_MIS = uid(503);
+const DEPT_COMPLIANCE = uid(504);
+const POS_MANAGER = uid(510);
+const POS_OFFICER = uid(511);
+const POS_ANALYST = uid(512);
+const POS_SPECIALIST = uid(513);
+const REIMB_SITI = uid(520);
 
 const demoPayslipContent = readFileSync(new URL("../fixtures/demo-payslip.pdf", import.meta.url));
 const demoPayslipChecksum = sha256(demoPayslipContent);
@@ -320,6 +330,33 @@ async function main(): Promise<void> {
       monthly_disbursement_cap: "1000000000.00",
     });
 
+    const departments = [
+      { id: DEPT_FINANCE, code: "FIN", name: "Finance" },
+      { id: DEPT_HR, code: "HR", name: "Human Resources" },
+      { id: DEPT_CLAIMS, code: "CLM", name: "Claims Operations" },
+      { id: DEPT_MIS, code: "MIS", name: "Management Information" },
+      { id: DEPT_COMPLIANCE, code: "CMP", name: "Compliance" },
+    ];
+    for (const department of departments) {
+      await upsert(client, "governance.departments", {
+        ...department,
+        tenant_id: T_SAU,
+      });
+    }
+
+    const positions = [
+      { id: POS_MANAGER, code: "MGR", name: "Manager", job_level: "MANAGER" },
+      { id: POS_OFFICER, code: "OFC", name: "Officer", job_level: "STAFF" },
+      { id: POS_ANALYST, code: "ANL", name: "Analyst", job_level: "STAFF" },
+      { id: POS_SPECIALIST, code: "SPC", name: "Specialist", job_level: "STAFF" },
+    ];
+    for (const position of positions) {
+      await upsert(client, "governance.positions", {
+        ...position,
+        tenant_id: T_SAU,
+      });
+    }
+
     const users = [
       {
         id: U_OFFICER_BDG,
@@ -463,6 +500,9 @@ async function main(): Promise<void> {
       id: PERSON_SITI,
       tenant_id: T_SAU,
       branch_id: BR_BDG,
+      department_id: DEPT_HR,
+      position_id: POS_SPECIALIST,
+      supervisor_id: PERSON_RINA,
       user_id: U_EMPLOYEE,
       personnel_code: "EMP-BDG-001",
       personnel_type: "EMPLOYEE",
@@ -485,6 +525,9 @@ async function main(): Promise<void> {
       id: PERSON_BUDI,
       tenant_id: T_SAU,
       branch_id: BR_BDG,
+      department_id: DEPT_HR,
+      position_id: POS_OFFICER,
+      supervisor_id: PERSON_RINA,
       personnel_code: "EMP-BDG-002",
       personnel_type: "EMPLOYEE",
       full_name: "Budi Santoso",
@@ -506,6 +549,9 @@ async function main(): Promise<void> {
       id: PERSON_RINA,
       tenant_id: T_SAU,
       branch_id: BR_BDG,
+      department_id: DEPT_HR,
+      position_id: POS_MANAGER,
+      supervisor_id: null,
       personnel_code: "EMP-BDG-003",
       personnel_type: "EMPLOYEE",
       full_name: "Rina Maharani",
@@ -527,6 +573,9 @@ async function main(): Promise<void> {
       id: AGENT_AGUS,
       tenant_id: T_SAU,
       branch_id: BR_BDG,
+      department_id: DEPT_CLAIMS,
+      position_id: POS_OFFICER,
+      supervisor_id: PERSON_RINA,
       personnel_code: "AGT-BDG-001",
       personnel_type: "SALES_AGENT",
       full_name: "Agus Setiawan",
@@ -548,6 +597,9 @@ async function main(): Promise<void> {
       id: AGENT_DEWI,
       tenant_id: T_SAU,
       branch_id: BR_BDG,
+      department_id: DEPT_CLAIMS,
+      position_id: POS_OFFICER,
+      supervisor_id: PERSON_RINA,
       personnel_code: "AGT-BDG-002",
       personnel_type: "SALES_AGENT",
       full_name: "Dewi Lestari",
@@ -594,8 +646,8 @@ async function main(): Promise<void> {
         id: uid(220),
         personnel_id: PERSON_SITI,
         working_days: 22,
-        present_days: 20,
-        paid_leave_days: 1,
+        present_days: 19,
+        paid_leave_days: 2,
         unpaid_leave_days: 0,
         absent_days: 1,
         overtime_hours: "4.00",
@@ -637,6 +689,7 @@ async function main(): Promise<void> {
       id: uid(230),
       tenant_id: T_SAU,
       personnel_id: PERSON_SITI,
+      created_by: U_EMPLOYEE,
       leave_type: "ANNUAL",
       start_date: "2026-11-10",
       end_date: "2026-11-11",
@@ -670,6 +723,22 @@ async function main(): Promise<void> {
         personnel_id: PERSON_SITI,
         leave_type: "UNPAID",
         entitlement_days: "0.00",
+        used_days: "0.00",
+        pending_days: "0.00",
+      },
+      {
+        id: uid(236),
+        personnel_id: PERSON_SITI,
+        leave_type: "MATERNITY",
+        entitlement_days: "90.00",
+        used_days: "0.00",
+        pending_days: "0.00",
+      },
+      {
+        id: uid(237),
+        personnel_id: PERSON_SITI,
+        leave_type: "OTHER",
+        entitlement_days: "5.00",
         used_days: "0.00",
         pending_days: "0.00",
       },
@@ -710,6 +779,20 @@ async function main(): Promise<void> {
         created_by: U_EMPLOYEE,
       });
     }
+
+    await upsert(client, "payroll.reimbursements", {
+      id: REIMB_SITI,
+      tenant_id: T_SAU,
+      personnel_id: PERSON_SITI,
+      category: "TRANSPORT",
+      expense_date: "2026-11-18",
+      amount: "150000.00",
+      description: "Perjalanan dinas Bandung",
+      receipt_url: "https://res.cloudinary.com/demo/image/upload/receipt.pdf",
+      receipt_public_id: "demo/reimbursement-receipt",
+      status: "PENDING",
+      created_by: U_EMPLOYEE,
+    });
 
     await upsert(client, "claims.submissions", {
       id: CLAIM_A,

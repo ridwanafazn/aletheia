@@ -5,8 +5,13 @@ import {
   OvertimeDecisionRequestSchema,
   OvertimeRequestListResponseSchema,
   OvertimeRequestSchema,
+  ReimbursementDecisionRequestSchema,
+  ReimbursementPageSchema,
+  ReimbursementSchema,
   type LeaveRequest,
   type OvertimeRequest,
+  type Reimbursement,
+  type ReimbursementPage,
 } from "@aletheia/shared-contracts";
 
 import { apiRequest, toQuery, type ApiResult } from "../../shared/api/client";
@@ -72,5 +77,43 @@ export function decideOvertime(
     method: "POST",
     body: parsed,
     schema: OvertimeRequestSchema,
+  });
+}
+
+export function listWorkforceReimbursements(
+  filters: WorkforceFilters = {},
+): Promise<ApiResult<ReimbursementPage>> {
+  return apiRequest(
+    `/api/v1/reimbursements${toQuery({
+      status: filters.status,
+      branch_id: filters.branch_id,
+      personnel_id: filters.personnel_id,
+      limit: 100,
+    })}`,
+    { schema: ReimbursementPageSchema },
+  );
+}
+
+export function decideReimbursement(
+  id: string,
+  decision: "APPROVED" | "REJECTED",
+  notes?: string,
+): Promise<ApiResult<Reimbursement>> {
+  const parsed = ReimbursementDecisionRequestSchema.parse({
+    decision,
+    ...(notes === undefined || notes.trim().length === 0 ? {} : { notes: notes.trim() }),
+  });
+  return apiRequest(`/api/v1/reimbursements/${id}/decide`, {
+    method: "POST",
+    body: parsed,
+    schema: ReimbursementSchema,
+  });
+}
+
+export function payReimbursement(id: string): Promise<ApiResult<Reimbursement>> {
+  return apiRequest(`/api/v1/reimbursements/${id}/pay`, {
+    method: "POST",
+    body: {},
+    schema: ReimbursementSchema,
   });
 }

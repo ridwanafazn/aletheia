@@ -67,6 +67,25 @@ export default function ClaimsPage() {
     });
   };
 
+  if (
+    !hasRole(
+      "CLAIMS_OFFICER",
+      "BRANCH_MANAGER",
+      "FINANCE_MANAGER",
+      "COMPLIANCE_ADMIN",
+      "MIS_ANALYST",
+    )
+  ) {
+    return (
+      <div className="panel">
+        <div className="panel__body">
+          <h1>Akses terbatas</h1>
+          <p className="muted">Ruang klaim hanya tersedia untuk peran operasional klaim.</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="stack">
       <PageHeader

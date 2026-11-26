@@ -28,6 +28,10 @@ const EnvSchema = z.object({
   MOCK_PAYMENT_AUTO_COMPLETE: OptionalString,
   PAYMENT_WEBHOOK_SECRET: OptionalString,
   FILE_SIGNING_SECRET: OptionalString,
+  CLOUDINARY_CLOUD_NAME: OptionalString,
+  CLOUDINARY_API_KEY: OptionalString,
+  CLOUDINARY_API_SECRET: OptionalString,
+  CLOUDINARY_FOLDER_PREFIX: z.string().min(1).default("aletheia/reimbursements"),
   FILE_URL_TTL_SECONDS: z.coerce.number().int().min(30).max(3600).default(300),
   LOG_LEVEL: z.string().default("info"),
 });
@@ -50,6 +54,13 @@ if (parsed.NODE_ENV === "production") {
   if (parsed.FILE_SIGNING_SECRET === undefined) {
     throw new Error("FILE_SIGNING_SECRET wajib diisi di production");
   }
+  if (
+    parsed.CLOUDINARY_CLOUD_NAME === undefined ||
+    parsed.CLOUDINARY_API_KEY === undefined ||
+    parsed.CLOUDINARY_API_SECRET === undefined
+  ) {
+    throw new Error("Konfigurasi Cloudinary wajib diisi di production");
+  }
 }
 
 export const env = {
@@ -59,6 +70,10 @@ export const env = {
   PAYMENT_WEBHOOK_SECRET: parsed.PAYMENT_WEBHOOK_SECRET ?? "dev-only-payment-webhook-secret",
   FILE_SIGNING_SECRET:
     parsed.FILE_SIGNING_SECRET ?? parsed.INTERNAL_GATEWAY_SECRET ?? "dev-only-file-signing-secret",
+  CLOUDINARY_CLOUD_NAME: parsed.CLOUDINARY_CLOUD_NAME ?? "aletheia-demo",
+  CLOUDINARY_API_KEY: parsed.CLOUDINARY_API_KEY ?? "demo",
+  CLOUDINARY_API_SECRET: parsed.CLOUDINARY_API_SECRET ?? "dev-only-cloudinary-secret",
+  CLOUDINARY_FOLDER_PREFIX: parsed.CLOUDINARY_FOLDER_PREFIX,
   FILE_URL_TTL_SECONDS: parsed.FILE_URL_TTL_SECONDS,
   MOCK_PAYMENT_AUTO_COMPLETE:
     parsed.MOCK_PAYMENT_AUTO_COMPLETE === undefined

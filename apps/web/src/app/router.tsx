@@ -129,6 +129,12 @@ const workforceRoute = createRoute({
   component: lazyRouteComponent(() => import("../features/workforce/WorkforcePage")),
 });
 
+const organizationRoute = createRoute({
+  getParentRoute: () => appRoute,
+  path: "/organization",
+  component: lazyRouteComponent(() => import("../features/organization/OrganizationPage")),
+});
+
 const misRoute = createRoute({
   getParentRoute: () => appRoute,
   path: "/mis",
@@ -158,6 +164,7 @@ const routeTree = rootRoute.addChildren([
     reportsRoute,
     meRoute,
     workforceRoute,
+    organizationRoute,
     misRoute,
     whatIfRoute,
   ]),

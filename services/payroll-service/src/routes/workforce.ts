@@ -122,6 +122,7 @@ function toSales(row: SalesRow): SalesAchievement {
 interface LeaveRow {
   id: string;
   personnel_id: string;
+  created_by: string | null;
   leave_type: string;
   start_date: string;
   end_date: string;
@@ -182,12 +183,22 @@ export const employeeRouter: RouterType = Router();
 
 employeeRouter.get(
   "/",
-  requireRoles("HR_SPECIALIST", "FINANCE_MANAGER", "COMPLIANCE_ADMIN", "MIS_ANALYST"),
+  requireRoles(
+    "HR_SPECIALIST",
+    "BRANCH_MANAGER",
+    "FINANCE_MANAGER",
+    "COMPLIANCE_ADMIN",
+    "MIS_ANALYST",
+  ),
   async (request, response) => {
     const auth = request.auth!;
     const query = EmployeeListQuerySchema.parse(request.query);
     const conditions = ["tenant_id = $1"];
     const values: unknown[] = [auth.tenantId];
+    if (auth.role === "BRANCH_MANAGER") {
+      values.push(auth.branchId);
+      conditions.push(`branch_id = $${values.length}`);
+    }
 
     if (query.branch_id !== undefined) {
       values.push(query.branch_id);
@@ -680,11 +691,15 @@ export const leaveRouter: RouterType = Router();
 
 leaveRouter.get(
   "/",
-  requireRoles("HR_SPECIALIST", "FINANCE_MANAGER", "COMPLIANCE_ADMIN"),
+  requireRoles("HR_SPECIALIST", "BRANCH_MANAGER", "FINANCE_MANAGER", "COMPLIANCE_ADMIN"),
   async (request, response) => {
     const auth = request.auth!;
     const conditions = ["l.tenant_id = $1"];
     const values: unknown[] = [auth.tenantId];
+    if (auth.role === "BRANCH_MANAGER") {
+      values.push(auth.branchId);
+      conditions.push(`p.branch_id = $${values.length}`);
+    }
     if (request.query.status !== undefined) {
       values.push(z.string().parse(request.query.status));
       conditions.push(`l.status = $${values.length}`);
@@ -754,8 +769,8 @@ leaveRouter.post("/", requireRoles("HR_SPECIALIST"), async (request, response) =
     const id = randomUUID();
     const result = await client.query<LeaveRow>(
       `insert into payroll.leave_requests
-        (id, tenant_id, personnel_id, leave_type, start_date, end_date, days, status, reason)
-       values ($1,$2,$3,$4,$5,$6,$7,'PENDING',$8)
+        (id, tenant_id, personnel_id, created_by, leave_type, start_date, end_date, days, status, reason)
+       values ($1,$2,$3,$4,$5,$6,$7,$8,'PENDING',$9)
        returning id, personnel_id, leave_type, start_date::text as start_date,
                  end_date::text as end_date, days, status, reason, decided_by, decided_at,
                  decision_notes, created_at`,
@@ -763,6 +778,7 @@ leaveRouter.post("/", requireRoles("HR_SPECIALIST"), async (request, response) =
         id,
         auth.tenantId,
         input.personnel_id,
+        auth.userId,
         input.leave_type,
         input.start_date,
         input.end_date,
@@ -811,7 +827,7 @@ leaveRouter.post(
     try {
       await client.query("BEGIN");
       const existing = await client.query<LeaveRow & { user_id: string | null; branch_id: string }>(
-        `select l.id, l.personnel_id, l.leave_type, l.start_date::text as start_date,
+        `select l.id, l.personnel_id, l.created_by, l.leave_type, l.start_date::text as start_date,
                 l.end_date::text as end_date, l.days, l.status, l.reason, l.decided_by,
                 l.decided_at, l.decision_notes, l.created_at, p.user_id, p.branch_id
            from payroll.leave_requests l
@@ -827,7 +843,10 @@ leaveRouter.post(
       if (auth.role === "BRANCH_MANAGER" && row.branch_id !== auth.branchId) {
         throw ApiError.notFound("Pengajuan cuti tidak ditemukan");
       }
-      if (row.user_id !== null && row.user_id === auth.userId) {
+      if (
+        (row.user_id !== null && row.user_id === auth.userId) ||
+        (row.created_by !== null && row.created_by === auth.userId)
+      ) {
         throw new ApiError(403, "ERR_SOD_VIOLATION", "Tidak dapat memutuskan cuti sendiri");
       }
       if (row.status !== "PENDING") {

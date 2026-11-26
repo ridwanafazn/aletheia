@@ -9,7 +9,13 @@ import {
   OvertimeRequestListResponseSchema,
   OvertimeRequestSchema,
   PayslipPageSchema,
+  ReimbursementCreateSchema,
+  ReimbursementPageSchema,
+  ReimbursementSchema,
+  ReimbursementUploadSignatureRequestSchema,
+  ReimbursementUploadSignatureSchema,
   SelfLeaveRequestCreateSchema,
+  type AttendanceSummary,
   type FileDownloadResponse,
   type LeaveBalance,
   type LeaveRequest,
@@ -17,8 +23,12 @@ import {
   type OvertimeRequest,
   type OvertimeRequestCreate,
   type PayslipPage,
+  type Reimbursement,
+  type ReimbursementCreate,
+  type ReimbursementPage,
+  type ReimbursementUploadSignature,
+  type ReimbursementUploadSignatureRequest,
   type SelfLeaveRequestCreate,
-  type AttendanceSummary,
 } from "@aletheia/shared-contracts";
 
 import { apiRequest, toQuery, type ApiResult } from "../../shared/api/client";
@@ -95,5 +105,33 @@ export function createMyOvertimeRequest(
     method: "POST",
     body: parsed,
     schema: OvertimeRequestSchema,
+  });
+}
+
+export function listMyReimbursements(): Promise<ApiResult<ReimbursementPage>> {
+  return apiRequest("/api/v1/me/reimbursements", {
+    schema: ReimbursementPageSchema,
+  });
+}
+
+export function createMyReimbursement(
+  input: ReimbursementCreate,
+): Promise<ApiResult<Reimbursement>> {
+  const parsed = ReimbursementCreateSchema.parse(input);
+  return apiRequest("/api/v1/me/reimbursements", {
+    method: "POST",
+    body: parsed,
+    schema: ReimbursementSchema,
+  });
+}
+
+export function requestReimbursementUploadSignature(
+  input: ReimbursementUploadSignatureRequest,
+): Promise<ApiResult<ReimbursementUploadSignature>> {
+  const parsed = ReimbursementUploadSignatureRequestSchema.parse(input);
+  return apiRequest("/api/v1/me/reimbursements/upload-signature", {
+    method: "POST",
+    body: parsed,
+    schema: ReimbursementUploadSignatureSchema,
   });
 }

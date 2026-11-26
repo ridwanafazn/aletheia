@@ -170,6 +170,9 @@ describe.skipIf(!integrationEnabled)("payroll service integration", () => {
     await pool.query(`delete from payroll.tax_reconciliations where tenant_id = $1`, [TENANT]);
     await pool.query(`delete from payroll.items where tenant_id = $1`, [TENANT]);
     await pool.query(`delete from payroll.batches where tenant_id = $1`, [TENANT]);
+    await pool.query(`delete from payroll.reimbursements where tenant_id = $1`, [TENANT]);
+    await pool.query(`delete from payroll.overtime_requests where tenant_id = $1`, [TENANT]);
+    await pool.query(`delete from payroll.leave_balances where tenant_id = $1`, [TENANT]);
     await pool.query(`delete from payroll.leave_requests where tenant_id = $1`, [TENANT]);
     await pool.query(`delete from payroll.attendance_summaries where tenant_id = $1`, [TENANT]);
     await pool.query(`delete from payroll.sales_achievements where tenant_id = $1`, [TENANT]);
@@ -356,6 +359,14 @@ describe.skipIf(!integrationEnabled)("payroll service integration", () => {
   });
 
   it("menegakkan SoD cuti dan persetujuan cuti", async () => {
+    await pool.query(
+      `insert into payroll.leave_balances
+         (id, tenant_id, personnel_id, leave_type, year, entitlement_days, used_days, pending_days)
+       values (gen_random_uuid(),$1,$2,'ANNUAL',2026,'12.00','0.00','0.00')
+       on conflict (tenant_id, personnel_id, leave_type, year) do update
+         set entitlement_days = excluded.entitlement_days`,
+      [TENANT, financeLinkedEmployeeId],
+    );
     const leave = await call(
       "POST",
       "/api/v1/leave-requests",
@@ -388,6 +399,169 @@ describe.skipIf(!integrationEnabled)("payroll service integration", () => {
     );
     expect(decided.status).toBe(200);
     expect(decided.body.data.status).toBe("APPROVED");
+
+    const balances = await call(
+      "GET",
+      `/api/v1/leave-balances?personnel_id=${financeLinkedEmployeeId}&year=2026`,
+      undefined,
+      hr,
+    );
+    expect(balances.status).toBe(200);
+    expect(balances.body.data.items[0].used_days).toBe(2);
+    expect(balances.body.data.items[0].pending_days).toBe(0);
+  });
+
+  it("menyetujui lembur dan memperbarui ringkasan absensi", async () => {
+    const attendanceSeed = await call(
+      "PUT",
+      `/api/v1/attendance/${financeLinkedEmployeeId}/2026-12`,
+      {
+        working_days: 22,
+        present_days: 20,
+        paid_leave_days: 1,
+        unpaid_leave_days: 1,
+        absent_days: 0,
+        overtime_hours: 4.5,
+        source: "MANUAL",
+      },
+      hr,
+    );
+    expect(attendanceSeed.status).toBe(200);
+
+    const created = await call(
+      "POST",
+      "/api/v1/me/overtime-requests",
+      {
+        work_date: "2026-12-15",
+        hours: 2,
+        reason: "Penutupan laporan akhir tahun",
+      },
+      finance,
+    );
+    expect(created.status).toBe(201);
+
+    const decided = await call(
+      "POST",
+      `/api/v1/overtime-requests/${created.body.data.id}/decide`,
+      { decision: "APPROVED" },
+      hr,
+    );
+    expect(decided.status).toBe(200);
+
+    const attendance = await call(
+      "GET",
+      `/api/v1/attendance?personnel_id=${financeLinkedEmployeeId}&period=2026-12`,
+      undefined,
+      hr,
+    );
+    expect(attendance.status).toBe(200);
+    expect(attendance.body.data.items[0].overtime_hours).toBe(2);
+  });
+
+  it("menegakkan self-scope, SoD, dan transisi status reimburse", async () => {
+    await pool.query(`update payroll.personnel set user_id = $1 where tenant_id = $2 and id = $3`, [
+      MANAGER,
+      TENANT,
+      employeeId,
+    ]);
+
+    const created = await call(
+      "POST",
+      "/api/v1/me/reimbursements",
+      {
+        category: "TRANSPORT",
+        expense_date: "2026-12-05",
+        amount: "150000.00",
+        description: "Perjalanan dinas Desember",
+      },
+      finance,
+    );
+    expect(created.status).toBe(201);
+    expect(created.body.data.status).toBe("PENDING");
+
+    const otherEmployee = await call("GET", "/api/v1/me/reimbursements", undefined, manager);
+    expect(otherEmployee.status).toBe(200);
+    expect(
+      otherEmployee.body.data.items.some(
+        (item: { id: string }) => item.id === created.body.data.id,
+      ),
+    ).toBe(false);
+
+    const selfDecision = await call(
+      "POST",
+      `/api/v1/reimbursements/${created.body.data.id}/decide`,
+      { decision: "APPROVED" },
+      finance,
+    );
+    expect(selfDecision.status).toBe(403);
+    expect(selfDecision.body.error.code).toBe("ERR_SOD_VIOLATION");
+
+    const approved = await call(
+      "POST",
+      `/api/v1/reimbursements/${created.body.data.id}/decide`,
+      { decision: "APPROVED" },
+      hr,
+    );
+    expect(approved.status).toBe(200);
+    expect(approved.body.data.status).toBe("APPROVED");
+
+    const doubleDecision = await call(
+      "POST",
+      `/api/v1/reimbursements/${created.body.data.id}/decide`,
+      { decision: "REJECTED", notes: "Sudah diputuskan" },
+      manager,
+    );
+    expect(doubleDecision.status).toBe(409);
+    expect(doubleDecision.body.error.code).toBe("ERR_CONCURRENT_LOCK");
+
+    const paid = await call(
+      "POST",
+      `/api/v1/reimbursements/${created.body.data.id}/pay`,
+      undefined,
+      finance,
+    );
+    expect(paid.status).toBe(200);
+    expect(paid.body.data.status).toBe("PAID");
+
+    const doublePay = await call(
+      "POST",
+      `/api/v1/reimbursements/${created.body.data.id}/pay`,
+      undefined,
+      finance,
+    );
+    expect(doublePay.status).toBe(409);
+    expect(doublePay.body.error.code).toBe("ERR_PAYMENT_STATE_CONFLICT");
+
+    const rejected = await call(
+      "POST",
+      "/api/v1/me/reimbursements",
+      {
+        category: "MEAL",
+        expense_date: "2026-12-06",
+        amount: "90000.00",
+        description: "Konsumsi rapat Desember",
+      },
+      finance,
+    );
+    expect(rejected.status).toBe(201);
+
+    const rejectedDecision = await call(
+      "POST",
+      `/api/v1/reimbursements/${rejected.body.data.id}/decide`,
+      { decision: "REJECTED", notes: "Tidak ada bukti" },
+      hr,
+    );
+    expect(rejectedDecision.status).toBe(200);
+    expect(rejectedDecision.body.data.status).toBe("REJECTED");
+
+    const payRejected = await call(
+      "POST",
+      `/api/v1/reimbursements/${rejected.body.data.id}/pay`,
+      undefined,
+      finance,
+    );
+    expect(payRejected.status).toBe(409);
+    expect(payRejected.body.error.code).toBe("ERR_PAYMENT_STATE_CONFLICT");
   });
 
   it("membuat batch idempoten dan menolak periode ganda", async () => {

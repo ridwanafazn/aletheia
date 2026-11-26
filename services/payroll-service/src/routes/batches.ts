@@ -138,9 +138,20 @@ export const batchRouter: RouterType = Router();
 
 payrollReferenceRouter.get(
   "/branches",
-  requireRoles("HR_SPECIALIST", "FINANCE_MANAGER", "COMPLIANCE_ADMIN", "MIS_ANALYST"),
+  requireRoles(
+    "HR_SPECIALIST",
+    "BRANCH_MANAGER",
+    "FINANCE_MANAGER",
+    "COMPLIANCE_ADMIN",
+    "MIS_ANALYST",
+  ),
   async (request, response) => {
     const auth = request.auth!;
+    const values: unknown[] = [auth.tenantId];
+    const branchFilter = auth.role === "BRANCH_MANAGER" ? "and id = $2" : "";
+    if (auth.role === "BRANCH_MANAGER") {
+      values.push(auth.branchId);
+    }
     const result = await pool.query<{
       id: string;
       code: string;
@@ -150,9 +161,9 @@ payrollReferenceRouter.get(
     }>(
       `select id, code, name, region, monthly_disbursement_cap::text as monthly_disbursement_cap
          from governance.branches
-        where tenant_id = $1
+        where tenant_id = $1 ${branchFilter}
         order by code asc`,
-      [auth.tenantId],
+      values,
     );
     const data = { items: result.rows };
     PayrollBranchListResponseSchema.parse(data);

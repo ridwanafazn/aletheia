@@ -195,6 +195,13 @@ const LEAVE_TYPE_LABELS: Record<string, string> = {
   OTHER: "Cuti lainnya",
 };
 
+const REIMBURSEMENT_CATEGORY_LABELS: Record<string, string> = {
+  TRANSPORT: "Transport",
+  MEAL: "Makan",
+  MEDICAL: "Medis",
+  OTHER: "Lainnya",
+};
+
 const ROLE_LABELS: Record<string, string> = {
   CLAIMS_OFFICER: "Petugas Klaim",
   BRANCH_MANAGER: "Manajer Cabang",
@@ -248,6 +255,10 @@ export function batchTypeLabel(value: string): string {
 
 export function leaveTypeLabel(value: string): string {
   return LEAVE_TYPE_LABELS[value] ?? value;
+}
+
+export function reimbursementCategoryLabel(value: string): string {
+  return REIMBURSEMENT_CATEGORY_LABELS[value] ?? value;
 }
 
 export function documentLabel(type: string): string {

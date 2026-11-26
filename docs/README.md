@@ -41,6 +41,7 @@ Mulai dari `HANDOVER.md` di root repository. Dokumen ini adalah indeks spesifika
 | `evidence/m6.2-verification.md` | Bukti production: smoke, web UI, async QStash, rollback, monitoring |
 | `evidence/m6.3-verification.md` | Bukti slip gaji, laporan PPh 21/BPJS, E2E, axe, dan bundle |
 | `evidence/m6.4-verification.md` | Bukti employee self-service, e-cuti, e-lembur, E2E, dan axe |
+| `evidence/m6.5-verification.md` | Bukti reimburse, struktur organisasi, E2E, dan axe |
 
 ## Evidence
 

@@ -376,7 +376,11 @@ export type ReimbursementListQuery = z.infer<typeof ReimbursementListQuerySchema
 export const ReimbursementUploadSignatureRequestSchema = z
   .object({
     mime_type: z.enum(["image/jpeg", "image/png", "image/webp", "application/pdf"]),
-    file_size_bytes: z.number().int().positive().max(5 * 1024 * 1024),
+    file_size_bytes: z
+      .number()
+      .int()
+      .positive()
+      .max(5 * 1024 * 1024),
   })
   .strict();
 export type ReimbursementUploadSignatureRequest = z.infer<
@@ -391,6 +395,8 @@ export const ReimbursementUploadSignatureSchema = z
     signature: z.string().min(1),
     folder: z.string().min(1),
     public_id: z.string().min(1),
+    allowed_formats: z.array(z.string()),
+    max_file_size: z.number().int().positive(),
   })
   .strict();
 export type ReimbursementUploadSignature = z.infer<typeof ReimbursementUploadSignatureSchema>;

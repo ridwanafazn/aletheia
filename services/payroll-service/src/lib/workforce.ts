@@ -1,5 +1,3 @@
-import { randomUUID } from "node:crypto";
-
 import type { PoolClient, QueryResult, QueryResultRow } from "pg";
 
 import type { LeaveBalance, OvertimeRequest } from "@aletheia/shared-contracts";
@@ -81,9 +79,16 @@ export async function resolveSelf(
        from payroll.personnel p
        join governance.branches b on b.id = p.branch_id and b.tenant_id = p.tenant_id
       where p.tenant_id = $1 and p.user_id = $2 and p.is_active
-      limit 1`,
+      limit 2`,
     [tenantId, userId],
   );
+  if (result.rows.length > 1) {
+    throw new ApiError(
+      409,
+      "ERR_EMPLOYEE_LINK_CONFLICT",
+      "Akun ini terhubung ke lebih dari satu data personel",
+    );
+  }
   const row = result.rows[0];
   if (row === undefined) {
     throw new ApiError(403, "ERR_RBAC_FORBIDDEN", "Akun ini tidak terhubung ke data personel");
@@ -149,9 +154,12 @@ export async function recomputeOvertimeSummary(
   tenantId: string,
   personnelId: string,
   workDate: string,
-  actorId: string,
+  _actorId: string,
 ): Promise<void> {
   const period = monthStart(workDate);
+  await client.query(`select pg_advisory_xact_lock(hashtextextended($1, 0))`, [
+    `${tenantId}:${personnelId}:${period}:overtime`,
+  ]);
   const total = await client.query<{ total: string }>(
     `select coalesce(sum(hours), 0)::text as total
        from payroll.overtime_requests
@@ -162,18 +170,18 @@ export async function recomputeOvertimeSummary(
         and work_date < ($3::date + interval '1 month')`,
     [tenantId, personnelId, period],
   );
-  await client.query(
-    `insert into payroll.attendance_summaries
-       (id, tenant_id, personnel_id, period_month, working_days, present_days,
-        paid_leave_days, unpaid_leave_days, absent_days, overtime_hours, source,
-        approved_by, approved_at)
-     values ($1,$2,$3,$4,0,0,0,0,0,$5,'API',$6,now())
-     on conflict (tenant_id, personnel_id, period_month)
-     do update set overtime_hours = excluded.overtime_hours,
-                   source = 'API',
-                   approved_by = excluded.approved_by,
-                   approved_at = now(),
-                   updated_at = now()`,
-    [randomUUID(), tenantId, personnelId, period, total.rows[0]?.total ?? "0", actorId],
+  const updated = await client.query(
+    `update payroll.attendance_summaries
+        set overtime_hours = $4,
+            updated_at = now()
+      where tenant_id = $1 and personnel_id = $2 and period_month = $3::date`,
+    [tenantId, personnelId, period, total.rows[0]?.total ?? "0"],
   );
+  if (updated.rowCount === 0) {
+    throw new ApiError(
+      409,
+      "ERR_ATTENDANCE_MISSING",
+      "Ringkasan absensi bulan ini belum tersedia. Minta HR mengisi absensi sebelum menyetujui lembur.",
+    );
+  }
 }

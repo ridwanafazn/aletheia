@@ -100,6 +100,17 @@ export default function PayrollPage() {
     });
   };
 
+  if (!hasRole("HR_SPECIALIST", "FINANCE_MANAGER", "COMPLIANCE_ADMIN", "MIS_ANALYST")) {
+    return (
+      <div className="panel">
+        <div className="panel__body">
+          <h1>Akses terbatas</h1>
+          <p className="muted">Konsol payroll hanya tersedia untuk peran payroll dan kepatuhan.</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="stack">
       <PageHeader

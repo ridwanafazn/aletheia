@@ -68,7 +68,7 @@ test("employee directory opens attendance and leave summary", async ({ page }) =
   await page.getByLabel("Periode", { exact: true }).fill("2026-11");
   await expect(page.getByRole("heading", { name: "Ringkasan absensi" })).toBeVisible();
   await expect(page.getByText("Hadir", { exact: true })).toBeVisible();
-  await expect(page.getByText("Cuti tahunan").first()).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Riwayat cuti" })).toBeVisible();
   expect(await accessibilityViolations(page)).toEqual([]);
   await page.screenshot({ path: `${EVIDENCE}/desktop-employee-drawer.png`, fullPage: true });
 });

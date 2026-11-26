@@ -1,0 +1,2 @@
+ALTER TABLE "payroll"."leave_requests" ADD COLUMN "created_by" uuid;--> statement-breakpoint
+CREATE UNIQUE INDEX "personnel_tenant_user_unique" ON "payroll"."personnel" USING btree ("tenant_id","user_id") WHERE "payroll"."personnel"."user_id" is not null;

@@ -13,17 +13,24 @@ import {
   PayslipListQuerySchema,
   PayslipPageSchema,
   PayslipSchema,
+  ReimbursementCreateSchema,
+  ReimbursementPageSchema,
+  ReimbursementSchema,
+  ReimbursementUploadSignatureRequestSchema,
+  ReimbursementUploadSignatureSchema,
   SelfLeaveRequestCreateSchema,
   type AttendanceSummary,
   type LeaveRequest,
   type OvertimeRequest,
   type Payslip,
+  type Reimbursement,
 } from "@aletheia/shared-contracts";
 import { Router, type Router as RouterType } from "express";
 import type { PoolClient } from "pg";
 import { z } from "zod";
 
 import { appendAudit } from "../lib/audit.js";
+import { assertTrustedReceiptUrl, createReimbursementUploadSignature } from "../lib/cloudinary.js";
 import { isUniqueViolation } from "../lib/db-errors.js";
 import { ApiError } from "../lib/errors.js";
 import { decodeCursor, encodeCursor } from "../lib/pagination.js";
@@ -154,6 +161,42 @@ function toLeave(row: LeaveRow): LeaveRequest {
   });
 }
 
+interface ReimbursementRow {
+  id: string;
+  personnel_id: string;
+  category: string;
+  expense_date: string;
+  amount: string;
+  description: string;
+  receipt_url: string | null;
+  status: string;
+  decided_by: string | null;
+  decided_at: Date | null;
+  decision_notes: string | null;
+  paid_by: string | null;
+  paid_at: Date | null;
+  created_at: Date;
+}
+
+function toReimbursement(row: ReimbursementRow): Reimbursement {
+  return ReimbursementSchema.parse({
+    id: row.id,
+    personnel_id: row.personnel_id,
+    category: row.category,
+    expense_date: row.expense_date,
+    amount: row.amount,
+    description: row.description,
+    receipt_url: row.receipt_url,
+    status: row.status,
+    decided_by: row.decided_by,
+    decided_at: row.decided_at?.toISOString() ?? null,
+    decision_notes: row.decision_notes,
+    paid_by: row.paid_by,
+    paid_at: row.paid_at?.toISOString() ?? null,
+    created_at: row.created_at.toISOString(),
+  });
+}
+
 function toMeProfile(self: SelfPersonnelRow) {
   return MeProfileSchema.parse({
     personnel_id: self.personnel_id,
@@ -215,8 +258,8 @@ async function insertLeaveRequest(
 
   const result = await client.query<LeaveRow>(
     `insert into payroll.leave_requests
-       (id, tenant_id, personnel_id, leave_type, start_date, end_date, days, status, reason)
-     values ($1,$2,$3,$4,$5,$6,$7,'PENDING',$8)
+       (id, tenant_id, personnel_id, created_by, leave_type, start_date, end_date, days, status, reason)
+     values ($1,$2,$3,$4,$5,$6,$7,$8,'PENDING',$9)
      returning id, personnel_id, leave_type, start_date::text as start_date,
                end_date::text as end_date, days, status, reason, decided_by, decided_at,
                decision_notes, created_at`,
@@ -224,6 +267,7 @@ async function insertLeaveRequest(
       id,
       tenantId,
       self.personnel_id,
+      actorId,
       input.leave_type,
       input.start_date,
       input.end_date,
@@ -505,6 +549,102 @@ meRouter.get("/overtime-requests", async (request, response) => {
   const data = { items: result.rows.map(toOvertimeRequest) };
   OvertimeRequestListResponseSchema.parse(data);
   sendData(response, data);
+});
+
+meRouter.post("/reimbursements/upload-signature", async (request, response) => {
+  const auth = request.auth!;
+  const self = await selfOrThrow(auth.tenantId, auth.userId);
+  ReimbursementUploadSignatureRequestSchema.parse(request.body);
+  const signature = createReimbursementUploadSignature({
+    tenantId: auth.tenantId,
+    personnelId: self.personnel_id,
+  });
+  sendData(response, ReimbursementUploadSignatureSchema.parse(signature));
+});
+
+meRouter.get("/reimbursements", async (request, response) => {
+  const auth = request.auth!;
+  const self = await selfOrThrow(auth.tenantId, auth.userId);
+  const result = await pool.query<ReimbursementRow>(
+    `select id, personnel_id, category, expense_date::text as expense_date,
+            amount::text as amount, description, receipt_url, status, decided_by,
+            decided_at, decision_notes, paid_by, paid_at, created_at
+       from payroll.reimbursements
+      where tenant_id = $1 and personnel_id = $2
+      order by created_at desc, id desc
+      limit 100`,
+    [auth.tenantId, self.personnel_id],
+  );
+  const data = {
+    items: result.rows.map(toReimbursement),
+    meta: { next_cursor: null, has_more: false },
+  };
+  ReimbursementPageSchema.parse(data);
+  sendData(response, data);
+});
+
+meRouter.post("/reimbursements", async (request, response) => {
+  const auth = request.auth!;
+  const self = await selfOrThrow(auth.tenantId, auth.userId);
+  const input = ReimbursementCreateSchema.parse(request.body);
+  if (input.receipt_url !== undefined) {
+    assertTrustedReceiptUrl(input.receipt_url);
+  }
+  const id = randomUUID();
+  const client = await pool.connect();
+
+  try {
+    await client.query("BEGIN");
+    const result = await client.query<ReimbursementRow>(
+      `insert into payroll.reimbursements
+         (id, tenant_id, personnel_id, category, expense_date, amount, description,
+          receipt_url, receipt_public_id, status, created_by)
+       values ($1,$2,$3,$4,$5,$6,$7,$8,$9,'PENDING',$10)
+       returning id, personnel_id, category, expense_date::text as expense_date,
+                 amount::text as amount, description, receipt_url, status, decided_by,
+                 decided_at, decision_notes, paid_by, paid_at, created_at`,
+      [
+        id,
+        auth.tenantId,
+        self.personnel_id,
+        input.category,
+        input.expense_date,
+        input.amount,
+        input.description,
+        input.receipt_url ?? null,
+        input.receipt_public_id ?? null,
+        auth.userId,
+      ],
+    );
+    await appendAudit(
+      {
+        tenantId: auth.tenantId,
+        actorId: auth.userId,
+        actorRole: auth.role,
+        domain: "PAYROLL",
+        entityType: "REIMBURSEMENT",
+        entityId: id,
+        action: "REIMBURSEMENT_REQUESTED",
+        policyVersionId: null,
+        decisionContext: {
+          personnel_id: self.personnel_id,
+          category: input.category,
+          amount: input.amount,
+          expense_date: input.expense_date,
+          source: "SELF_SERVICE",
+        },
+        correlationId: request.correlationId,
+      },
+      client,
+    );
+    await client.query("COMMIT");
+    sendData(response, toReimbursement(result.rows[0]!), 201);
+  } catch (error) {
+    await client.query("ROLLBACK").catch(() => undefined);
+    throw error;
+  } finally {
+    client.release();
+  }
 });
 
 meRouter.post("/overtime-requests", async (request, response) => {

@@ -29,6 +29,10 @@ Semua perubahan penting pada Aletheia. Format mengikuti [Keep a Changelog](https
 - M6.4: endpoint self-scope `/api/v1/me/*` dan antrean HR `/workforce` untuk keputusan cuti dan lembur.
 - M6.4: SoD cuti/lembur, validasi saldo, dan rekalkulasi lembur ke attendance summary.
 - Bukti M6.4: `docs/evidence/m6.4-verification.md` dan empat screenshot Ruang Saya.
+- M6.5: reimburse karyawan dengan Cloudinary signed upload, approval HR, dan pembayaran mock Finance.
+- M6.5: departemen, posisi, penugasan personel, dan halaman Struktur Organisasi read-only.
+- M6.5: guard peran pada halaman payroll dan klaim, unique link personel-user, dan hardening overtime/leave.
+- Bukti M6.5: `docs/evidence/m6.5-verification.md` dan screenshot reimburse serta organisasi.
 
 ### Changed
 

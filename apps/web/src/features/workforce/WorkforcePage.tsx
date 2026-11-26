@@ -1,19 +1,41 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { CalendarDays, Clock3, RefreshCw } from "lucide-react";
+import { CalendarDays, Clock3, ReceiptText, RefreshCw } from "lucide-react";
 import { useState } from "react";
 
-import type { LeaveRequest, OvertimeRequest } from "@aletheia/shared-contracts";
+import type { LeaveRequest, OvertimeRequest, Reimbursement } from "@aletheia/shared-contracts";
 
 import { ApiError } from "../../shared/api/client";
 import { listBranches } from "../../shared/api/reference";
-import { Banner, Button, EmptyState, ErrorState, PageHeader, SkeletonTable } from "../../shared/ui";
-import { formatDate, formatNumber, leaveTypeLabel } from "../../shared/lib/format";
+import {
+  Banner,
+  Button,
+  EmptyState,
+  ErrorState,
+  PageHeader,
+  SkeletonTable,
+  StatusBadge,
+} from "../../shared/ui";
+import {
+  formatDate,
+  formatMoney,
+  formatNumber,
+  leaveTypeLabel,
+  reimbursementCategoryLabel,
+} from "../../shared/lib/format";
 import { useAuth } from "../auth/AuthProvider";
 import { listAllEmployees } from "../employees/api";
 import { DecisionDialog } from "./DecisionDialog";
-import { decideLeave, decideOvertime, listWorkforceLeave, listWorkforceOvertime } from "./api";
+import {
+  decideLeave,
+  decideOvertime,
+  decideReimbursement,
+  listWorkforceLeave,
+  listWorkforceOvertime,
+  listWorkforceReimbursements,
+  payReimbursement,
+} from "./api";
 
-type Tab = "leave" | "overtime";
+type Tab = "leave" | "overtime" | "reimbursements";
 
 export default function WorkforcePage() {
   const { hasRole, user } = useAuth();
@@ -26,6 +48,10 @@ export default function WorkforcePage() {
   const [leaveDecision, setLeaveDecision] = useState<"APPROVED" | "REJECTED">("APPROVED");
   const [overtimeTarget, setOvertimeTarget] = useState<OvertimeRequest | null>(null);
   const [overtimeDecision, setOvertimeDecision] = useState<"APPROVED" | "REJECTED">("APPROVED");
+  const [reimbursementTarget, setReimbursementTarget] = useState<Reimbursement | null>(null);
+  const [reimbursementDecision, setReimbursementDecision] = useState<"APPROVED" | "REJECTED">(
+    "APPROVED",
+  );
 
   const branchesQuery = useQuery({
     queryKey: ["payroll-branches"],
@@ -57,13 +83,22 @@ export default function WorkforcePage() {
         ...(branchId.length === 0 ? {} : { branch_id: branchId }),
       }),
   });
+  const reimbursementQuery = useQuery({
+    queryKey: ["workforce-reimbursements", branchId],
+    queryFn: () =>
+      listWorkforceReimbursements({
+        ...(branchId.length === 0 ? {} : { branch_id: branchId }),
+      }),
+  });
 
   const leaveItems = leaveQuery.data?.data.items ?? [];
   const overtimeItems = overtimeQuery.data?.data.items ?? [];
+  const reimbursementItems = reimbursementQuery.data?.data.items ?? [];
 
   const invalidate = () => {
     void queryClient.invalidateQueries({ queryKey: ["workforce-leave"] });
     void queryClient.invalidateQueries({ queryKey: ["workforce-overtime"] });
+    void queryClient.invalidateQueries({ queryKey: ["workforce-reimbursements"] });
   };
 
   const leaveMutation = useMutation({
@@ -87,6 +122,34 @@ export default function WorkforcePage() {
     onSuccess: () => {
       setOvertimeTarget(null);
       setNotice("Keputusan lembur tersimpan.");
+      setActionError(null);
+      invalidate();
+    },
+    onError: (error) => {
+      setNotice(null);
+      setActionError(error);
+    },
+  });
+
+  const reimbursementMutation = useMutation({
+    mutationFn: (input: { id: string; decision: "APPROVED" | "REJECTED"; notes?: string }) =>
+      decideReimbursement(input.id, input.decision, input.notes),
+    onSuccess: () => {
+      setReimbursementTarget(null);
+      setNotice("Keputusan reimburse tersimpan.");
+      setActionError(null);
+      invalidate();
+    },
+    onError: (error) => {
+      setNotice(null);
+      setActionError(error);
+    },
+  });
+
+  const payMutation = useMutation({
+    mutationFn: (id: string) => payReimbursement(id),
+    onSuccess: () => {
+      setNotice("Reimburse ditandai dibayar.");
       setActionError(null);
       invalidate();
     },
@@ -195,6 +258,20 @@ export default function WorkforcePage() {
             Lembur ({overtimeItems.length})
           </span>
         </button>
+        <button
+          type="button"
+          role="tab"
+          id="workforce-tab-reimbursements"
+          aria-selected={tab === "reimbursements"}
+          aria-controls="workforce-panel-reimbursements"
+          className="tabs__item"
+          onClick={() => setTab("reimbursements")}
+        >
+          <span className="row" style={{ gap: 6 }}>
+            <ReceiptText size={14} aria-hidden="true" />
+            Reimburse ({reimbursementItems.length})
+          </span>
+        </button>
       </div>
 
       {tab === "leave" ? (
@@ -286,7 +363,7 @@ export default function WorkforcePage() {
             </div>
           )}
         </section>
-      ) : (
+      ) : tab === "overtime" ? (
         <section
           className="panel"
           role="tabpanel"
@@ -371,6 +448,114 @@ export default function WorkforcePage() {
             </div>
           )}
         </section>
+      ) : (
+        <section
+          className="panel"
+          role="tabpanel"
+          id="workforce-panel-reimbursements"
+          aria-labelledby="workforce-tab-reimbursements"
+        >
+          {reimbursementQuery.isPending ? (
+            <SkeletonTable rows={4} />
+          ) : reimbursementQuery.isError ? (
+            <ErrorState
+              error={reimbursementQuery.error}
+              onRetry={() => void reimbursementQuery.refetch()}
+            />
+          ) : reimbursementItems.length === 0 ? (
+            <EmptyState
+              title="Tidak ada reimburse"
+              body="Pengajuan reimburse yang menunggu atau sudah disetujui akan muncul di sini."
+              icon={<ReceiptText size={18} />}
+            />
+          ) : (
+            <div className="table-wrap">
+              <table className="table">
+                <caption className="sr-only">Antrean dan riwayat reimburse</caption>
+                <thead>
+                  <tr>
+                    <th scope="col">Personel</th>
+                    <th scope="col">Tanggal</th>
+                    <th scope="col">Kategori</th>
+                    <th scope="col" className="numeric">
+                      Nominal
+                    </th>
+                    <th scope="col" className="col-hide-sm">
+                      Deskripsi
+                    </th>
+                    <th scope="col">Status</th>
+                    <th scope="col">
+                      <span className="sr-only">Aksi</span>
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {reimbursementItems.map((item) => (
+                    <tr key={item.id}>
+                      <td>
+                        <div className="table__primary">{employeeName(item.personnel_id)}</div>
+                        <div className="table__secondary mono">
+                          {branchName(
+                            employees.find((employee) => employee.id === item.personnel_id)
+                              ?.branch_id ?? "",
+                          )}
+                        </div>
+                      </td>
+                      <td>{formatDate(item.expense_date)}</td>
+                      <td>{reimbursementCategoryLabel(item.category)}</td>
+                      <td className="numeric">{formatMoney(item.amount)}</td>
+                      <td className="col-hide-sm small">{item.description}</td>
+                      <td>
+                        <StatusBadge status={item.status} />
+                      </td>
+                      <td>
+                        {item.status === "PENDING" && !isSelf(item.personnel_id) ? (
+                          <div className="row" style={{ gap: 6, justifyContent: "flex-end" }}>
+                            <Button
+                              variant="secondary"
+                              size="sm"
+                              onClick={() => {
+                                setReimbursementTarget(item);
+                                setReimbursementDecision("APPROVED");
+                              }}
+                            >
+                              Setujui
+                            </Button>
+                            <Button
+                              variant="danger"
+                              size="sm"
+                              onClick={() => {
+                                setReimbursementTarget(item);
+                                setReimbursementDecision("REJECTED");
+                              }}
+                            >
+                              Tolak
+                            </Button>
+                          </div>
+                        ) : item.status === "APPROVED" && hasRole("FINANCE_MANAGER") ? (
+                          <Button
+                            variant="primary"
+                            size="sm"
+                            loading={payMutation.isPending}
+                            onClick={() => payMutation.mutate(item.id)}
+                          >
+                            Bayar
+                          </Button>
+                        ) : (
+                          <span className="small muted">
+                            {item.status === "PENDING" && isSelf(item.personnel_id)
+                              ? "Menunggu approver lain"
+                              : ""}
+                          </span>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </section>
       )}
 
       <DecisionDialog
@@ -418,6 +603,31 @@ export default function WorkforcePage() {
           await overtimeMutation.mutateAsync({
             id: overtimeTarget.id,
             decision: overtimeDecision,
+            ...(notes === undefined ? {} : { notes }),
+          });
+        }}
+      />
+
+      <DecisionDialog
+        open={reimbursementTarget !== null}
+        onClose={() => setReimbursementTarget(null)}
+        decision={reimbursementDecision}
+        title={reimbursementDecision === "APPROVED" ? "Setujui reimburse" : "Tolak reimburse"}
+        description={
+          reimbursementTarget === null
+            ? ""
+            : `${employeeName(reimbursementTarget.personnel_id)} · ${reimbursementCategoryLabel(
+                reimbursementTarget.category,
+              )} · ${formatMoney(reimbursementTarget.amount)}`
+        }
+        loading={reimbursementMutation.isPending}
+        onConfirm={async (notes) => {
+          if (reimbursementTarget === null) {
+            return;
+          }
+          await reimbursementMutation.mutateAsync({
+            id: reimbursementTarget.id,
+            decision: reimbursementDecision,
             ...(notes === undefined ? {} : { notes }),
           });
         }}

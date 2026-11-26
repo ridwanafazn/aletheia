@@ -153,10 +153,63 @@ test("employee nav hides payroll, claims, and workforce routes", async ({ page }
   await expect(page.getByRole("link", { name: "Ruang Klaim" })).toHaveCount(0);
   await expect(page.getByRole("link", { name: "Cuti dan Lembur" })).toHaveCount(0);
 
-  await page.goto("/workforce");
+  for (const path of ["/workforce", "/payslips"]) {
+    await page.goto(path);
+    await expect(page.getByRole("heading", { name: "Akses terbatas" })).toBeVisible();
+  }
+});
+
+test("employee cannot open payroll", async ({ page }) => {
+  await login(page, "Karyawan", "employee.siti@aletheia.id", "Ruang Saya");
+  await page.goto("/payroll");
   await expect(page.getByRole("heading", { name: "Akses terbatas" })).toBeVisible();
-  await page.goto("/payslips");
+});
+
+test("employee cannot open claims", async ({ page }) => {
+  await login(page, "Karyawan", "employee.siti@aletheia.id", "Ruang Saya");
+  await page.goto("/claims");
   await expect(page.getByRole("heading", { name: "Akses terbatas" })).toBeVisible();
+});
+
+test("self endpoints reject a forged personnel id", async ({ request }) => {
+  const login = await request.post("http://127.0.0.1:8787/api/v1/auth/login", {
+    data: {
+      email: "employee.siti@aletheia.id",
+      password: "AletheiaDemo!2026",
+    },
+  });
+  expect(login.status()).toBe(200);
+  const token = ((await login.json()) as { data: { access_token: string } }).data.access_token;
+  const response = await request.get(
+    "http://127.0.0.1:8787/api/v1/me/payslips?personnel_id=019361a2-7c00-7000-8000-000000000201",
+    { headers: { authorization: `Bearer ${token}` } },
+  );
+  if (response.status() === 200) {
+    const body = (await response.json()) as {
+      data: { items: Array<{ personnel_id: string }> };
+    };
+    for (const item of body.data.items) {
+      expect(item.personnel_id).toBe("019361a2-7c00-7000-8000-000000000200");
+    }
+  } else {
+    expect(response.status()).toBe(400);
+  }
+});
+
+test("HR workforce queue is accessible and mobile usable", async ({ page }) => {
+  await login(page, "Spesialis SDM", "hr.ops@aletheia.id", "Konsol Payroll");
+  await page.getByRole("link", { name: "Cuti dan Lembur" }).click();
+  await expect(page.getByRole("heading", { name: "Cuti dan Lembur" })).toBeVisible();
+  await expect(page.getByRole("tab", { name: /Reimburse/ })).toBeVisible();
+  expect(await accessibilityViolations(page)).toEqual([]);
+  await page.screenshot({ path: `${EVIDENCE}/workforce.png`, fullPage: true });
+
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.getByRole("button", { name: "Buka navigasi" }).click();
+  await page.getByRole("link", { name: "Cuti dan Lembur" }).click();
+  await expect(page.getByRole("heading", { name: "Cuti dan Lembur" })).toBeVisible();
+  expect(await accessibilityViolations(page)).toEqual([]);
+  await page.screenshot({ path: `${EVIDENCE}/workforce-mobile.png`, fullPage: true });
 });
 
 test("mobile self-service remains usable", async ({ page }) => {

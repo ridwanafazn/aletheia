@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { CalendarDays, FileText, Wallet } from "lucide-react";
+import { CalendarDays, FileText, ReceiptText, Wallet } from "lucide-react";
 import { useState } from "react";
 
 import { ErrorState, PageHeader, SkeletonTable } from "../../shared/ui";
@@ -9,13 +9,15 @@ import { getMyProfile } from "./api";
 import { MyAttendanceTab } from "./MyAttendanceTab";
 import { MyLeaveTab } from "./MyLeaveTab";
 import { MyPayslipsTab } from "./MyPayslipsTab";
+import { MyReimbursementsTab } from "./MyReimbursementsTab";
 
-type Tab = "payslips" | "attendance" | "leave";
+type Tab = "payslips" | "attendance" | "leave" | "reimbursements";
 
 const TABS: Array<{ id: Tab; label: string; icon: typeof FileText }> = [
   { id: "payslips", label: "Slip Gaji", icon: FileText },
   { id: "attendance", label: "Absensi", icon: CalendarDays },
   { id: "leave", label: "Cuti dan Lembur", icon: Wallet },
+  { id: "reimbursements", label: "Reimburse", icon: ReceiptText },
 ];
 
 export default function MePage() {
@@ -108,6 +110,7 @@ export default function MePage() {
         {tab === "payslips" ? <MyPayslipsTab /> : null}
         {tab === "attendance" ? <MyAttendanceTab /> : null}
         {tab === "leave" ? <MyLeaveTab /> : null}
+        {tab === "reimbursements" ? <MyReimbursementsTab /> : null}
       </div>
     </div>
   );
