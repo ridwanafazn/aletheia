@@ -122,7 +122,7 @@
 
 | Fase | Task | Yang dituntaskan | Gate |
 | --- | --- | --- | --- |
-| M6.1 | TASK-19 | README final, 8 screenshot desktop/mobile, video 2–3 menit, akun demo, CHANGELOG, job matrix status 3/4 | Reviewer dapat menjalankan demo < 3 menit; evidence lengkap |
+| M6.1 | TASK-19 | **Aset selesai 26 November 2026.** README final, 8 screenshot inti + 3 mobile, video 2:16, akun demo, CHANGELOG, job matrix aktual. | Reviewer dapat menjalankan demo < 3 menit via `dev-up.sh`; evidence lengkap; live URL pending M5.4. Bukti: `docs/evidence/m6.1-verification.md` |
 | M6.2 | Launch (bagian dari TASK-19/18) | Smoke production, reset seed, monitoring 24 jam, freeze deploy, final checklist | Semua endpoint sehat; tidak ada P0; matrix ≥ 100% |
 
 **Deploy final:** production demo di free-tier, dengan akun demo dan data sintetis.

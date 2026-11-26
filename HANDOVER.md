@@ -19,11 +19,12 @@ Aletheia adalah platform governance pencairan klaim dan payroll dengan:
 * OpenTelemetry, Prometheus, Grafana, dan Jaeger untuk observability.
 * k6 untuk load test dan Playwright untuk E2E.
 
-**Yang sudah selesai:** M1 fondasi, M2 governance dan claims, M3 payroll dan disbursement, M4 MIS, M5.1 security hardening, M5.2 observability dan load test, M5.3 E2E, accessibility, dan final QA.
+**Yang sudah selesai:** M1 fondasi, M2 governance dan claims, M3 payroll dan disbursement, M4 MIS, M5.1 security hardening, M5.2 observability dan load test, M5.3 E2E/accessibility/final QA, dan M6.1 README/screenshot/video/CHANGELOG/job matrix.
 
 **Yang belum selesai:**
 
-* M5.4 deployment production, rollback, Neon, Upstash, Cloudinary, Koyeb/Render. Prasyarat runtime sudah selesai; deployment eksternal menunggu kredensial provider.
+* M5.4 deployment production, rollback, Upstash, Cloudinary, Koyeb/Render. Runtime RLS dan Neon production sudah selesai; deployment eksternal menunggu kredensial provider.
+* M6.2 live demo dan monitoring 24 jam, menunggu M5.4.
 * UI payslip dan laporan. API-nya sudah ada dan diverifikasi di M3.4.
 * Edge preview live perlu deploy ulang.
 * RUM LCP/INP, exporter span edge, dan label Prometheus kardinalitas tinggi.
@@ -250,6 +251,7 @@ pnpm load:seed
 
 Indeks lengkap ada di `docs/evidence/README.md`. Mulai dari:
 
+* `docs/evidence/m6.1-verification.md` — README, screenshot, video 2:16, CHANGELOG, job matrix.
 * `docs/evidence/m5.3-verification.md` — E2E, axe, coverage, race.
 * `docs/evidence/m5.2-verification.md` — OTel, SLO, load test, query plan.
 * `docs/evidence/m5.1-verification.md` — RLS, security scan, audit chain.
@@ -299,6 +301,8 @@ Gunakan `pnpm test:e2e` atau `node apps/web/node_modules/@playwright/test/cli.js
 Jalankan `bash scripts/dev-up.sh`; skrip memilih container 55432 atau Compose 5432 secara otomatis.
 
 ## 12. Langkah berikutnya
+
+M6.1 selesai: lihat `README.md`, `docs/evidence/m6.1-verification.md`, dan `docs/evidence/m6.1/aletheia-demo.webm`.
 
 M5.4 TASK-18:
 

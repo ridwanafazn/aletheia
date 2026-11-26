@@ -22,6 +22,7 @@ Folder ini menyimpan bukti yang dapat diperiksa reviewer: verifikasi milestone, 
 | `m5.2-verification.md` | OTel, SLO, load test, query optimization | Selesai |
 | `m5.3-verification.md` | E2E, axe, coverage, final QA | Selesai |
 | `m5.4-verification.md` | Runtime RLS, role `aletheia_app`, tenant binding, worker Go | Prasyarat selesai; deployment eksternal pending |
+| `m6.1-verification.md` | README, screenshot, video, akun demo, CHANGELOG, job matrix | Aset selesai; live URL pending |
 
 ## Load test
 
@@ -65,6 +66,8 @@ Hasil utama: daftar klaim per cabang 5,853 ms menjadi 1,183 ms; daftar klaim per
 
 * `demo-access.md` — akun, role, URL, cara menjalankan ulang.
 * `m5.3/coverage-summary.json` — ringkasan coverage domain.
+* `m6.1/` — 8 screenshot inti, 3 mobile, dan `aletheia-demo.webm` (2:16).
+* `m6.1/screenshots.md` — indeks screenshot dan catatan gap payslip/report UI.
 
 ## Metadata
 

@@ -36,6 +36,7 @@
     "obs:capture": "pnpm --filter @aletheia/web exec node scripts/capture-dashboards.mjs",
     "test:coverage": "vitest run --coverage",
     "test:e2e": "node apps/web/node_modules/@playwright/test/cli.js test --config apps/web/playwright.config.ts",
+    "demo:record": "node scripts/record-demo.mjs",
     "test:a11y": "node apps/web/node_modules/@playwright/test/cli.js test --config apps/web/playwright.config.ts e2e/a11y.spec.ts"
   },
   "devDependencies": {

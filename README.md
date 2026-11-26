@@ -4,7 +4,7 @@
 
 Aletheia (Greek: *unconcealment*) is a reference implementation for governed money movement: customer claims, payroll, agent commissions, tax withholding, and cross-domain risk intelligence — built around **versioned policy references**, **zero double-disbursement**, and an **immutable audit trail**.
 
-> **Status:** M1 sampai M5.3 selesai. M5.4 sedang berjalan: pool service runtime memakai role non-owner `aletheia_app` dengan tenant binding per request (RLS), security gate 36/36, integration test 27/36/34 lulus dengan RLS aktif, worker Go terverifikasi, dan Neon production sudah dimigrasi/seed dengan RLS 36/36. Deployment Cloudflare/Upstash/Cloudinary/Koyeb-Render menunggu kredensial provider. Server demo dihentikan; nyalakan dengan `bash scripts/dev-up.sh`. Baca [`HANDOVER.md`](HANDOVER.md) sebelum melanjutkan.
+> **Status:** M1 sampai M5.3 selesai. M5.4 sedang berjalan: runtime RLS, worker Go, dan Neon production sudah siap (security gate 36/36, integration 27/36/34). M6.1 portofolio siap: README, 8 screenshot, video demo 2:16, akun demo, dan CHANGELOG. Deployment Cloudflare/Upstash/Cloudinary/Koyeb-Render menunggu kredensial provider. Server demo dihentikan; nyalakan dengan `bash scripts/dev-up.sh`. Baca [`HANDOVER.md`](HANDOVER.md) sebelum melanjutkan.
 
 ## Why this exists
 
@@ -23,6 +23,24 @@ Aletheia separates:
 - **MIS intelligence** — cross-branch KPIs, tren, materialized views, cache dan invalidasi, What-If policy simulation read-only melalui GraphQL.
 - **Governance** — versioned policies with checksums, RBAC, segregation of duties, hash-chained audit, tenant-ready schema.
 - **Payments** — provider-agnostic adapter, idempotent webhook, reversal, retry with attempt numbers, and a mock provider for demos.
+
+## Screenshots
+
+| Login dan akun demo | Workbench klaim |
+| --- | --- |
+| <img src="docs/evidence/m6.1/01-login.png" alt="Login dan pemilih peran demo" width="100%"> | <img src="docs/evidence/m6.1/02-claims.png" alt="Workbench klaim" width="100%"> |
+| **Antrean persetujuan** | **Konsol payroll** |
+| <img src="docs/evidence/m6.1/04-approvals.png" alt="Antrean persetujuan" width="100%"> | <img src="docs/evidence/m6.1/05-payroll.png" alt="Konsol payroll" width="100%"> |
+| **Breakdown PPh 21 / BPJS** | **MIS intelligence** |
+| <img src="docs/evidence/m6.1/06-payroll-breakdown.png" alt="Breakdown payroll" width="100%"> | <img src="docs/evidence/m6.1/07-mis.png" alt="MIS intelligence" width="100%"> |
+| **What-If sandbox** | **Jejak audit** |
+| <img src="docs/evidence/m6.1/08-what-if.png" alt="What-If sandbox" width="100%"> | <img src="docs/evidence/m6.1/09-audit.png" alt="Jejak audit" width="100%"> |
+
+Mobile: [`claims`](docs/evidence/m6.1/mobile-claims.png) · [`payroll`](docs/evidence/m6.1/mobile-payroll.png) · [`MIS`](docs/evidence/m6.1/mobile-mis.png). Semua data sintetis. Indeks lengkap ada di [`docs/evidence/m6.1/screenshots.md`](docs/evidence/m6.1/screenshots.md).
+
+## Demo video
+
+[Tonton walkthrough 2:16](docs/evidence/m6.1/aletheia-demo.webm) — login, klaim, approval/SoD, payroll dan breakdown, MIS/What-If, serta verifikasi audit chain. Rekaman dibuat dengan `pnpm demo:record` saat stack lokal hidup; skripnya ada di `scripts/record-demo.mjs`.
 
 ## Architecture
 
@@ -82,6 +100,8 @@ flowchart TB
 | [`14-architecture-decision-records.md`](docs/14-architecture-decision-records.md) | ADR-001..018 with trade-offs |
 | [`15-audit-fix-register.md`](docs/15-audit-fix-register.md) | Audit findings, fixes, remaining risks |
 | [`16-milestone-phase-plan.md`](docs/16-milestone-phase-plan.md) | 7 milestone, 19 fase, deployment free-tier |
+| [`CHANGELOG.md`](CHANGELOG.md) | Riwayat rilis dan perubahan |
+| [`docs/evidence/m6.1-verification.md`](docs/evidence/m6.1-verification.md) | Verifikasi portofolio M6.1 |
 
 ## Getting started
 
@@ -112,12 +132,29 @@ pnpm test:e2e
 
 Web tersedia di `http://localhost:5173`, edge di `http://127.0.0.1:8787`. Web mem-proxy `/api` dan `/graphql` ke edge, sehingga cookie refresh tetap same-origin saat development.
 
+## Demo accounts
+
+Kata sandi semua akun: **`AletheiaDemo!2026`**. MFA nonaktif pada demo.
+
+| Email | Role | Tenant | Cabang |
+| --- | --- | --- | --- |
+| `officer.bdg@aletheia.id` | CLAIMS_OFFICER | SAU | BDG-01 |
+| `manager.bdg@aletheia.id` | BRANCH_MANAGER | SAU | BDG-01 |
+| `finance.vp@aletheia.id` | FINANCE_MANAGER | SAU | JKT-HQ |
+| `hr.ops@aletheia.id` | HR_SPECIALIST | SAU | JKT-HQ |
+| `compliance@aletheia.id` | COMPLIANCE_ADMIN | SAU | JKT-HQ |
+| `mis.analyst@aletheia.id` | MIS_ANALYST | SAU | JKT-HQ |
+| `compliance@bpui.id` | COMPLIANCE_ADMIN | BPUI | JKT-HQ |
+
+Halaman login menyediakan tombol peran demo yang mengisi email dan kata sandi otomatis. Untuk alur < 3 menit: jalankan `bash scripts/dev-up.sh`, buka `http://localhost:5173`, pilih **Spesialis SDM** untuk payroll atau **Petugas Klaim** untuk klaim, lalu jelajahi menu sesuai peran.
+
 ## Live preview
 
 - Web: [aletheia-web-preview.pages.dev](https://aletheia-web-preview.pages.dev)
-- Edge: deploy ulang pada TASK-18. Hostname `aletheia-edge-preview.ridwanafazn.workers.dev` tidak lagi resolve per 26 November 2026.
+- Edge: belum dideploy ulang. Hostname `aletheia-edge-preview.ridwanafazn.workers.dev` tidak lagi resolve per 26 November 2026.
+- Neon production: project `aletheia` (PG16, Singapore) sudah dimigrasi, di-seed, dan lulus RLS 36/36.
 
-Preview memakai Cloudflare Pages dan Workers. Web preview menyajikan CSP, HSTS, COOP, dan Permissions-Policy. Service backend, worker, dan database saat ini berjalan lokal; server demo dihentikan dan dapat dinyalakan dengan `bash scripts/dev-up.sh`. Preview backend akan menjadi permanen setelah deployment Koyeb atau Render dan Neon branch selesai. Gunakan akun demo pada halaman masuk, kata sandi `AletheiaDemo!2026`.
+Web preview statis menyajikan CSP, HSTS, COOP, dan Permissions-Policy. Service backend, worker, dan edge production masih menunggu kredensial Koyeb/Render, Upstash, dan Cloudinary. Untuk demo yang dapat dijalankan sekarang, gunakan stack lokal: `bash scripts/dev-up.sh`, lalu buka `http://localhost:5173` dan masuk dengan akun demo di atas.
 
 Semua endpoint selain health, login, refresh, dan webhook payment memerlukan header bertanda tangan gateway. Produksi wajib mengisi `INTERNAL_GATEWAY_SECRET`, `JWT_PRIVATE_KEY`, `JWT_PUBLIC_KEY`, `REFRESH_TOKEN_PEPPER`, `MFA_ENCRYPTION_KEY`, `PII_PEPPER`, kredensial Cloudinary, `PAYMENT_WEBHOOK_SECRET`, dan `FILE_SIGNING_SECRET`.
 
@@ -178,8 +215,8 @@ Dashboard dan alert disimpan di `infra/observability/`. Bukti M5.2 ada di `docs/
 | 2 | Claims vertical slice | done: M2.1, M2.2, M2.3 |
 | 3 | Payroll + HRIS-lite | done: M3.1–M3.4 |
 | 4 | MIS + GraphQL BFF | done: M4.1 dan M4.2 |
-| 5 | Hardening: RLS audit, observability, load, security, E2E | done: M5.1, M5.2, dan M5.3 |
-| 6 | Portfolio: deploy, README, video, evidence | planned |
+| 5 | Hardening: RLS audit, observability, load, security, E2E | done: M5.1–M5.3; M5.4 runtime + Neon ready, deployment provider pending |
+| 6 | Portfolio: deploy, README, video, evidence | in progress: M6.1 assets ready; M6.2 live demo pending |
 
 See [`docs/06-execution-roadmap.md`](docs/06-execution-roadmap.md) for task-level detail.
 

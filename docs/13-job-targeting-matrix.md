@@ -12,11 +12,11 @@
 | --- | --- | --- |
 | Requirement teknis wajib tercakup di desain | 100% | 100% |
 | Preferred qualification tercakup di desain | 100% | 100% |
-| Kesiapan bukti saat ini | ~15% (desain, belum ada kode) | ~15% (desain, belum ada kode) |
+| Kesiapan bukti saat ini | 100% requirement yang dapat dibuktikan (M1–M5.4 + M6.1); live URL pending | 100% requirement yang dapat dibuktikan (M1–M5.4 + M6.1); live URL pending |
 | Target setelah implementasi | 120%+ | 120%+ |
 | Gap yang tidak bisa ditutup proyek | Pengalaman formal 2 tahun | — |
 
-**Kesimpulan:** rancangan sudah memetakan **seluruh requirement teknis dan preferred qualification** kedua lowongan; J1-R1 (gelar) dan J1-R2 (pengalaman formal 2 tahun) berada di luar artefak proyek dan ditandai `N/A`. Yang belum ada adalah implementasi dan artefak bukti. Karena itu, prioritas berikutnya bukan menambah dokumen, melainkan mengeksekusi vertical slice dan mengumpulkan evidence.
+**Kesimpulan:** seluruh requirement teknis dan preferred qualification sudah diimplementasikan dengan artefak yang dapat diperiksa: kode, test, screenshot, video 2:16, load test, query plan, security evidence, dan Neon production. J1-R1 (gelar) dan J1-R2 (pengalaman formal 2 tahun) tetap `N/A` dan dikompensasi dengan portfolio. Gap utama yang tersisa adalah **live URL production** (menunggu Koyeb/Render, Upstash, Cloudinary) dan **UI payslip/laporan**; keduanya dicatat sebagai residual gap, bukan klaim selesai.
 
 ## 1. Metode Penilaian
 
@@ -37,19 +37,19 @@
 | J1-R1 | S1 Informatika/SI | — | — | N/A | pribadi |
 | J1-R2 | Min. 2 tahun full-stack | Riwayat commit/PR + demo live + studi kasus | `12`, README | N/A (pengalaman formal) | kompensasi: demo/portfolio |
 | J1-R3 | HRIS/payroll experience | Modul HRIS-lite + payslip + PPh 21/BPJS | `11`, TASK-10/11 | 4 | master data, absensi, cuti, payroll console, kalkulasi TER/BPJS, approval, disbursement, payslip PDF, laporan CSV, dan rekonsiliasi live; UI payslip dan laporan belum |
-| J1-R4 | Frontend JS/TS + React/Vue/Next | React 19 + TS + Vite, 7 layar | `07`, TASK-09/10/14 | 3 | UI klaim, payroll, employee directory, MIS dashboard, dan What-If sandbox live |
+| J1-R4 | Frontend JS/TS + React/Vue/Next | React 19 + TS + Vite | `07`, TASK-09/10/14 | 3 | UI klaim, payroll, employee directory, MIS dashboard, dan What-If sandbox live; screenshot + video M6.1 |
 | J1-R5 | Backend Node/Go/Java | Express TS + Go worker | `01`, TASK-04..07 | 4 (dua bahasa) | 3 Express service dan Go worker live; race test lulus |
 | J1-R6 | PostgreSQL design & query | ERD, migrasi, index, query plan | `02`, TASK-03 | 4 | selesai; bukti M1.3 |
 | J1-R7 | REST API | Kontrak REST + error envelope + idempotency | `03`, TASK-05/06 | 3 | governance, claims, dan payroll live |
-| J1-R8 | Git, debugging, testing | Branch/PR/ADR + test suite + CI | `10`, `12`, `CONTRIBUTING.md` | 3 | unit, integration, 21 E2E dua run, coverage 96,26%, security workflow, dan probe RLS live; pipeline PR belum dijalankan |
+| J1-R8 | Git, debugging, testing | Branch/PR/ADR + test suite + CI | `10`, `12`, `CONTRIBUTING.md` | 3 | unit, integration, 21 E2E dua run, coverage 96,26%, security workflow, dan probe RLS live; CI main hijau, PR nyata belum |
 | J1-R9 | Analytical/problem solving | ADR + post-mortem + trade-off | `14`, `12` | 3 | sebagian |
 | J1-R10 | Kolaborasi HR/Payroll/Product | Persona, alur peran, demo script | `00`, `12` | 3 | sebagian |
 | J1-P1 | **PPh 21 & BPJS** | TER + annual + employer + laporan | `04`, `11` | 4 | TER, BPJS, payslip, laporan bulanan, bank file, variance, dan rekonsiliasi tahunan live |
 | J1-P2 | **RBAC/approval/audit** | 6 role, SoD, hash chain | `00`, `08` | 4 | governance, claims, dan payroll SoD live |
 | J1-P3 | **Large-scale & anti-duplikasi** | Goroutine pool, idempotency, `FOR UPDATE` | `02`, `04` | 4 | Go worker pool, idempotency, constraint, dan row lock live; batch 500 dalam 214 ms |
-| J1-P4 | **Docker/CI-CD/cloud** | Multi-stage, GH Actions, deploy | `05`, `12` | 3 | desain |
+| J1-P4 | **Docker/CI-CD/cloud** | Multi-stage, GH Actions, deploy | `05`, `12` | 3 | Docker multi-stage, image scan, CI/Security hijau, Cloudflare Pages preview, Neon production; host service production pending |
 
-**Kesimpulan Job 1:** desain sudah mencakup **semua** requirement; yang kurang adalah implementasi + bukti. HRIS-lite menutup gap "HRIS" yang sebelumnya tipis.
+**Kesimpulan Job 1:** implementasi dan bukti sudah mencakup **semua** requirement teknis; HRIS-lite menutup gap "HRIS". Residual gap: live URL production dan UI payslip/laporan.
 
 ### 2A. Cakupan Opsi Stack (Job 1)
 
@@ -73,14 +73,14 @@ Lowongan memakai frasa "at least one of" dan "one of", jadi pilihan berikut seng
 | J2-R1 | React TS + Node/Express microservices | 3 Express service + 1 Go worker + React app | `01`, `12` | 3 | 3 Express service, Go worker, React, dan UI payroll live |
 | J2-R2 | PostgreSQL advanced query/optimization | CTE, window, partial/covering/GIN, `EXPLAIN` | `02`, `09` | 4 | MV KPI, window MoM, partial index, security barrier, dan query plan cache |
 | J2-R3 | REST + GraphQL integration | REST transaksional + GraphQL BFF | `03`, TASK-08/13 | 3 | GraphQL query KPI, tren, audit klaim, dan mutation What-If live |
-| J2-R4 | Caching/load balancing/cloud-native | Redis, Nginx `least_conn`, edge, stateless | `01`, `09` | 3 | edge rate limit live; Redis dan load test belum |
-| J2-R5 | Docker & containerization | Dockerfile per service + compose | `05`, TASK-01 | 3 | image governance dan claims terverifikasi; edge dan web di Cloudflare |
+| J2-R4 | Caching/load balancing/cloud-native | Redis, Nginx `least_conn`, edge, stateless | `01`, `09` | 3 | edge rate limit live; 7 load test lulus; Upstash Redis production pending |
+| J2-R5 | Docker & containerization | Dockerfile per service + compose | `05`, TASK-01 | 3 | Dockerfile multi-stage dan image scan hijau; edge/web production pending |
 | J2-R6 | Kolaborasi tim MIS Analyst | Persona MIS + dashboard + What-If | `00`, `07`, `09` | 3 | MIS dashboard, tren, drill-down, dan What-If sandbox live |
 | J2-R7 | Clean code, documented, review | TSDoc/GoDoc, lint, PR template, ADR | `05`, `12`, `14`, `CONTRIBUTING.md` | 3 | sebagian |
-| J2-R8 | CI/CD, deploy, monitoring, maintenance | Pipeline + OTel + SLO + runbook | `05`, `09`, TASK-16/18 | 3 | preview dan security workflow tersedia; OTel, dashboard, SLO, load test, 21 E2E, dan coverage lulus; pipeline PR belum |
+| J2-R8 | CI/CD, deploy, monitoring, maintenance | Pipeline + OTel + SLO + runbook | `05`, `09`, TASK-16/18 | 3 | CI/Security main hijau; OTel, dashboard, SLO, load test, 21 E2E, coverage, dan Neon production lulus; service host production pending |
 | J2-R9 | Patuh kebijakan perusahaan | Governance/compliance + proses PR/CI | `00`, `08`, `CONTRIBUTING.md` | 3 | kontrol governance, claims, dan UI audit live |
 
-**Kesimpulan Job 2:** desain sudah mencakup **semua** requirement; gap utama ada di bukti operasional (dashboard, load test, pipeline hijau) dan artefak review.
+**Kesimpulan Job 2:** implementasi dan bukti operasional sudah tersedia (dashboard, load test, CI hijau, Neon production). Residual gap: host service production, Upstash/Cloudinary, dan live URL.
 
 ## 4. Pembeda di Atas Requirement (Skor 4)
 
@@ -99,31 +99,30 @@ Lowongan memakai frasa "at least one of" dan "one of", jadi pilihan berikut seng
 
 ## 5. Evidence Checklist (Harus Ada Sebelum Melamar)
 
-- [ ] URL demo live (atau video 2–3 menit jika gratis tidak memungkinkan).
-- [ ] 6 akun demo + data seed realistis.
-- [ ] README dengan arsitektur, screenshot, cara jalan, akun demo.
-- [ ] Test report: unit, integration, E2E, race; coverage domain ≥ 90%.
-- [ ] Load test report: p95, error rate, batch 500 item.
-- [ ] Query plan before/after untuk minimal 3 query.
-- [ ] Bundle analyzer + ukuran gzip.
-- [ ] Security checklist + hasil probe (SoD, replay, cross-tenant, audit tamper).
-- [ ] 5–8 ADR yang menjelaskan trade-off.
-- [ ] Screenshot desktop + mobile untuk 8 layar inti (login, claims, approval, payroll, payslip, reports, MIS, audit).
-- [ ] Video walkthrough 2–3 menit.
-- [ ] CHANGELOG + riwayat PR yang rapi.
-- [ ] Job matrix ini diperbarui dengan status aktual.
+- [ ] URL demo live — pending M5.4 deployment.
+- [x] 6 akun demo + data seed realistis.
+- [x] README dengan arsitektur, screenshot, cara jalan, akun demo.
+- [x] Test report: unit, integration, E2E, race; coverage domain ≥ 90%.
+- [x] Load test report: p95, error rate, batch 500 item.
+- [x] Query plan before/after untuk minimal 3 query.
+- [x] Bundle analyzer + ukuran gzip.
+- [x] Security checklist + hasil probe (SoD, replay, cross-tenant, audit tamper).
+- [x] 5–8 ADR yang menjelaskan trade-off.
+- [x] 8 screenshot inti + 3 mobile; payslip/report UI masih API-only.
+- [x] Video walkthrough 2:16 (`docs/evidence/m6.1/aletheia-demo.webm`).
+- [x] CHANGELOG + riwayat commit yang rapi.
+- [x] Job matrix ini diperbarui dengan status aktual.
 
-## 6. Gap Prioritas (Urut Dampak)
+## 6. Residual Gap (Status 26 November 2026)
 
-| Prioritas | Gap | Aksi | Task |
+| Prioritas | Gap | Dampak | Aksi |
 | --- | --- | --- | --- |
-| P0 | Fondasi ada, domain/demo belum | Bangun vertical slice claims + deploy | TASK-01..05, 08, 09 |
-| P0 | HRIS breadth | Payslip + PPh 21/BPJS report | TASK-11 |
-| P1 | Bukti performa | k6 + dashboard + query plan | TASK-16 |
-| P1 | Artefak proses | PR template, ADR, CONTRIBUTING | TASK-00/19 |
-| P2 | Multi-tenant RLS | `tenant_id` + policy + test | TASK-03/15 |
-| P2 | Payment realism | Adapter + mock + state machine | TASK-12 |
-| P3 | Full HRIS | **Tidak dikerjakan**; catat future | backlog |
+| P0 | Live URL production | Reviewer belum bisa mencoba tanpa clone | Deploy Koyeb/Render + Cloudflare + Upstash/Cloudinary (M5.4/M6.2) |
+| P1 | UI payslip dan laporan | Screenshot payslip/report belum ada | Bangun layar payslip/PPh 21/BPJS di atas API M3.4 |
+| P1 | Video MP4/narasi | WebM diterima, tetapi MP4 lebih universal | Konversi dengan ffmpeg + narasi opsional |
+| P2 | RUM LCP/INP, edge span OTLP | SLO web/edge belum terukur production | Tambah web-vitals dan exporter edge |
+| P2 | CI E2E full-stack | E2E belum otomatis di CI | Tambah job service stack di TASK-18 |
+| P3 | Full HRIS (clock-in, shift, THR) | Di luar scope | Catat sebagai future |
 
 ## 7. Narasi Interview per Requirement
 

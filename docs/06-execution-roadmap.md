@@ -2,7 +2,7 @@
 
 * **Status Dokumen:** Peta Jalan Eksekusi (*Single Source of Truth* untuk Agen OpenCode)
 * **Strategi:** *Contract-First, Vertical Slice, Evidence-Driven, Zero Context Drift*
-* **Kondisi Saat Ini:** Fase 0, M1.1–M1.3, M2.1–M2.3, M3.1–M3.4, M4.1, M4.2, M5.1, M5.2, dan M5.3 selesai. M5.4 sedang berjalan: prasyarat runtime selesai (pool `aletheia_app`, tenant binding per request/transaksi, worker Go, webhook, dan signed file token), security gate 36/36, integration test 27/36/34 lulus dengan RLS aktif pada database baru. Deployment provider eksternal (Cloudflare, Neon, Upstash, Cloudinary, Koyeb/Render) menunggu kredensial. Server demo sudah dihentikan; nyalakan dengan `bash scripts/dev-up.sh` dan baca `HANDOVER.md`. Bukti prasyarat: `docs/evidence/m5.4-verification.md`.
+* **Kondisi Saat Ini:** Fase 0, M1.1–M1.3, M2.1–M2.3, M3.1–M3.4, M4.1, M4.2, M5.1, M5.2, M5.3, dan M6.1 selesai. M5.4 sedang berjalan: prasyarat runtime selesai (pool `aletheia_app`, tenant binding per request/transaksi, worker Go, webhook, dan signed file token), security gate 36/36, integration test 27/36/34 lulus dengan RLS aktif pada database baru, dan Neon production sudah dimigrasi/seed. Deployment Koyeb/Render, Upstash, Cloudinary, dan Cloudflare production menunggu kredensial. M6.1 menghasilkan README final, 8 screenshot inti, video 2:16, CHANGELOG, dan job matrix aktual. Server demo sudah dihentikan; nyalakan dengan `bash scripts/dev-up.sh` dan baca `HANDOVER.md`. Bukti: `docs/evidence/m5.4-verification.md` dan `docs/evidence/m6.1-verification.md`.
 
 ## 1. Protokol Kerja Agen
 
@@ -183,9 +183,11 @@
 ### FASE 6 — Portofolio
 
 #### `TASK-19` — README, Screenshot, Video & Job Matrix
+* **Status:** aset selesai 26 November 2026. README final, 8 screenshot inti + 3 mobile, video 2:16, akun demo, CHANGELOG, dan job matrix aktual tersedia. Live URL production masih menunggu M5.4.
 * **Konteks Wajib:** `docs/12`, `docs/13`.
 * **Cakupan:** README final, 8 screenshot desktop/mobile, video 2–3 menit, akun demo, CHANGELOG, job matrix status 3/4.
 * **Gerbang:** reviewer dapat menjalankan demo < 3 menit; semua evidence ada; matrix ≥ 100%.
+* **Catatan:** bukti di `docs/evidence/m6.1-verification.md`; screenshot dan video di `docs/evidence/m6.1/`. UI payslip/report belum ada sehingga dua layar tersebut masih API-only.
 
 ---
 
