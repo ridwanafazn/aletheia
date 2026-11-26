@@ -39,9 +39,9 @@ export function PayslipDetailDrawer({
               {payslip.verification_code}
             </div>
           </div>
-          <span className="badge badge--ready">
+          <span className="badge badge--draft">
             <span className="badge__dot" aria-hidden="true" />
-            Siap
+            Tersimpan
           </span>
         </div>
 

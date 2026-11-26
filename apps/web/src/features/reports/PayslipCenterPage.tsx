@@ -141,7 +141,7 @@ export default function PayslipCenterPage() {
         <Stat label="Periode" value={formatPeriod(`${period}-01`)} meta="Asia/Jakarta" />
         <Stat
           label="Status berkas"
-          value={items.every((item) => item.file_checksum_sha256.length > 0) ? "Siap" : "Sebagian"}
+          value={items.length === 0 ? "Belum ada" : "Tersimpan"}
           meta="Checksum tersimpan"
         />
       </div>
@@ -230,7 +230,7 @@ export default function PayslipCenterPage() {
                       employee?.full_name ?? `Personel ${payslip.personnel_id.slice(-6)}`;
                     const code = employee?.personnel_code ?? payslip.personnel_id.slice(-8);
                     return (
-                      <tr key={payslip.id}>
+                      <tr key={payslip.id} data-testid={`payslip-row-${payslip.verification_code}`}>
                         <td>
                           <button
                             type="button"

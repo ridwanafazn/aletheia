@@ -1,4 +1,5 @@
 import { createHash } from "node:crypto";
+import { readFileSync } from "node:fs";
 
 import { hash as argonHash } from "@node-rs/argon2";
 import type { PoolClient } from "pg";
@@ -35,6 +36,7 @@ const U_MIS = uid(24);
 const U_COMPLIANCE = uid(25);
 const U_OFFICER_SBY = uid(26);
 const U_BPUI_COMPLIANCE = uid(27);
+const U_EMPLOYEE = uid(28);
 
 const P_CLAIMS_OLD = uid(100);
 const P_CLAIMS_ACTIVE = uid(101);
@@ -74,10 +76,16 @@ const AUDIT_BATCH = uid(462);
 const FILE_PAYSLIP_SITI = uid(470);
 const FILE_REPORT_PPH21 = uid(471);
 
-const demoPayslipContent = Buffer.from("%PDF-1.4\n% Aletheia demo payslip\n");
+const demoPayslipContent = readFileSync(new URL("../fixtures/demo-payslip.pdf", import.meta.url));
 const demoPayslipChecksum = sha256(demoPayslipContent);
 const demoReportContent = Buffer.from(
-  "personnel_code,name,gross,tax,net\nSAU-EMP-001,Siti Aminah,11000000.00,220000.00,10349577.00\n",
+  [
+    "personnel_code,name,gross,employee_bpjs,pph21,net",
+    "EMP-BDG-001,Siti Aminah,11000000.00,430423.00,220000.00,10349577.00",
+    "EMP-BDG-002,Budi Santoso,8000000.00,320000.00,100000.00,7580000.00",
+    "AGT-BDG-001,Agus Setiawan,12000000.00,0.00,420000.00,11580000.00",
+    "",
+  ].join("\n"),
 );
 const demoReportChecksum = sha256(demoReportContent);
 
@@ -377,6 +385,15 @@ async function main(): Promise<void> {
         role: "CLAIMS_OFFICER",
       },
       {
+        id: U_EMPLOYEE,
+        tenant_id: T_SAU,
+        branch_id: BR_BDG,
+        employee_number: "SAU-0008",
+        full_name: "Siti Aminah",
+        email: "employee.siti@aletheia.id",
+        role: "EMPLOYEE",
+      },
+      {
         id: U_BPUI_COMPLIANCE,
         tenant_id: T_BPUI,
         branch_id: BR_BPUI,
@@ -446,6 +463,7 @@ async function main(): Promise<void> {
       id: PERSON_SITI,
       tenant_id: T_SAU,
       branch_id: BR_BDG,
+      user_id: U_EMPLOYEE,
       personnel_code: "EMP-BDG-001",
       personnel_type: "EMPLOYEE",
       full_name: "Siti Aminah",
@@ -629,6 +647,69 @@ async function main(): Promise<void> {
       decided_at: "2026-11-05T09:00:00.000Z",
       decision_notes: "Disetujui sesuai saldo cuti",
     });
+
+    const leaveBalances = [
+      {
+        id: uid(233),
+        personnel_id: PERSON_SITI,
+        leave_type: "ANNUAL",
+        entitlement_days: "12.00",
+        used_days: "2.00",
+        pending_days: "0.00",
+      },
+      {
+        id: uid(234),
+        personnel_id: PERSON_SITI,
+        leave_type: "SICK",
+        entitlement_days: "12.00",
+        used_days: "0.00",
+        pending_days: "0.00",
+      },
+      {
+        id: uid(235),
+        personnel_id: PERSON_SITI,
+        leave_type: "UNPAID",
+        entitlement_days: "0.00",
+        used_days: "0.00",
+        pending_days: "0.00",
+      },
+    ];
+
+    for (const balance of leaveBalances) {
+      await upsert(client, "payroll.leave_balances", {
+        ...balance,
+        tenant_id: T_SAU,
+        year: 2026,
+      });
+    }
+
+    const overtimeRequests = [
+      {
+        id: uid(231),
+        work_date: "2026-11-05",
+        hours: "2.00",
+        reason: "Penutupan laporan bulanan",
+      },
+      {
+        id: uid(232),
+        work_date: "2026-11-12",
+        hours: "2.00",
+        reason: "Rekonsiliasi data klaim",
+      },
+    ];
+
+    for (const overtime of overtimeRequests) {
+      await upsert(client, "payroll.overtime_requests", {
+        ...overtime,
+        tenant_id: T_SAU,
+        personnel_id: PERSON_SITI,
+        status: "APPROVED",
+        decided_by: U_BRANCH_BDG,
+        decided_at: "2026-11-13T09:00:00.000Z",
+        decision_notes: "Disetujui sesuai kebutuhan operasional",
+        created_by: U_EMPLOYEE,
+      });
+    }
 
     await upsert(client, "claims.submissions", {
       id: CLAIM_A,
@@ -1048,6 +1129,8 @@ async function main(): Promise<void> {
       secure_url: "https://res.cloudinary.com/demo/image/upload/payslip-siti.pdf",
       snapshot_hash_sha256: sha256("payslip-siti-snapshot"),
       file_checksum_sha256: demoPayslipChecksum,
+      gross_income: "11000000.00",
+      net_take_home_pay: "10349577.00",
       verification_code: "SLP-202611-001",
       published_at: "2026-11-24T09:05:00.000Z",
     });

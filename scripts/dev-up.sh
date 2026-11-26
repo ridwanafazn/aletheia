@@ -126,7 +126,7 @@ Prometheus: http://localhost:9090
 Accounts:   officer.bdg@aletheia.id, manager.bdg@aletheia.id,
             finance.vp@aletheia.id, hr.ops@aletheia.id,
             compliance@aletheia.id, mis.analyst@aletheia.id,
-            compliance@bpui.id
+            employee.siti@aletheia.id, compliance@bpui.id
 Password:   AletheiaDemo!2026
 Logs:       .dev/logs
 Stop:       bash scripts/dev-down.sh

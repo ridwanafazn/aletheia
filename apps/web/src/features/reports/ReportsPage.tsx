@@ -157,6 +157,8 @@ export default function ReportsPage() {
   }
 
   const actionApiError = actionError instanceof ApiError ? actionError : null;
+  const canCreate = hasRole("HR_SPECIALIST", "FINANCE_MANAGER");
+  const failedItems = items.filter((item) => item.status === "FAILED");
 
   return (
     <div className="stack">
@@ -193,6 +195,13 @@ export default function ReportsPage() {
         />
       </div>
 
+      {failedItems.length === 0 ? null : (
+        <Banner tone="danger" title="Sebagian laporan gagal dibuat">
+          Laporan yang gagal tidak dapat diunduh. Periksa periode dan cabang, lalu buat ulang
+          laporan. Hubungi administrator bila masalah berulang.
+        </Banner>
+      )}
+
       <section className="panel">
         <div className="panel__header">
           <div>
@@ -202,91 +211,100 @@ export default function ReportsPage() {
             </div>
           </div>
         </div>
-        <div className="panel__body">
-          <div className="filter-bar" aria-label="Filter dan pembuatan laporan">
-            <div className="field">
-              <label className="field__label" htmlFor="report-type">
-                Jenis laporan
-              </label>
-              <select
-                id="report-type"
-                className="select"
-                value={reportType}
-                onChange={(event) => updateFilter("type", event.target.value)}
-              >
-                {REPORT_TYPE_OPTIONS.map((item) => (
-                  <option key={item.value} value={item.value}>
-                    {item.label}
-                  </option>
-                ))}
-              </select>
-            </div>
-            {option?.periodMode === "year" ? (
+        {canCreate ? (
+          <div className="panel__body">
+            <div className="filter-bar" aria-label="Filter dan pembuatan laporan">
               <div className="field">
-                <label className="field__label" htmlFor="report-year">
-                  Tahun pajak
+                <label className="field__label" htmlFor="report-type">
+                  Jenis laporan
                 </label>
-                <input
-                  id="report-year"
-                  className="input"
-                  type="number"
-                  min={2000}
-                  max={2100}
-                  value={year}
-                  onChange={(event) => updateFilter("year", event.target.value)}
-                />
+                <select
+                  id="report-type"
+                  className="select"
+                  value={reportType}
+                  onChange={(event) => updateFilter("type", event.target.value)}
+                >
+                  {REPORT_TYPE_OPTIONS.map((item) => (
+                    <option key={item.value} value={item.value}>
+                      {item.label}
+                    </option>
+                  ))}
+                </select>
               </div>
-            ) : (
+              {option?.periodMode === "year" ? (
+                <div className="field">
+                  <label className="field__label" htmlFor="report-year">
+                    Tahun pajak
+                  </label>
+                  <input
+                    id="report-year"
+                    className="input"
+                    type="number"
+                    min={2000}
+                    max={2100}
+                    value={year}
+                    onChange={(event) => updateFilter("year", event.target.value)}
+                  />
+                </div>
+              ) : (
+                <div className="field">
+                  <label className="field__label" htmlFor="report-period">
+                    Periode
+                  </label>
+                  <input
+                    id="report-period"
+                    className="input"
+                    type="month"
+                    value={month}
+                    onChange={(event) => updateFilter("period", event.target.value)}
+                  />
+                </div>
+              )}
               <div className="field">
-                <label className="field__label" htmlFor="report-period">
-                  Periode
+                <label className="field__label" htmlFor="report-branch">
+                  Cabang
                 </label>
-                <input
-                  id="report-period"
-                  className="input"
-                  type="month"
-                  value={month}
-                  onChange={(event) => updateFilter("period", event.target.value)}
-                />
+                <select
+                  id="report-branch"
+                  className="select"
+                  value={search.branch_id ?? ""}
+                  onChange={(event) => updateFilter("branch_id", event.target.value)}
+                >
+                  <option value="">Semua cabang</option>
+                  {branches.map((branch) => (
+                    <option key={branch.id} value={branch.id}>
+                      {branch.code} · {branch.name}
+                    </option>
+                  ))}
+                </select>
               </div>
-            )}
-            <div className="field">
-              <label className="field__label" htmlFor="report-branch">
-                Cabang
-              </label>
-              <select
-                id="report-branch"
-                className="select"
-                value={search.branch_id ?? ""}
-                onChange={(event) => updateFilter("branch_id", event.target.value)}
-              >
-                <option value="">Semua cabang</option>
-                {branches.map((branch) => (
-                  <option key={branch.id} value={branch.id}>
-                    {branch.code} · {branch.name}
-                  </option>
-                ))}
-              </select>
+              <div className="field field--action">
+                <span className="field__label" aria-hidden="true">
+                  &nbsp;
+                </span>
+                <Button
+                  variant="primary"
+                  icon={<FileSpreadsheet size={15} />}
+                  loading={generateMutation.isPending}
+                  onClick={() => generateMutation.mutate(crypto.randomUUID())}
+                >
+                  Buat laporan
+                </Button>
+              </div>
             </div>
-            <div className="field field--action">
-              <span className="field__label" aria-hidden="true">
-                &nbsp;
-              </span>
-              <Button
-                variant="primary"
-                icon={<FileSpreadsheet size={15} />}
-                loading={generateMutation.isPending}
-                onClick={() => generateMutation.mutate(crypto.randomUUID())}
-              >
-                Buat laporan
-              </Button>
-            </div>
+            <p className="small muted" style={{ marginTop: 10 }}>
+              Rentang {period.period_start} sampai {period.period_end}. Laporan baru membuat versi
+              baru dan tidak menimpa laporan lama.
+            </p>
           </div>
-          <p className="small muted" style={{ marginTop: 10 }}>
-            Rentang {period.period_start} sampai {period.period_end}. Laporan baru membuat versi
-            baru dan tidak menimpa laporan lama.
-          </p>
-        </div>
+        ) : (
+          <div className="panel__body">
+            <Banner tone="info" title="Mode baca">
+              Peran kepatuhan dapat melihat dan mengunduh laporan. Pembuatan laporan dilakukan
+              Spesialis SDM atau Manajer Keuangan.
+            </Banner>
+          </div>
+        )}
       </section>
 
       <section className="panel">
@@ -348,14 +366,11 @@ export default function ReportsPage() {
                   {items.map((report) => {
                     const branch = branches.find((item) => item.id === report.branch_id);
                     return (
-                      <tr key={report.id}>
+                      <tr key={report.id} data-testid={`report-row-${report.id}`}>
                         <td>
                           <div className="table__primary">
                             {reportTypeLabel(report.report_type)}
                           </div>
-                          {report.error_message === null ? null : (
-                            <div className="table__secondary">{report.error_message}</div>
-                          )}
                         </td>
                         <td>{reportPeriodLabel(report)}</td>
                         <td className="col-hide-sm">{branch?.code ?? "Semua"}</td>

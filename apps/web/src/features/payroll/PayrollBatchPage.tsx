@@ -67,6 +67,7 @@ export default function PayrollBatchPage() {
   const [notice, setNotice] = useState<string | null>(null);
   const [calculateError, setCalculateError] = useState<unknown>(null);
   const [payslipError, setPayslipError] = useState<unknown>(null);
+  const [payslipQueued, setPayslipQueued] = useState(false);
   const [approveOpen, setApproveOpen] = useState(false);
   const [disburseOpen, setDisburseOpen] = useState(false);
   const [approveKey, setApproveKey] = useState("");
@@ -164,6 +165,7 @@ export default function PayrollBatchPage() {
     mutationFn: (idempotencyKey: string) => requestPayslips(batchId, idempotencyKey),
     onSuccess: (result) => {
       setPayslipError(null);
+      setPayslipQueued(true);
       setNotice(
         `Slip gaji masuk antrean untuk ${result.data.item_count} personel. Buka menu Slip Gaji untuk melihat hasilnya.`,
       );
@@ -219,7 +221,7 @@ export default function PayrollBatchPage() {
   const canApprove = hasRole("FINANCE_MANAGER") && batch!.status === "READY_FOR_APPROVAL" && !maker;
   const canDisburse = hasRole("FINANCE_MANAGER") && batch!.status === "APPROVED";
   const canRequestPayslips =
-    hasRole("HR_SPECIALIST") && ["APPROVED", "DISBURSED"].includes(batch!.status);
+    hasRole("HR_SPECIALIST") && ["APPROVED", "DISBURSED"].includes(batch!.status) && !payslipQueued;
   const currentStep = STEPS.findIndex((step) => step.statuses.includes(batch!.status));
   const failed = ["FAILED", "PARTIAL", "REJECTED", "CANCELLED"].includes(batch!.status);
 
@@ -564,6 +566,11 @@ export default function PayrollBatchPage() {
                 >
                   Buat slip gaji
                 </Button>
+              ) : null}
+              {payslipQueued ? (
+                <span className="small muted">
+                  Slip gaji sudah diminta pada sesi ini. Buka menu Slip Gaji untuk melihat hasilnya.
+                </span>
               ) : null}
               {batch!.status === "READY_FOR_APPROVAL" && maker && hasRole("FINANCE_MANAGER") ? (
                 <span className="small muted">

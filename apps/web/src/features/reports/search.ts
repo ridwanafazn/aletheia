@@ -1,7 +1,7 @@
 import { z } from "zod";
 
-const periodSchema = z.string().regex(/^\d{4}-\d{2}$/);
-const yearSchema = z.string().regex(/^\d{4}$/);
+const periodSchema = z.string().regex(/^\d{4}-(0[1-9]|1[0-2])$/);
+const yearSchema = z.string().regex(/^(20\d{2}|2100)$/);
 
 export const payslipSearchSchema = z.object({
   period: periodSchema.optional(),

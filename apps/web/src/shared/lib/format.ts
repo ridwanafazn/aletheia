@@ -202,6 +202,7 @@ const ROLE_LABELS: Record<string, string> = {
   COMPLIANCE_ADMIN: "Administrator Kepatuhan",
   MIS_ANALYST: "Analis MIS",
   HR_SPECIALIST: "Spesialis SDM",
+  EMPLOYEE: "Karyawan",
 };
 
 const DOCUMENT_LABELS: Record<string, string> = {
