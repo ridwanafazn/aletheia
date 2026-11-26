@@ -9,7 +9,7 @@ function uid(value: number): string {
   return `019361a2-7c00-7000-8000-${String(value).padStart(12, "0")}`;
 }
 
-function sha256(value: string): string {
+function sha256(value: string | Buffer): string {
   return createHash("sha256").update(value).digest("hex");
 }
 
@@ -71,6 +71,15 @@ const WHATIF = uid(450);
 const AUDIT_POLICY = uid(460);
 const AUDIT_CLAIM = uid(461);
 const AUDIT_BATCH = uid(462);
+const FILE_PAYSLIP_SITI = uid(470);
+const FILE_REPORT_PPH21 = uid(471);
+
+const demoPayslipContent = Buffer.from("%PDF-1.4\n% Aletheia demo payslip\n");
+const demoPayslipChecksum = sha256(demoPayslipContent);
+const demoReportContent = Buffer.from(
+  "personnel_code,name,gross,tax,net\nSAU-EMP-001,Siti Aminah,11000000.00,220000.00,10349577.00\n",
+);
+const demoReportChecksum = sha256(demoReportContent);
 
 const claimsPolicy = {
   approval_tiers: {
@@ -1038,7 +1047,7 @@ async function main(): Promise<void> {
       version: 1,
       secure_url: "https://res.cloudinary.com/demo/image/upload/payslip-siti.pdf",
       snapshot_hash_sha256: sha256("payslip-siti-snapshot"),
-      file_checksum_sha256: sha256("payslip-siti-file"),
+      file_checksum_sha256: demoPayslipChecksum,
       verification_code: "SLP-202611-001",
       published_at: "2026-11-24T09:05:00.000Z",
     });
@@ -1055,7 +1064,7 @@ async function main(): Promise<void> {
       status: "READY",
       file_url: "https://res.cloudinary.com/demo/raw/upload/pph21-2026-11.csv",
       snapshot_hash_sha256: sha256("pph21-2026-11-snapshot"),
-      file_checksum_sha256: sha256("pph21-2026-11-file"),
+      file_checksum_sha256: demoReportChecksum,
       total_gross: "31000000.00",
       total_employee_bpjs: "750423.00",
       total_employer_bpjs: "1926446.00",
@@ -1066,6 +1075,30 @@ async function main(): Promise<void> {
       totals: { branch_code: "BDG-01", period: "2026-11" },
       generated_by: U_FINANCE,
       generated_at: "2026-11-24T10:00:00.000Z",
+    });
+
+    await upsert(client, "payroll.generated_files", {
+      id: FILE_PAYSLIP_SITI,
+      tenant_id: T_SAU,
+      kind: "PAYSLIP",
+      entity_id: PAYSLIP_SITI,
+      file_name: "payslip-siti.pdf",
+      mime_type: "application/pdf",
+      file_size: demoPayslipContent.length,
+      content: demoPayslipContent,
+      checksum_sha256: demoPayslipChecksum,
+    });
+
+    await upsert(client, "payroll.generated_files", {
+      id: FILE_REPORT_PPH21,
+      tenant_id: T_SAU,
+      kind: "REPORT",
+      entity_id: REPORT_PPH21,
+      file_name: "pph21-2026-11.csv",
+      mime_type: "text/csv",
+      file_size: demoReportContent.length,
+      content: demoReportContent,
+      checksum_sha256: demoReportChecksum,
     });
 
     await upsert(client, "payroll.tax_reconciliations", {
