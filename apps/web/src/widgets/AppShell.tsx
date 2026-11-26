@@ -3,6 +3,7 @@ import { Navigate, Outlet, useNavigate, useRouterState } from "@tanstack/react-r
 import {
   BarChart3,
   ClipboardList,
+  FileSpreadsheet,
   FileText,
   FlaskConical,
   Inbox,
@@ -26,6 +27,7 @@ interface NavItem {
     | "/payroll"
     | "/employees"
     | "/payslips"
+    | "/reports"
     | "/mis"
     | "/mis/what-if"
     | "/audit";
@@ -84,6 +86,12 @@ const NAV_GROUPS: NavGroup[] = [
         icon: FileText,
         roles: ["HR_SPECIALIST", "FINANCE_MANAGER", "COMPLIANCE_ADMIN"],
       },
+      {
+        to: "/reports",
+        label: "Laporan dan Ekspor",
+        icon: FileSpreadsheet,
+        roles: ["HR_SPECIALIST", "FINANCE_MANAGER", "COMPLIANCE_ADMIN"],
+      },
     ],
   },
   {
@@ -123,6 +131,7 @@ const PAGE_TITLES: Record<string, string> = {
   "/payroll": "Konsol Payroll",
   "/employees": "Karyawan dan Agen",
   "/payslips": "Slip Gaji",
+  "/reports": "Laporan dan Ekspor",
   "/mis": "MIS Intelligence",
   "/mis/what-if": "What-If Sandbox",
   "/audit": "Jejak Audit",
