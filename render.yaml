@@ -50,7 +50,7 @@ services:
       - key: PII_PEPPER
         sync: false
       - key: QSTASH_URL
-        value: https://qstash.upstash.io
+        value: https://qstash-us-east-1.upstash.io
       - key: QSTASH_TOKEN
         sync: false
       - key: QSTASH_CURRENT_SIGNING_KEY
@@ -97,7 +97,7 @@ services:
       - key: CLOUDINARY_FOLDER_PREFIX
         value: aletheia/claims
       - key: QSTASH_URL
-        value: https://qstash.upstash.io
+        value: https://qstash-us-east-1.upstash.io
       - key: QSTASH_TOKEN
         sync: false
       - key: QSTASH_CURRENT_SIGNING_KEY
@@ -146,7 +146,7 @@ services:
       - key: CLOUDINARY_FOLDER_PREFIX
         value: aletheia/claims
       - key: QSTASH_URL
-        value: https://qstash.upstash.io
+        value: https://qstash-us-east-1.upstash.io
       - key: QSTASH_TOKEN
         sync: false
       - key: QSTASH_CURRENT_SIGNING_KEY
@@ -179,7 +179,7 @@ services:
       - key: ALLOW_UNSIGNED_EVENTS
         value: "false"
       - key: QSTASH_URL
-        value: https://qstash.upstash.io
+        value: https://qstash-us-east-1.upstash.io
       - key: QSTASH_TOKEN
         sync: false
       - key: QSTASH_CURRENT_SIGNING_KEY
