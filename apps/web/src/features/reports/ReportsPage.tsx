@@ -67,7 +67,7 @@ export default function ReportsPage() {
   });
   const branches = branchesQuery.data?.data.items ?? [];
 
-  const listPeriod = option?.periodMode === "year" ? `${year}-01` : month;
+  const listPeriod = option?.periodMode === "year" ? `${year}-01-01` : `${month}-01`;
 
   const query = useInfiniteQuery({
     queryKey: ["reports", reportType, listPeriod, search.branch_id],

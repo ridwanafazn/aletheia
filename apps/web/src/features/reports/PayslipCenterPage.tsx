@@ -54,7 +54,7 @@ export default function PayslipCenterPage() {
     initialPageParam: undefined as string | undefined,
     queryFn: ({ pageParam }) =>
       listPayslips({
-        period_month: period,
+        period_month: `${period}-01`,
         personnel_id: search.personnel_id,
         cursor: pageParam,
         limit: 25,
