@@ -5,10 +5,13 @@ import {
   BatchStatusSchema,
   BatchTypeSchema,
   EmploymentStatusSchema,
+  JobLevelSchema,
   LeaveStatusSchema,
   LeaveTypeSchema,
   OvertimeStatusSchema,
   PaymentProviderNameSchema,
+  ReimbursementCategorySchema,
+  ReimbursementStatusSchema,
   PaymentStatusSchema,
   PersonnelTypeSchema,
   PtkpStatusSchema,
@@ -313,6 +316,135 @@ export const MeProfileSchema = z
   })
   .strict();
 export type MeProfile = z.infer<typeof MeProfileSchema>;
+
+export const ReimbursementCreateSchema = z
+  .object({
+    category: ReimbursementCategorySchema,
+    expense_date: DateOnlySchema,
+    amount: MoneySchema,
+    description: z.string().trim().min(3).max(500),
+    receipt_url: z.string().url().max(2048).optional(),
+    receipt_public_id: z.string().max(255).optional(),
+  })
+  .strict();
+export type ReimbursementCreate = z.infer<typeof ReimbursementCreateSchema>;
+
+export const ReimbursementSchema = z
+  .object({
+    id: UuidSchema,
+    personnel_id: UuidSchema,
+    category: ReimbursementCategorySchema,
+    expense_date: DateOnlySchema,
+    amount: MoneySchema,
+    description: z.string(),
+    receipt_url: z.string().nullable(),
+    status: ReimbursementStatusSchema,
+    decided_by: UuidSchema.nullable(),
+    decided_at: IsoDateTimeSchema.nullable(),
+    decision_notes: z.string().nullable(),
+    paid_by: UuidSchema.nullable(),
+    paid_at: IsoDateTimeSchema.nullable(),
+    created_at: IsoDateTimeSchema,
+  })
+  .strict();
+export type Reimbursement = z.infer<typeof ReimbursementSchema>;
+
+export const ReimbursementPageSchema = z
+  .object({ items: z.array(ReimbursementSchema), meta: ApiMetaSchema })
+  .strict();
+export type ReimbursementPage = z.infer<typeof ReimbursementPageSchema>;
+
+export const ReimbursementDecisionRequestSchema = z
+  .object({
+    decision: z.enum(["APPROVED", "REJECTED"]),
+    notes: z.string().trim().min(3).max(2000).optional(),
+  })
+  .strict()
+  .refine((value) => value.decision !== "REJECTED" || value.notes !== undefined, {
+    message: "notes wajib diisi untuk penolakan",
+    path: ["notes"],
+  });
+export type ReimbursementDecisionRequest = z.infer<typeof ReimbursementDecisionRequestSchema>;
+
+export const ReimbursementListQuerySchema = PaginationQuerySchema.extend({
+  status: ReimbursementStatusSchema.optional(),
+  personnel_id: UuidSchema.optional(),
+  branch_id: UuidSchema.optional(),
+}).strict();
+export type ReimbursementListQuery = z.infer<typeof ReimbursementListQuerySchema>;
+
+export const ReimbursementUploadSignatureRequestSchema = z
+  .object({
+    mime_type: z.enum(["image/jpeg", "image/png", "image/webp", "application/pdf"]),
+    file_size_bytes: z.number().int().positive().max(5 * 1024 * 1024),
+  })
+  .strict();
+export type ReimbursementUploadSignatureRequest = z.infer<
+  typeof ReimbursementUploadSignatureRequestSchema
+>;
+
+export const ReimbursementUploadSignatureSchema = z
+  .object({
+    cloud_name: z.string().min(1),
+    api_key: z.string().min(1),
+    timestamp: z.number().int().positive(),
+    signature: z.string().min(1),
+    folder: z.string().min(1),
+    public_id: z.string().min(1),
+  })
+  .strict();
+export type ReimbursementUploadSignature = z.infer<typeof ReimbursementUploadSignatureSchema>;
+
+export const DepartmentSchema = z
+  .object({
+    id: UuidSchema,
+    code: z.string(),
+    name: z.string(),
+    headcount: z.number().int().min(0),
+  })
+  .strict();
+export type Department = z.infer<typeof DepartmentSchema>;
+
+export const PositionSchema = z
+  .object({
+    id: UuidSchema,
+    code: z.string(),
+    name: z.string(),
+    job_level: JobLevelSchema,
+    headcount: z.number().int().min(0),
+  })
+  .strict();
+export type Position = z.infer<typeof PositionSchema>;
+
+export const OrganizationPersonSchema = z
+  .object({
+    personnel_id: UuidSchema,
+    personnel_code: z.string(),
+    full_name: z.string(),
+    personnel_type: PersonnelTypeSchema,
+    employment_status: EmploymentStatusSchema,
+    supervisor_id: UuidSchema.nullable(),
+  })
+  .strict();
+export type OrganizationPerson = z.infer<typeof OrganizationPersonSchema>;
+
+export const OrganizationPositionSchema = PositionSchema.extend({
+  personnel: z.array(OrganizationPersonSchema),
+}).strict();
+export type OrganizationPosition = z.infer<typeof OrganizationPositionSchema>;
+
+export const OrganizationDepartmentSchema = DepartmentSchema.extend({
+  positions: z.array(OrganizationPositionSchema),
+}).strict();
+export type OrganizationDepartment = z.infer<typeof OrganizationDepartmentSchema>;
+
+export const OrganizationTreeSchema = z
+  .object({
+    departments: z.array(OrganizationDepartmentSchema),
+    unassigned: z.array(OrganizationPersonSchema),
+  })
+  .strict();
+export type OrganizationTree = z.infer<typeof OrganizationTreeSchema>;
 
 export const PayrollBatchCreateSchema = z
   .object({

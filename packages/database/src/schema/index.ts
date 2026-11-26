@@ -66,6 +66,41 @@ export const branches = governance.table(
   ],
 );
 
+export const departments = governance.table(
+  "departments",
+  {
+    id: uuid("id").primaryKey(),
+    tenantId: uuid("tenant_id").notNull(),
+    code: varchar("code", { length: 24 }).notNull(),
+    name: varchar("name", { length: 120 }).notNull(),
+    createdAt: createdAt(),
+  },
+  (table) => [
+    unique("departments_tenant_code_unique").on(table.tenantId, table.code),
+    index("idx_departments_tenant").on(table.tenantId, table.code),
+  ],
+);
+
+export const positions = governance.table(
+  "positions",
+  {
+    id: uuid("id").primaryKey(),
+    tenantId: uuid("tenant_id").notNull(),
+    code: varchar("code", { length: 24 }).notNull(),
+    name: varchar("name", { length: 120 }).notNull(),
+    jobLevel: varchar("job_level", { length: 16 }).notNull(),
+    createdAt: createdAt(),
+  },
+  (table) => [
+    unique("positions_tenant_code_unique").on(table.tenantId, table.code),
+    check(
+      "positions_job_level_check",
+      sql`${table.jobLevel} in ('STAFF','SUPERVISOR','MANAGER','DIRECTOR')`,
+    ),
+    index("idx_positions_tenant").on(table.tenantId, table.code),
+  ],
+);
+
 export const users = governance.table(
   "users",
   {
@@ -374,6 +409,9 @@ export const personnel = payroll.table(
     id: uuid("id").primaryKey(),
     tenantId: uuid("tenant_id").notNull(),
     branchId: uuid("branch_id").notNull(),
+    departmentId: uuid("department_id").references(() => departments.id),
+    positionId: uuid("position_id").references(() => positions.id),
+    supervisorId: uuid("supervisor_id"),
     userId: uuid("user_id"),
     personnelCode: varchar("personnel_code", { length: 32 }).notNull(),
     personnelType: varchar("personnel_type", { length: 16 }).notNull(),
@@ -694,6 +732,49 @@ export const overtimeRequests = payroll.table(
   ],
 );
 
+export const reimbursements = payroll.table(
+  "reimbursements",
+  {
+    id: uuid("id").primaryKey(),
+    tenantId: uuid("tenant_id").notNull(),
+    personnelId: uuid("personnel_id")
+      .notNull()
+      .references(() => personnel.id),
+    category: varchar("category", { length: 24 }).notNull(),
+    expenseDate: date("expense_date").notNull(),
+    amount: money("amount").notNull(),
+    description: text("description").notNull(),
+    receiptUrl: text("receipt_url"),
+    receiptPublicId: text("receipt_public_id"),
+    status: varchar("status", { length: 16 }).notNull(),
+    decidedBy: uuid("decided_by"),
+    decidedAt: timestamp("decided_at", { withTimezone: true }),
+    decisionNotes: text("decision_notes"),
+    paidBy: uuid("paid_by"),
+    paidAt: timestamp("paid_at", { withTimezone: true }),
+    createdBy: uuid("created_by").notNull(),
+    createdAt: createdAt(),
+    updatedAt: updatedAt(),
+  },
+  (table) => [
+    check(
+      "reimbursements_category_check",
+      sql`${table.category} in ('TRANSPORT','MEAL','MEDICAL','OTHER')`,
+    ),
+    check(
+      "reimbursements_status_check",
+      sql`${table.status} in ('PENDING','APPROVED','REJECTED','PAID')`,
+    ),
+    check("reimbursements_amount_check", sql`${table.amount} > 0`),
+    index("idx_reimbursements_tenant_status_date").on(
+      table.tenantId,
+      table.status,
+      table.expenseDate,
+    ),
+    index("idx_reimbursements_tenant_personnel").on(table.tenantId, table.personnelId),
+  ],
+);
+
 export const payslips = payroll.table(
   "payslips",
   {
@@ -979,6 +1060,8 @@ export const whatIfSimulations = analytics.table(
 export const allTables = [
   tenants,
   branches,
+  departments,
+  positions,
   users,
   policyVersions,
   auditLogs,
@@ -996,6 +1079,7 @@ export const allTables = [
   leaveRequests,
   leaveBalances,
   overtimeRequests,
+  reimbursements,
   payslips,
   taxReports,
   taxReconciliations,

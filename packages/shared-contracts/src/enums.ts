@@ -107,6 +107,15 @@ export type LeaveStatus = z.infer<typeof LeaveStatusSchema>;
 export const OvertimeStatusSchema = z.enum(["PENDING", "APPROVED", "REJECTED", "CANCELLED"]);
 export type OvertimeStatus = z.infer<typeof OvertimeStatusSchema>;
 
+export const ReimbursementCategorySchema = z.enum(["TRANSPORT", "MEAL", "MEDICAL", "OTHER"]);
+export type ReimbursementCategory = z.infer<typeof ReimbursementCategorySchema>;
+
+export const ReimbursementStatusSchema = z.enum(["PENDING", "APPROVED", "REJECTED", "PAID"]);
+export type ReimbursementStatus = z.infer<typeof ReimbursementStatusSchema>;
+
+export const JobLevelSchema = z.enum(["STAFF", "SUPERVISOR", "MANAGER", "DIRECTOR"]);
+export type JobLevel = z.infer<typeof JobLevelSchema>;
+
 export const ReportTypeSchema = z.enum([
   "PPH21_MONTHLY",
   "PPH21_ANNUAL",
