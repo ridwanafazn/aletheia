@@ -11,6 +11,7 @@ import {
   ReportListQuerySchema,
   TaxReportPageSchema,
   TaxReportSchema,
+  tenantPlanHasFeature,
 } from "@aletheia/shared-contracts";
 import { Router, type Router as RouterType } from "express";
 import { z } from "zod";
@@ -22,7 +23,7 @@ import { beginIdempotency, completeIdempotency } from "../lib/idempotency.js";
 import { decodeCursor, encodeCursor } from "../lib/pagination.js";
 import { signFileToken, signedFilePath } from "../lib/files.js";
 import { getActivePayrollCostPolicy, getActivePayrollPolicy } from "../lib/policy.js";
-import { assertTenantFeature } from "../lib/tenant-plan.js";
+import { assertTenantFeature, getTenantPlan } from "../lib/tenant-plan.js";
 import {
   buildPayslipGenerateEvent,
   buildReportGenerateEvent,
@@ -254,11 +255,16 @@ reportRouter.get(
   async (request, response) => {
     const auth = request.auth!;
     const query = ReportListQuerySchema.parse(request.query);
-    if (query.report_type === "PAYROLL_COST_INVOICE") {
+    const plan = await getTenantPlan(auth.tenantId);
+    const canReadCostInvoice = tenantPlanHasFeature(plan, "PAYROLL_COST_INVOICE");
+    if (query.report_type === "PAYROLL_COST_INVOICE" && !canReadCostInvoice) {
       await assertTenantFeature(auth.tenantId, "PAYROLL_COST_INVOICE");
     }
     const conditions = ["tenant_id = $1"];
     const values: unknown[] = [auth.tenantId];
+    if (!canReadCostInvoice) {
+      conditions.push(`report_type <> 'PAYROLL_COST_INVOICE'`);
+    }
     if (query.report_type !== undefined) {
       values.push(query.report_type);
       conditions.push(`report_type = $${values.length}`);
