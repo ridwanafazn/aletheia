@@ -30,7 +30,7 @@ You are the Aletheia DevOps engineer. You make the system reproducible, observab
 - Multi-stage Dockerfiles for Express and Go; non-root, read-only filesystem where possible.
 - Local `docker-compose.yml` with Nginx `least_conn`, health checks, and multi-replica simulation.
 - GitHub Actions: typecheck, lint, unit/integration tests, `go test -race`, Gitleaks, Trivy, build, deploy.
-- Cloudflare Pages (web), Cloudflare Workers (edge gateway), Koyeb/Render (services).
+- Cloudflare Pages (web), Cloudflare Workers (edge gateway), Render (services).
 - Neon branching for preview/test; Upstash Redis/QStash; Cloudinary.
 - OpenTelemetry traces/metrics/logs; `/healthz`, `/readyz`, `/metrics`.
 - k6 load tests and documented results.

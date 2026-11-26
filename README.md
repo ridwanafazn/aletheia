@@ -4,7 +4,7 @@
 
 Aletheia (Greek: *unconcealment*) is a reference implementation for governed money movement: customer claims, payroll, agent commissions, tax withholding, and cross-domain risk intelligence — built around **versioned policy references**, **zero double-disbursement**, and an **immutable audit trail**.
 
-> **Status:** M1 sampai M5.4 live. Web, edge, empat service Render, Neon, Upstash QStash, dan Cloudinary aktif; smoke production **15/15 lulus**, async QStash/worker terverifikasi, login enam peran dan UI web terverifikasi, serta rollback edge, Pages, dan Render diuji. M6.1 portofolio siap (README, 8 screenshot, video 2:16, CHANGELOG). M6.2 live dengan monitoring 24 jam berjalan via `.github/workflows/production-monitor.yml`. Render free tier memiliki cold start; jalankan `pnpm warm:production` sebelum demo. Baca [`HANDOVER.md`](HANDOVER.md) sebelum melanjutkan.
+> **Status:** M1–M5.4 live di production. Web, edge, empat service Render, Neon, Upstash QStash, dan Cloudinary aktif; smoke production **15/15 lulus**, async QStash/worker terverifikasi, login enam peran dan UI web terverifikasi, serta rollback edge, Pages, dan Render diuji. M6.1 portofolio siap (README, 8 screenshot, video 2:16, CHANGELOG). M6.2 live dengan monitoring 24 jam berjalan via `.github/workflows/production-monitor.yml`. Render free tier memiliki cold start; jalankan `pnpm warm:production` sebelum demo. Baca [`HANDOVER.md`](HANDOVER.md) sebelum melanjutkan.
 
 ## Why this exists
 
@@ -150,7 +150,7 @@ Kata sandi semua akun: **`AletheiaDemo!2026`**. MFA nonaktif pada demo.
 
 Halaman login menyediakan tombol peran demo yang mengisi email dan kata sandi otomatis. Untuk alur < 3 menit: jalankan `bash scripts/dev-up.sh`, buka `http://localhost:5173`, pilih **Spesialis SDM** untuk payroll atau **Petugas Klaim** untuk klaim, lalu jelajahi menu sesuai peran.
 
-## Live preview
+## Live production
 
 - Web: [aletheia-web-preview.pages.dev](https://aletheia-web-preview.pages.dev)
 - Edge: [aletheia-edge.ridwanafzn.workers.dev](https://aletheia-edge.ridwanafzn.workers.dev)
@@ -167,7 +167,7 @@ Web production menyajikan CSP, HSTS, COOP, dan Permissions-Policy. Render free t
 pnpm warm:production
 ```
 
-Lalu buka web production dan masuk dengan akun demo di atas. Uji async QStash/worker dengan `pnpm async:production`. Monitoring production berjalan setiap 6 jam lewat workflow **Production Monitor**. Untuk stack lokal, gunakan `bash scripts/dev-up.sh` dan `http://localhost:5173`.
+Lalu buka web production dan masuk dengan akun demo di atas. Uji async QStash/worker dengan `pnpm async:production`. Monitoring production berjalan setiap 6 jam lewat workflow **Production Monitor**; baseline `45816325368` dan run pasca-drill `45821314200` lulus dengan smoke 15/15. Untuk stack lokal, gunakan `bash scripts/dev-up.sh` dan `http://localhost:5173`.
 
 Semua endpoint selain health, login, refresh, dan webhook payment memerlukan header bertanda tangan gateway. Produksi wajib mengisi `INTERNAL_GATEWAY_SECRET`, `JWT_PRIVATE_KEY`, `JWT_PUBLIC_KEY`, `REFRESH_TOKEN_PEPPER`, `MFA_ENCRYPTION_KEY`, `PII_PEPPER`, kredensial Cloudinary, `PAYMENT_WEBHOOK_SECRET`, dan `FILE_SIGNING_SECRET`.
 
@@ -229,7 +229,7 @@ Dashboard dan alert disimpan di `infra/observability/`. Bukti M5.2 ada di `docs/
 | 3 | Payroll + HRIS-lite | done: M3.1–M3.4 |
 | 4 | MIS + GraphQL BFF | done: M4.1 dan M4.2 |
 | 5 | Hardening: RLS audit, observability, load, security, E2E | done: M5.1–M5.4 live di Render, Neon, Cloudflare, Upstash, Cloudinary |
-| 6 | Portfolio: deploy, README, video, evidence | in progress: M6.1 selesai; M6.2 live, async QStash lulus, monitoring 24 jam berjalan |
+| 6 | Portfolio: deploy, README, video, evidence | in progress: M6.1 selesai; M6.2 live, rollback edge/Pages/Render lulus, monitoring 24 jam berjalan; sign-off setelah 4 run |
 
 See [`docs/06-execution-roadmap.md`](docs/06-execution-roadmap.md) for task-level detail.
 

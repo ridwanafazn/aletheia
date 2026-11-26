@@ -65,8 +65,8 @@ aletheia/
 | --- | --- | --- |
 | `apps/web` | Cloudflare Pages | build statis, preview per PR |
 | `apps/edge-gateway` | Cloudflare Workers | `wrangler deploy`, preview per PR |
-| `services/*` | Koyeb/Render (Docker) | build image, push GHCR, deploy webhook |
-| `analytics-worker-go` | Koyeb/Render (Docker) | build image, push GHCR, deploy |
+| `services/*` | Render (Docker) | Blueprint sync/API deploy, health check |
+| `analytics-worker-go` | Render (Docker) | Blueprint sync/API deploy, health check |
 | Database | Neon | branch per PR, migration job |
 | Cache/Queue | Upstash | namespace per environment |
 | Media | Cloudinary | folder per tenant/environment |
@@ -164,6 +164,8 @@ Ini bukan janji; gunakan sebagai urutan, bukan deadline. Yang penting: setiap mi
 ## 8. Kemasan Portofolio
 
 ### 8.1 README (wajib)
+
+**Status 26 November 2026:** live di `https://aletheia-web-preview.pages.dev` dengan edge `https://aletheia-edge.ridwanafzn.workers.dev`; smoke production 15/15 dan rollback edge/Pages/Render lulus.
 
 - Nama, tagline, status (design/implementation/live).
 - Masalah yang dipecahkan (3 kalimat).

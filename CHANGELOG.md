@@ -14,15 +14,24 @@ Semua perubahan penting pada Aletheia. Format mengikuti [Keep a Changelog](https
 - Neon production project `aletheia` (PG16, Singapore) dengan migrasi, seed, dan RLS 36/36.
 - `.env.production.local` untuk konfigurasi deployment lokal (di-ignore Git).
 - CHANGELOG, galeri screenshot M6.1, dan skrip rekaman demo Playwright.
+- Production launch 26 November 2026: web Cloudflare Pages, edge Cloudflare Workers, governance/claims/payroll/worker Render, Neon PG16, Upstash QStash, dan Cloudinary.
+- Smoke production 15/15, cek UI web tiga peran, dan verifikasi async QStash/worker (~5 detik).
+- Rollback drill edge Workers, Cloudflare Pages, dan Render `aletheia-claims`.
+- `pnpm warm:production`, `pnpm async:production`, dan workflow `Production Monitor` tiap 6 jam.
+- Bukti M6.2: `docs/evidence/m6.2-verification.md` dan screenshot web production.
 
 ### Changed
 
 - Service runtime tidak lagi memakai role owner database.
 - CI database job membangun paket workspace dan mem-provision role sebelum integration test.
-- Dokumentasi status M5.4, RLS, deployment, dan evidence diperbarui.
+- Dokumentasi status M5.4, RLS, deployment, live URL, dan evidence diperbarui.
+- `QSTASH_URL` memakai region `us-east-1`; `WORKER_URL` memakai host `aletheia-worker-zjnt.onrender.com`.
+- Edge production memakai subdomain akun `ridwanafzn.workers.dev`; dokumentasi lama dengan `ridwanafazn` diperbaiki.
 
 ### Fixed
 
+- QStash mengembalikan `enqueued=false` karena token berada di `us-east-1` tetapi endpoint default mengarah ke `eu-central-1`.
+- Production Monitor gagal resolve edge karena variabel memakai subdomain `ridwanafazn`, bukan `ridwanafzn`.
 - CI integration test gagal karena `@aletheia/observability` belum dibangun pada checkout bersih.
 - `db:check` dan `security:db` gagal pada Neon karena owner bukan member `aletheia_app`.
 - RLS cast error ketika `app.tenant_id` kosong; policy sekarang memakai `nullif(..., '')`.

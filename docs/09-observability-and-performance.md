@@ -208,7 +208,7 @@ Aturan:
 | Upstash Redis | 10k cmd/hari, 256 MB | cache selektif, pipeline, TTL, hindari `KEYS *` |
 | QStash | 500 msg/hari | coarse-grained batch, dedup, DLQ |
 | Cloudflare Workers | 100k req/hari, 10ms CPU | edge hanya auth/route/forward |
-| Koyeb/Render | 512 MB/container, sleep | `--max-old-space-size=256`, `GOMEMLIMIT=128MiB`, health check |
+| Render | 512 MB/container, sleep | `--max-old-space-size=256`, `GOMEMLIMIT=128MiB`, health check, `pnpm warm:production` |
 | Cloudinary | 25 credit/bulan | 5 MB limit, format allowlist, transformasi minimal |
 
 **Budget harian:** hitung perkiraan request × command Redis; jika > 60% kuota, kurangi cache/rate-limit atau naikkan paket.

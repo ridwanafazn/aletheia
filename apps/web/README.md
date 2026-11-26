@@ -10,10 +10,10 @@ pnpm dev
 
 Vite mem-proxy `/api` dan `/graphql` ke edge gateway di `http://127.0.0.1:8787`. Jalankan governance, claims, dan edge lebih dahulu.
 
-Untuk build preview yang memanggil Worker langsung:
+Untuk build production yang memanggil Worker langsung:
 
 ```bash
-VITE_API_BASE_URL=https://aletheia-edge-preview.ridwanafzn.workers.dev VITE_DEMO_UPLOAD=true pnpm build
+VITE_API_BASE_URL=https://aletheia-edge.ridwanafzn.workers.dev VITE_DEMO_UPLOAD=true pnpm build
 ```
 
 `VITE_DEMO_UPLOAD=true` membuat lampiran demo tanpa mengunggah berkas nyata ke Cloudinary. Produksi wajib memakai `false` dan kredensial Cloudinary nyata.

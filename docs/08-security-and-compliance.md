@@ -154,7 +154,7 @@
 
 - Tidak ada secret di repo, Dockerfile, compose, atau source.
 - `.env.example` hanya nama variabel.
-- Produksi: GitHub Actions secrets/OIDC, Koyeb/Render secret, Cloudflare secret, Neon connection string terenkripsi.
+- Produksi: GitHub Actions secrets/OIDC, Render secret, Cloudflare secret, Neon connection string terenkripsi.
 - Rotasi: JWT signing key 90 hari (dengan `kid`), gateway secret 90 hari, DB credential 180 hari, Cloudinary 180 hari.
 - Akses secret minimal; tidak ada logging nilai secret; audit akses secret di platform.
 - Backup secret di password manager tim, bukan di repo.

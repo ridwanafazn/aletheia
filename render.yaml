@@ -5,8 +5,9 @@
 # .env.production.local (which is ignored by Git).
 #
 # Neon production is external; Render only hosts the four container services.
-# After the first deploy, update WORKER_URL if Render assigns a suffixed
-# onrender.com hostname.
+# Render assigned the worker a -zjnt suffix, so WORKER_URL and
+# WORKER_PUBLIC_URL must use https://aletheia-worker-zjnt.onrender.com.
+# QSTASH_URL must use the token's region: https://qstash-us-east-1.upstash.io.
 
 services:
   - type: web

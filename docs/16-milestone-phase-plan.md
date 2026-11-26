@@ -3,7 +3,7 @@
 * **Status Dokumen:** Rencana eksekusi per milestone (*view* dari `docs/06` dan `docs/12`)
 * **Hierarki:** **7 milestone** → **19 fase** → **20 task** (`TASK-00`..`TASK-19`)
 * **Prinsip:** setiap milestone harus menghasilkan demo yang bisa dilihat; deploy preview dilakukan sedini mungkin, bukan di akhir.
-* **Target biaya:** **Rp 0 / free-tier** (Cloudflare, Neon, Upstash, Cloudinary, Koyeb/Render).
+* **Target biaya:** **Rp 0 / free-tier** (Cloudflare, Neon, Upstash, Cloudinary, Render).
 
 ## 1. Ringkasan
 
@@ -59,18 +59,18 @@
 | --- | --- | --- | --- |
 | M2.1 | TASK-04 | **Selesai 26 November 2026.** Governance: login, refresh rotation, MFA privileged, tenant/RBAC, policy draft/approve/publish, audit verify, HMAC gateway. | I-07, I-11, I-12; audit chain valid. Bukti: `docs/evidence/m2.1-verification.md` |
 | M2.2 | TASK-05 | **Selesai 26 November 2026.** Claims: draft/revisi/submit, upload signature Cloudinary, evaluasi risiko dan flag konflik, review kepatuhan, keputusan `FOR UPDATE`, SoD, pencairan via `packages/payments`, webhook payment. | I-01, I-02, I-11, I-12. Bukti: `docs/evidence/m2.2-verification.md` |
-| M2.3 | TASK-08, TASK-09 | **Selesai 26 November 2026.** Edge Hono + GraphQL BFF, rate limit, REST proxy; web shell, claims workbench, approval queue, audit drawer. | Playwright 5 lulus; initial 140,7 KB gzip; axe 0 serious; **preview live** di `aletheia-web-preview.pages.dev` dan `aletheia-edge-preview.ridwanafzn.workers.dev`. Bukti: `docs/evidence/m2.3-verification.md` |
+| M2.3 | TASK-08, TASK-09 | **Selesai 26 November 2026.** Edge Hono + GraphQL BFF, rate limit, REST proxy; web shell, claims workbench, approval queue, audit drawer. | Playwright 5 lulus; initial 140,7 KB gzip; axe 0 serious; **preview live** di `aletheia-web-preview.pages.dev` dan `aletheia-edge-preview.ridwanafzn.workers.dev`; production edge: `aletheia-edge.ridwanafzn.workers.dev`. Bukti: `docs/evidence/m2.3-verification.md` |
 
 **Deploy pertama (wajib):**
 - Web → **Cloudflare Pages preview** (per PR).
 - Edge → **Cloudflare Workers preview** (`wrangler deploy --env preview`).
-- Services → **Koyeb/Render free** (governance, claims).
+- Services → **Render free** (governance, claims, payroll, worker).
 - DB → **Neon branch** per PR.
 - Redis/QStash → namespace `preview-<pr>`.
 - Cloudinary → folder `preview/`.
 
 **Demo:** login 6 role → buat klaim → risk/conflict → approve/SoD → audit.
-**Status 26 November 2026:** M5.3 selesai. M5.4 live: service Render, Neon, Upstash QStash, Cloudinary, edge Workers, dan web Pages aktif; smoke production 15/15 lulus; async QStash/worker lulus (~5 detik); login enam peran, UI web, serta rollback edge, Pages, dan Render terverifikasi. M6.2 live dengan monitoring 24 jam via workflow Production Monitor; sisa monitoring 24 jam dan sign-off. Render free tier memiliki cold start; jalankan `pnpm warm:production` sebelum demo.
+**Status 26 November 2026:** M5.3 selesai. M5.4 live: service Render, Neon, Upstash QStash, Cloudinary, edge Workers, dan web Pages aktif; smoke production 15/15 lulus; async QStash/worker lulus (~5 detik); login enam peran, UI web, serta rollback edge, Pages, dan Render terverifikasi. M6.2 live; Production Monitor baseline `45816325368` dan pasca-drill `45821314200` lulus. Sisa 4 run terjadwal (24 jam), freeze deploy, dan sign-off. Render free tier memiliki cold start; jalankan `pnpm warm:production` sebelum demo.
 **Catatan:** payroll BE (TASK-06/07) boleh berjalan paralel setelah kontrak stabil, tetapi tidak menghambat demo klaim.
 
 ---
@@ -122,7 +122,7 @@
 
 | Fase | Task | Yang dituntaskan | Gate |
 | --- | --- | --- | --- |
-| M6.1 | TASK-19 | **Aset selesai 26 November 2026.** README final, 8 screenshot inti + 3 mobile, video 2:16, akun demo, CHANGELOG, job matrix aktual. | Reviewer dapat menjalankan demo < 3 menit via `dev-up.sh`; evidence lengkap; live URL pending M5.4. Bukti: `docs/evidence/m6.1-verification.md` |
+| M6.1 | TASK-19 | **Aset selesai 26 November 2026.** README final, 8 screenshot inti + 3 mobile, video 2:16, akun demo, CHANGELOG, job matrix aktual. | Reviewer dapat menjalankan demo < 3 menit via `dev-up.sh` atau live URL; evidence lengkap. Bukti: `docs/evidence/m6.1-verification.md` |
 | M6.2 | Launch (bagian dari TASK-19/18) | **Live, monitoring berjalan.** Smoke production 15/15, web UI 3 peran, async QStash/worker (~5 detik), rollback edge/Pages/Render, dan CSP lulus. Sisa: 4 run Production Monitor (24 jam), freeze deploy, sign-off. Runbook: `docs/runbooks/m6.2-launch.md`; bukti: `docs/evidence/m6.2-verification.md`. | Semua endpoint sehat; tidak ada P0; matrix ≥ 100% |
 
 **Deploy final:** production demo di free-tier, dengan akun demo dan data sintetis.
@@ -133,9 +133,9 @@
 | Environment | Web | Edge | Services/Worker | Database | Cache/Queue | Media |
 | --- | --- | --- | --- | --- | --- | --- |
 | Local | Vite dev | `wrangler dev` | Docker Compose | Postgres/Neon dev | Upstash dev/local | Cloudinary dev |
-| Preview (M2.3+) | Cloudflare Pages preview | CF Workers preview | Koyeb/Render preview | Neon branch per PR | namespace `preview-*` | folder `preview/` |
-| Staging (M5.4) | CF Pages staging | CF Workers staging | Koyeb/Render staging | Neon staging | namespace `staging` | folder `staging/` |
-| Production demo (M5.4–M6.2) | CF Pages production | CF Workers production | Koyeb/Render production | Neon main | namespace `prod` | folder `prod/` |
+| Preview (M2.3+) | Cloudflare Pages preview | CF Workers preview | Render preview | Neon branch per PR | namespace `preview-*` | folder `preview/` |
+| Staging (M5.4) | CF Pages staging | CF Workers staging | Render staging | Neon staging | namespace `staging` | folder `staging/` |
+| Production demo (M5.4–M6.2) | CF Pages production | CF Workers production | Render production | Neon main | namespace `prod` | folder `prod/` |
 
 ## 5. Kuota Free-Tier & Mitigasi
 
@@ -147,7 +147,7 @@
 | **Upstash Redis** | 10.000 command/hari; 256 MB | Hanya rate limit, lock, idempotency, cache agregasi; TTL + pipeline; tanpa `KEYS *` |
 | **Upstash QStash** | 500 pesan/hari | 1 pesan per batch/periode, bukan per karyawan; DLQ; idempotent |
 | **Cloudinary** | 25 credit/bulan | Upload ≤ 5 MB; format PDF/JPG/PNG/WEBP; transformasi minimal; signed URL |
-| **Koyeb/Render** | 512 MB/container; sleep saat idle | `NODE_OPTIONS=--max-old-space-size=256`; `GOMEMLIMIT=128MiB`; `/healthz`; uptime ping; cold-start tolerance |
+| **Render** | 512 MB/container; sleep saat idle | `NODE_OPTIONS=--max-old-space-size=256`; `GOMEMLIMIT=128MiB`; `/healthz`; `pnpm warm:production`; cold-start tolerance |
 
 **Aturan:** jika pemakaian > 60% kuota harian, kurangi cache/rate limit atau naikkan paket. Jangan menambah service baru tanpa ADR.
 
@@ -185,7 +185,7 @@ M0
 
 | Risiko | Dampak | Mitigasi |
 | --- | --- | --- |
-| Cold start/sleep Koyeb/Render | demo lambat | uptime ping, health check, loading state, warm-up |
+| Cold start/sleep Render | demo lambat | health check, loading state, `pnpm warm:production` |
 | Neon auto-suspend | query pertama lambat | retry backoff, connection pool, keep-alive ringan |
 | Redis quota habis | rate limit/idempotency gagal | fallback DB, command budget, pipeline, TTL |
 | QStash 500/hari | batch gagal | coarse-grained, dedup, DLQ, monitor |

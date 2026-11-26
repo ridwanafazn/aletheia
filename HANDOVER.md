@@ -1,6 +1,6 @@
 # Aletheia — Handover
 
-* **Status:** M1 sampai M5.4 live. Web, edge, empat service Render, Neon, Upstash QStash, dan Cloudinary aktif; smoke production 15/15 lulus; async QStash/worker terverifikasi; login enam peran, UI web, serta rollback edge, Pages, dan Render terverifikasi. M6.2 live dengan monitoring 24 jam berjalan via workflow Production Monitor.
+* **Status:** M1–M5.4 live di production. Web, edge, empat service Render, Neon, Upstash QStash, dan Cloudinary aktif; smoke production 15/15 lulus; async QStash/worker terverifikasi; login enam peran, UI web, serta rollback edge, Pages, dan Render terverifikasi. M6.2 live dengan monitoring 24 jam berjalan via workflow Production Monitor.
 * **Tanggal handover:** 26 November 2026
 * **Data:** seluruhnya sintetis. Tidak ada uang nyata atau PII nyata.
 * **Server demo:** dihentikan. Nyalakan ulang dengan `bash scripts/dev-up.sh`.
@@ -23,14 +23,13 @@ Aletheia adalah platform governance pencairan klaim dan payroll dengan:
 
 **Yang belum selesai:**
 
-* M6.2 finalisasi: monitoring 24 jam (Production Monitor tiap 6 jam), freeze deploy, dan sign-off akhir.
-* Cold start Render free tier; mitigasi `pnpm warm:production`. Jalankan `pnpm deploy:check`, lalu ikuti `docs/runbooks/m6.2-launch.md`.
+* M6.2 finalisasi: monitoring 24 jam (Production Monitor tiap 6 jam; 2 run hijau sejauh ini), freeze deploy, dan sign-off akhir.
+* Cold start Render free tier; mitigasi `pnpm warm:production`. `pnpm deploy:check` sudah lulus; runbook ada di `docs/runbooks/m6.2-launch.md`.
 * UI payslip dan laporan. API-nya sudah ada dan diverifikasi di M3.4.
-* Edge preview live perlu deploy ulang.
 * RUM LCP/INP, exporter span edge, dan label Prometheus kardinalitas tinggi.
 * CI E2E full-stack belum menjadi job CI.
 
-**Sudah selesai pada M5.4 (prasyarat):**
+**Sudah selesai pada M5.4:**
 
 * Pool service runtime memakai role non-owner `aletheia_app` dengan tenant binding per request/transaksi; RLS aktif.
 * Worker Go mengikat tenant dari event ke koneksi `pgxpool`.
@@ -97,7 +96,7 @@ Kata sandi semua akun: **`AletheiaDemo!2026`**. MFA nonaktif.
 | Payroll | `https://aletheia-payroll.onrender.com` |
 | Worker | `https://aletheia-worker-zjnt.onrender.com` |
 
-Jalankan `pnpm warm:production` sebelum demo karena Render free tier tidur saat idle.
+Jalankan `pnpm warm:production` sebelum demo karena Render free tier tidur saat idle. Production Monitor berjalan tiap 6 jam; baseline `45816325368` dan run pasca-drill `45821314200` lulus. Sign-off M6.2 setelah minimal 4 run sukses (perkiraan 27 November 2026, 19:05 WIB).
 
 ## 4A. URL lokal
 
@@ -277,13 +276,14 @@ Indeks lengkap ada di `docs/evidence/README.md`. Mulai dari:
 | Item | Status | Tindakan |
 | --- | --- | --- |
 | Service memakai role pemilik DB | Selesai | Semua service production memakai `aletheia_app` + tenant binding |
-| Edge preview tidak resolve | Selesai | Edge live di `aletheia-edge.ridwanafzn.workers.dev` |
+| Edge production | Selesai | Live di `aletheia-edge.ridwanafzn.workers.dev`; rollback drill lulus |
 | QStash belum aktif | Selesai | Upstash QStash aktif; `WORKER_URL` ke `-zjnt`; async What-If diproses worker ~5 detik |
+| Monitoring 24 jam M6.2 | Berjalan | Baseline `45816325368` dan pasca-drill `45821314200` hijau; sign-off setelah 4 run terjadwal |
 | Cold start Render free tier | Terbuka | Jalankan `pnpm warm:production`; pertimbangkan plan berbayar untuk demo tanpa jeda |
 | UI payslip dan laporan belum ada | Terbuka | API sudah diverifikasi M3.4; UI dapat menjadi task lanjutan |
 | RUM LCP/INP belum ada | Terbuka | Tambah web-vitals atau RUM di task lanjutan |
 | Label Prometheus kardinalitas tinggi | Terbuka | Gunakan `resource_constant_labels` atau transform collector |
-| Perubahan M5.4 | Selesai | Commit `e81fca0`, `b829b94`, `fb10579`; lihat riwayat Git |
+| Perubahan M5.4–M6.2 | Selesai | Commit `e81fca0`, `b829b94`, `fb10579`, `3209231`, `08ad6d7`; lihat riwayat Git |
 | CI E2E full-stack belum ada | Terbuka | Tambah job E2E dengan service stack |
 
 ## 11. Troubleshooting

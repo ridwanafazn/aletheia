@@ -12,11 +12,11 @@
 | --- | --- | --- |
 | Requirement teknis wajib tercakup di desain | 100% | 100% |
 | Preferred qualification tercakup di desain | 100% | 100% |
-| Kesiapan bukti saat ini | 100% requirement yang dapat dibuktikan (M1–M5.4 + M6.1); live URL pending | 100% requirement yang dapat dibuktikan (M1–M5.4 + M6.1); live URL pending |
+| Kesiapan bukti saat ini | 100% requirement yang dapat dibuktikan (M1–M6.2); live URL aktif | 100% requirement yang dapat dibuktikan (M1–M6.2); live URL aktif |
 | Target setelah implementasi | 120%+ | 120%+ |
 | Gap yang tidak bisa ditutup proyek | Pengalaman formal 2 tahun | — |
 
-**Kesimpulan:** seluruh requirement teknis dan preferred qualification sudah diimplementasikan dengan artefak yang dapat diperiksa: kode, test, screenshot, video 2:16, load test, query plan, security evidence, dan Neon production. J1-R1 (gelar) dan J1-R2 (pengalaman formal 2 tahun) tetap `N/A` dan dikompensasi dengan portfolio. Gap utama yang tersisa adalah **live URL production** (menunggu Koyeb/Render, Upstash, Cloudinary) dan **UI payslip/laporan**; keduanya dicatat sebagai residual gap, bukan klaim selesai.
+**Kesimpulan:** seluruh requirement teknis dan preferred qualification sudah diimplementasikan dengan artefak yang dapat diperiksa: kode, test, screenshot, video 2:16, load test, query plan, security evidence, live URL production, dan Neon production. J1-R1 (gelar) dan J1-R2 (pengalaman formal 2 tahun) tetap `N/A` dan dikompensasi dengan portfolio. Gap yang tersisa adalah **UI payslip/laporan**; live URL sudah aktif dan tidak lagi menjadi residual gap.
 
 ## 1. Metode Penilaian
 
@@ -47,9 +47,9 @@
 | J1-P1 | **PPh 21 & BPJS** | TER + annual + employer + laporan | `04`, `11` | 4 | TER, BPJS, payslip, laporan bulanan, bank file, variance, dan rekonsiliasi tahunan live |
 | J1-P2 | **RBAC/approval/audit** | 6 role, SoD, hash chain | `00`, `08` | 4 | governance, claims, dan payroll SoD live |
 | J1-P3 | **Large-scale & anti-duplikasi** | Goroutine pool, idempotency, `FOR UPDATE` | `02`, `04` | 4 | Go worker pool, idempotency, constraint, dan row lock live; batch 500 dalam 214 ms |
-| J1-P4 | **Docker/CI-CD/cloud** | Multi-stage, GH Actions, deploy | `05`, `12` | 3 | Docker multi-stage, image scan, CI/Security hijau, Cloudflare Pages preview, Neon production; host service production pending |
+| J1-P4 | **Docker/CI-CD/cloud** | Multi-stage, GH Actions, deploy | `05`, `12` | 3 | Docker multi-stage, image scan, CI/Security hijau, Cloudflare Pages/Workers, 4 service Render, Neon production; smoke 15/15 dan rollback drills lulus |
 
-**Kesimpulan Job 1:** implementasi dan bukti sudah mencakup **semua** requirement teknis; HRIS-lite menutup gap "HRIS". Residual gap: live URL production dan UI payslip/laporan.
+**Kesimpulan Job 1:** implementasi dan bukti sudah mencakup **semua** requirement teknis; HRIS-lite menutup gap "HRIS". Live URL production aktif. Residual gap: UI payslip/laporan.
 
 ### 2A. Cakupan Opsi Stack (Job 1)
 
@@ -73,14 +73,14 @@ Lowongan memakai frasa "at least one of" dan "one of", jadi pilihan berikut seng
 | J2-R1 | React TS + Node/Express microservices | 3 Express service + 1 Go worker + React app | `01`, `12` | 3 | 3 Express service, Go worker, React, dan UI payroll live |
 | J2-R2 | PostgreSQL advanced query/optimization | CTE, window, partial/covering/GIN, `EXPLAIN` | `02`, `09` | 4 | MV KPI, window MoM, partial index, security barrier, dan query plan cache |
 | J2-R3 | REST + GraphQL integration | REST transaksional + GraphQL BFF | `03`, TASK-08/13 | 3 | GraphQL query KPI, tren, audit klaim, dan mutation What-If live |
-| J2-R4 | Caching/load balancing/cloud-native | Redis, Nginx `least_conn`, edge, stateless | `01`, `09` | 3 | edge rate limit live; 7 load test lulus; Upstash Redis production pending |
-| J2-R5 | Docker & containerization | Dockerfile per service + compose | `05`, TASK-01 | 3 | Dockerfile multi-stage dan image scan hijau; edge/web production pending |
+| J2-R4 | Caching/load balancing/cloud-native | Redis, Nginx `least_conn`, edge, stateless | `01`, `09` | 3 | edge rate limit live; 7 load test lulus; Upstash Redis production aktif |
+| J2-R5 | Docker & containerization | Dockerfile per service + compose | `05`, TASK-01 | 3 | Dockerfile multi-stage dan image scan hijau; edge, web, dan 4 service Render live |
 | J2-R6 | Kolaborasi tim MIS Analyst | Persona MIS + dashboard + What-If | `00`, `07`, `09` | 3 | MIS dashboard, tren, drill-down, dan What-If sandbox live |
 | J2-R7 | Clean code, documented, review | TSDoc/GoDoc, lint, PR template, ADR | `05`, `12`, `14`, `CONTRIBUTING.md` | 3 | sebagian |
-| J2-R8 | CI/CD, deploy, monitoring, maintenance | Pipeline + OTel + SLO + runbook | `05`, `09`, TASK-16/18 | 3 | CI/Security main hijau; OTel, dashboard, SLO, load test, 21 E2E, coverage, dan Neon production lulus; service host production pending |
+| J2-R8 | CI/CD, deploy, monitoring, maintenance | Pipeline + OTel + SLO + runbook | `05`, `09`, TASK-16/18 | 3 | CI/Security main hijau; OTel, dashboard, SLO, load test, 21 E2E, coverage, dan Neon production lulus; service host production live; Production Monitor tiap 6 jam |
 | J2-R9 | Patuh kebijakan perusahaan | Governance/compliance + proses PR/CI | `00`, `08`, `CONTRIBUTING.md` | 3 | kontrol governance, claims, dan UI audit live |
 
-**Kesimpulan Job 2:** implementasi dan bukti operasional sudah tersedia (dashboard, load test, CI hijau, Neon production). Residual gap: host service production, Upstash/Cloudinary, dan live URL.
+**Kesimpulan Job 2:** implementasi dan bukti operasional sudah tersedia (dashboard, load test, CI hijau, Neon production, live URL, Upstash/Cloudinary). Tidak ada residual gap pada host atau deployment.
 
 ## 4. Pembeda di Atas Requirement (Skor 4)
 
@@ -99,7 +99,7 @@ Lowongan memakai frasa "at least one of" dan "one of", jadi pilihan berikut seng
 
 ## 5. Evidence Checklist (Harus Ada Sebelum Melamar)
 
-- [ ] URL demo live — pending M5.4 deployment.
+- [x] URL demo live — `https://aletheia-web-preview.pages.dev` (edge `https://aletheia-edge.ridwanafzn.workers.dev`).
 - [x] 6 akun demo + data seed realistis.
 - [x] README dengan arsitektur, screenshot, cara jalan, akun demo.
 - [x] Test report: unit, integration, E2E, race; coverage domain ≥ 90%.
@@ -117,11 +117,11 @@ Lowongan memakai frasa "at least one of" dan "one of", jadi pilihan berikut seng
 
 | Prioritas | Gap | Dampak | Aksi |
 | --- | --- | --- | --- |
-| P0 | Live URL production | Reviewer belum bisa mencoba tanpa clone | Deploy Koyeb/Render + Cloudflare + Upstash/Cloudinary (M5.4/M6.2) |
+| ~~P0~~ | ~~Live URL production~~ | Selesai 26 November 2026 | Web, edge, 4 service Render, Neon, Upstash, dan Cloudinary live |
 | P1 | UI payslip dan laporan | Screenshot payslip/report belum ada | Bangun layar payslip/PPh 21/BPJS di atas API M3.4 |
 | P1 | Video MP4/narasi | WebM diterima, tetapi MP4 lebih universal | Konversi dengan ffmpeg + narasi opsional |
 | P2 | RUM LCP/INP, edge span OTLP | SLO web/edge belum terukur production | Tambah web-vitals dan exporter edge |
-| P2 | CI E2E full-stack | E2E belum otomatis di CI | Tambah job service stack di TASK-18 |
+| P2 | CI E2E full-stack | E2E belum otomatis di CI | Tambah job service stack di task lanjutan |
 | P3 | Full HRIS (clock-in, shift, THR) | Di luar scope | Catat sebagai future |
 
 ## 7. Narasi Interview per Requirement

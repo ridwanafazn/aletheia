@@ -2,7 +2,7 @@
 
 * **Nama Sistem:** Aletheia (*Enterprise Disbursement Governance & MIS Intelligence Platform*)
 * **Status Dokumen:** Spesifikasi DevOps, Kualitas Kode & Verifikasi (*Single Source of Truth* untuk Agen OpenCode)
-* **Target Lingkungan:** Local Docker Compose (Multi-Replica Simulation) & Cloud Free-Tier (Cloudflare, Koyeb/Render, Neon, Upstash)
+* **Target Lingkungan:** Local Docker Compose (Multi-Replica Simulation) & Cloud Free-Tier (Cloudflare, Render, Neon, Upstash, Cloudinary)
 
 ---
 
@@ -91,7 +91,7 @@ Setiap *Pull Request* dan *push* ke cabang `main` wajib melewati empat gerbang o
 | **1. Static Analysis & Security** | Semua PR & Push | Menjalankan `pnpm typecheck`, `eslint`, `golangci-lint run`, serta pemindaian kebocoran kredensial (*Gitleaks*). | Nol kesalahan tipe, nol peringatan *linter* kritis, nol rahasia terekspos. |
 | **2. Automated Testing** | Semua PR & Push | Menjalankan pengujian unit (`vitest` & `go test -race ./...`), coverage domain dengan threshold, serta pengujian integrasi terhadap kontainer Postgres sementara. E2E full-stack dijalankan lokal dan pada job deployment. | $100\%$ kasus uji lulus, coverage domain minimal 90%, dan tidak terdeteksi *data race*. |
 | **3. Container Build & Scan** | Push ke `main` | Membangun seluruh *multi-stage Docker images*, memindai kerentanan paket OS dengan **Trivy**, dan mendorong *image* bertag SHA komit ke GitHub Container Registry (`ghcr.io`). | Tidak ada kerentanan tingkat `CRITICAL` yang belum ditambal. |
-| **4. Multi-Cloud Deployment** | Push ke `main` (setelah Stage 3 lulus) | Memicu *deploy* otomatis `apps/web` ke **Cloudflare Pages**, `apps/edge-gateway` ke **Cloudflare Workers** (`wrangler deploy`), dan memicu *deploy webhook* kontainer backend. | Seluruh titik akhir `/readyz` produksi merespons HTTP `200 OK` dalam waktu $< 30\text{ detik}$. |
+| **4. Multi-Cloud Deployment** | Manual/Blueprint sync setelah Stage 3 lulus | Deploy `apps/web` ke **Cloudflare Pages**, `apps/edge-gateway` ke **Cloudflare Workers** (`wrangler deploy`), dan empat service Docker ke **Render** via Blueprint/API. `autoDeployTrigger: off` selama jendela demo. | Seluruh titik akhir `/readyz` produksi merespons HTTP `200 OK`; smoke production 15/15. |
 
 ### 3A. Workflow Keamanan Tambahan (`.github/workflows/security.yml`)
 
@@ -167,11 +167,13 @@ Skenario k6 wajib: `smoke`, `claims-read`, `claim-submit`, `approval-race`, `pay
 | --- | --- | --- |
 | Web | Cloudflare Pages | preview per PR, production dari `main` |
 | Edge | Cloudflare Workers | `wrangler deploy`, preview per PR |
-| Services | Koyeb/Render | image GHCR tag SHA, rolling deploy |
-| Worker Go | Koyeb/Render | image distroless, rolling deploy |
+| Services | Render | Docker image dari repo, health check `/healthz` |
+| Worker Go | Render | Docker image distroless, health check `/healthz` |
 | DB | Neon | branch per PR, migration job, PITR |
 | Redis/QStash | Upstash | namespace per environment |
 | Cloudinary | Cloudinary | folder per environment/tenant |
+
+**Status live 26 November 2026:** web Cloudflare Pages, edge Cloudflare Workers, governance/claims/payroll/worker Render, Neon PG16, Upstash QStash, dan Cloudinary aktif. Smoke production 15/15; async QStash/worker ~5 detik; rollback edge, Pages, dan Render diuji. Bukti: `docs/evidence/m6.2-verification.md`.
 
 **Urutan deploy:** migration → governance → claims/payroll → worker → edge → web. Setiap langkah punya smoke test; jika gagal, rollback ke image/tag sebelumnya.
 

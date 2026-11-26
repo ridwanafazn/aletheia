@@ -3,6 +3,8 @@
 Gunakan file ini saat Render meminta nilai `sync: false` pada Blueprint pertama.
 Semua nilai diambil dari `.env.production.local` (di-ignore Git). Jangan menempelkan nilai secret ke chat atau commit.
 
+**Status 26 November 2026:** Blueprint sudah diterapkan dan keempat service live. Env `WORKER_URL`, `WORKER_PUBLIC_URL`, dan `QSTASH_URL` sudah diaudit lewat Render API; nilainya sesuai tabel di `docs/evidence/m6.2-verification.md`.
+
 ## Ringkasan service
 
 | Service Render | Dockerfile | Health check |
@@ -76,10 +78,11 @@ Semua nilai diambil dari `.env.production.local` (di-ignore Git). Jangan menempe
 2. `JWT_PRIVATE_KEY` dan `JWT_PUBLIC_KEY` disimpan satu baris dengan urutan `\n`. Copy persis dari file; jangan mengubah menjadi baris baru.
 3. `DATABASE_URL_APP` adalah koneksi **pooled** Neon dengan role `aletheia_app`.
 4. `WORKER_DATABASE_URL` adalah koneksi **direct** Neon dengan role `aletheia_app`.
-5. `WORKER_URL` dan `WORKER_PUBLIC_URL` sudah diisi di `render.yaml` sebagai `https://aletheia-worker.onrender.com`. Jika Render memberi suffix pada nama service, update nilai tersebut di dashboard setelah deploy.
+5. `WORKER_URL` dan `WORKER_PUBLIC_URL` sudah diisi di `render.yaml` sebagai `https://aletheia-worker-zjnt.onrender.com` (Render memberi suffix pada nama service). Jangan memakai `https://aletheia-worker.onrender.com`; host itu milik aplikasi lain.
 6. Setelah Blueprint apply, tunggu keempat service berstatus **Live** dan health check hijau.
-7. Jika service gagal start, buka **Logs** dan cari pesan seperti:
+7. `QSTASH_URL` harus memakai region token: `https://qstash-us-east-1.upstash.io`. Endpoint default `https://qstash.upstash.io` mengarah ke `eu-central-1` dan menghasilkan `enqueued=false`.
+8. Jika service gagal start, buka **Logs** dan cari pesan seperti:
    - `DATABASE_URL_APP wajib diisi di production` → env belum terpasang di service itu.
    - `INTERNAL_GATEWAY_SECRET wajib diisi` → secret belum diisi.
    - `WORKER_DATABASE_URL atau DATABASE_URL wajib diisi` → env worker belum diisi.
-8. Jika Render meminta kartu untuk free tier, ikuti verifikasi yang diminta; ini di luar kendali aplikasi.
+9. Jika Render meminta kartu untuk free tier, ikuti verifikasi yang diminta; ini di luar kendali aplikasi.

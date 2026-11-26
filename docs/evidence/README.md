@@ -21,8 +21,8 @@ Folder ini menyimpan bukti yang dapat diperiksa reviewer: verifikasi milestone, 
 | `m5.1-verification.md` | RLS, security hardening, scan | Selesai |
 | `m5.2-verification.md` | OTel, SLO, load test, query optimization | Selesai |
 | `m5.3-verification.md` | E2E, axe, coverage, final QA | Selesai |
-| `m5.4-verification.md` | Runtime RLS, role `aletheia_app`, tenant binding, worker Go | Prasyarat selesai; deployment eksternal pending |
-| `m6.1-verification.md` | README, screenshot, video, akun demo, CHANGELOG, job matrix | Aset selesai; live URL pending |
+| `m5.4-verification.md` | Runtime RLS, role `aletheia_app`, tenant binding, worker Go, deployment | Live di Render/Cloudflare/Neon/Upstash/Cloudinary |
+| `m6.1-verification.md` | README, screenshot, video, akun demo, CHANGELOG, job matrix | Aset selesai; live URL aktif |
 | `m6.2-verification.md` | Smoke, web UI, async QStash, rollback edge/Pages/Render, cold start, monitoring | Live; monitoring 24 jam berjalan |
 
 ## Load test

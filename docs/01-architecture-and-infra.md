@@ -71,7 +71,7 @@ Aletheia memakai **satu monorepo dengan deploy terpisah**:
 
 - `apps/web` → Cloudflare Pages (static SPA).
 - `apps/edge-gateway` → Cloudflare Workers (`wrangler deploy`).
-- `services/*` dan `analytics-worker-go` → container host (Koyeb/Render), image dari GHCR.
+- `services/*` dan `analytics-worker-go` → Render (Docker build dari repo).
 - `packages/*` → library internal, tidak di-deploy sendiri.
 
 Alasan: kontrak berubah dalam satu PR atomik, CI memakai path filter, dan perekrut melihat satu repo yang koheren. Dua repo FE/BE ditolak untuk konteks proyek ini; lihat `docs/12-delivery-repo-and-portfolio-strategy.md` dan ADR-001.
@@ -100,7 +100,7 @@ Alasan: kontrak berubah dalam satu PR atomik, CI memakai path filter, dan perekr
 
 ### C. Lapisan *Microservices* Inti (*Express.js TS & Go Worker*)
 
-Untuk menjaga kemurnian arsitektur *microservices* sekaligus mengakomodasi batasan memori *free-tier* (seperti Koyeb, Render, atau Hugging Face Spaces), layanan dibangun secara terpisah di dalam monorepo dengan jejak memori minimal:
+Untuk menjaga kemurnian arsitektur *microservices* sekaligus mengakomodasi batasan memori *free-tier* (Render), layanan dibangun secara terpisah di dalam monorepo dengan jejak memori minimal:
 
 1. **`governance-service` (Express.js + TypeScript):** Mengelola autentikasi, RBAC, siklus versi *Policy Reference*, dan buku besar *Immutable Audit Trail*.
 
@@ -117,7 +117,7 @@ Untuk menjaga kemurnian arsitektur *microservices* sekaligus mengakomodasi batas
    * Eksekusi simulasi *What-If* bagi analis MIS dan penyegaran *Materialized Views* PostgreSQL.
 
 > **Catatan Deployment Fleksibel (Multi-Container vs Consolidated Gateway):**
-> Di lingkungan lokal (`docker-compose.yml`), keempat layanan berjalan sebagai kontainer terpisah di belakang *load balancer* Nginx. Pada lingkungan produksi *free-tier* yang membatasi jumlah kontainer aktif, layanan Express.js dapat dijalankan secara terpisah per layanan pada penyedia *cloud* berbeda (misalnya Koyeb + Render) atau dikonsolidasikan di balik *internal reverse proxy* dengan batas memori ketat tanpa mengubah satu baris pun logika domainnya.
+> Di lingkungan lokal (`docker-compose.yml`), keempat layanan berjalan sebagai kontainer terpisah di belakang *load balancer* Nginx. Pada lingkungan produksi *free-tier* yang membatasi jumlah kontainer aktif, layanan Express.js dijalankan sebagai empat service Render terpisah di belakang edge gateway, dengan batas memori ketat tanpa mengubah satu baris pun logika domainnya.
 
 ## 3. Batasan Keras *Free-Tier* & Strategi Mitigasi Arsitektural
 
@@ -129,7 +129,7 @@ Agen pengembangan wajib mematuhi batasan kuota layanan gratis berikut agar siste
 | **Upstash Redis** | Maks. `10.000` perintah/hari & kapasitas `256 MB` pada paket gratis. | Kuota perintah harian habis jika setiap kueri kecil menyentuh Redis. | Gunakan Redis secara selektif hanya untuk: (1) *Rate limiting* mutasi, (2) *Distributed lock* & *Idempotency key* pencairan, dan (3) *Cache* hasil agregasi dasbor MIS (`TTL 5–15 menit`). Hindari `KEYS *`. | 
 | **Upstash QStash** | Maks. `500` pesan/hari pada paket gratis. | Pengiriman pesan gagal jika setiap baris data dikirim sebagai 1 event terpisah. | Terapkan pola **Coarse-Grained Batch Events**: satu periode *payroll* berisi 500 karyawan dikirim sebagai **1 pesan QStash** berisi `batch_id`, bukan 500 pesan terpisah. | 
 | **Cloudflare Workers** | Maks. `100.000` permintaan/hari & batas waktu CPU `10 ms` per eksekusi. | Eksekusi dihentikan paksa jika *edge* melakukan pemrosesan data besar. | *Edge Worker* dilarang melakukan agregasi berat atau transformasi array besar; tugasnya murni validasi JWT, *routing*, dan *forwarding* GraphQL/REST. | 
-| **Container Runtime** *(Koyeb / Render)* | RAM `512 MB` per kontainer, *sleep* setelah 15 menit tanpa trafik. | Node.js mengalami *OOM Crash* atau *cold start* lambat saat *demo*. | Konfigurasi `NODE_OPTIONS="--max-old-space-size=256"` pada semua kontainer Express.js, gunakan `GOMEMLIMIT=128MiB` pada pekerja Go, dan sediakan *endpoint* `/healthz` ringan untuk pemantauan *uptime*. | 
+| **Container Runtime** *(Render)* | RAM `512 MB` per kontainer, *sleep* setelah 15 menit tanpa trafik. | Node.js mengalami *OOM Crash* atau *cold start* lambat saat *demo*. | Konfigurasi `NODE_OPTIONS="--max-old-space-size=256"` pada semua kontainer Express.js, gunakan `GOMEMLIMIT=128MiB` pada pekerja Go, dan sediakan *endpoint* `/healthz` ringan untuk pemantauan *uptime*. |
 | **Cloudinary** | `25` kredit/bulan (\~25 GB penyimpanan/bandwidth). | Pembengkakan ukuran unggahan dokumen bukti klaim. | Batasi ukuran unggahan maksimal `5 MB` per berkas melalui parameter *signed upload* (format `PDF`, `JPG`, `PNG`, `WEBP` saja). | 
 
 ## 4. Pola Ketahanan Sistem (*Cloud-Native Resiliency & Load Balancing*)

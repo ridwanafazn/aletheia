@@ -111,7 +111,7 @@ A reviewer should be able to log in as six roles and see one coherent story: a c
 
 ## Constraints
 
-- Free-tier infrastructure: Neon, Upstash, Cloudflare, Cloudinary, Koyeb/Render.
+- Free-tier infrastructure: Neon, Upstash, Cloudflare, Cloudinary, Render.
 - Solo development, portfolio timeline.
 - Indonesian payroll context; parameters must be policy-driven and verified.
 - No real money in demos; synthetic data only.

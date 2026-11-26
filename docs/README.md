@@ -37,6 +37,8 @@ Mulai dari `HANDOVER.md` di root repository. Dokumen ini adalah indeks spesifika
 | `14-architecture-decision-records.md` | ADR |
 | `15-audit-fix-register.md` | Temuan audit dan status perbaikan |
 | `16-milestone-phase-plan.md` | Rencana fase dan status milestone |
+| `runbooks/m6.2-launch.md` | Launch, smoke, rollback, dan monitoring production |
+| `evidence/m6.2-verification.md` | Bukti production: smoke, web UI, async QStash, rollback, monitoring |
 
 ## Evidence
 

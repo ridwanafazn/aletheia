@@ -89,10 +89,10 @@
 | Parameter pajak/BPJS | VERIFY | Semua angka contoh; policy version adalah SSOT, bukan nasihat pajak. |
 | Provider pembayaran nyata | VERIFY | Mock untuk demo; Xendit/Midtrans butuh KYC dan sandbox. |
 | Full HRIS (absensi, shift, THR) | DEFERRED | Di luar milestone; lihat `docs/11` §10. |
-| Bukti implementasi domain | PARTIAL | M1.1–M1.3, M2.1–M2.3, M3.1–M3.4, M4, M5.1, M5.2, dan M5.3 terverifikasi. Sisa UI payslip dan laporan, serta deploy production. |
-| Audit ulang setelah implementasi | OPEN | Jalankan `architect` + `finance-reviewer` sebelum rilis. |
+| Bukti implementasi domain | PARTIAL | M1.1–M5.4 live dan M6.1 selesai; smoke production 15/15 dan rollback edge/Pages/Render lulus. Sisa UI payslip dan laporan. |
+| Audit ulang setelah implementasi | OPEN | Jalankan `architect` + `finance-reviewer` sebelum rilis publik. Production demo saat ini memakai data sintetis dan provider `MOCK`. |
 | Retry dan batch `FAILED` | FIXED | Retry Finance membuat payment `attempt_no` baru untuk item `FAILED` atau `REVERSED`, lalu menyinkronkan status batch. |
-| QStash dan worker live | VERIFY | Signature, handler, dan replay teruji. Token QStash demo belum aktif sehingga event live dikirim manual. |
+| QStash dan worker live | FIXED | Upstash QStash aktif di region `us-east-1`; `pnpm async:production` enqueued dan worker memproses What-If ~5 detik (event `a6a57496-f1c6-4f0a-b61a-f063c90620d6`). |
 | I-08 payslip versus item | FIXED | `payroll.payslips` menyimpan gross dan net; integration test memastikan total net payslip sama dengan item. |
 | Form create/edit karyawan | DEFERRED | API tersedia, tetapi UI masih direktori baca dan drawer profil. Perubahan kompensasi tetap melalui alur HR terkontrol. |
 | Penyimpanan berkas di database | DEFERRED | Payslip dan laporan disimpan pada `payroll.generated_files` untuk demo gratis. Produksi sebaiknya memakai object storage. |
@@ -108,7 +108,7 @@
 | Go semconv schema | FIXED | Resource Go memakai schema semconv yang sama dengan SDK untuk menghindari konflik schema URL. |
 | CVE golang.org/x/net | FIXED | Trivy image menemukan CVE HIGH pada v0.60.0. Dinaikkan ke v0.62.0; Trivy dan govulncheck bersih. |
 | Label Prometheus kardinalitas tinggi | OPEN | Collector 0.140 mengubah seluruh resource attribute menjadi label. Production wajib memakai `resource_constant_labels` atau transform collector agar hanya service dan environment yang menjadi label. |
-| Edge span OTLP | ACCEPTED | Edge Workers meneruskan `traceparent` dan mencatat trace ID, tetapi belum mengekspor span. Exporter edge dan RUM ditunda ke TASK-18. |
+| Edge span OTLP | ACCEPTED | Edge Workers meneruskan `traceparent` dan mencatat trace ID, tetapi belum mengekspor span. Exporter edge dan RUM ditunda ke task lanjutan. |
 | E2E bergantung data seed | FIXED | Test klaim memakai ID deterministik dan pencarian klaim konflik lewat API. Bukti: `docs/evidence/m5.3-verification.md`. |
 | Payroll E2E tidak deterministik | FIXED | Test final membuat batch koreksi unik, menghitung lewat worker lokal, lalu menyetujui dan mencairkan. Menggantikan test approval opt-in lama. |
 | Coverage domain belum diukur | FIXED | `pnpm test:coverage` dengan threshold 90% lines, 90% statements, 90% functions, 85% branches. Hasil 96,26% lines. |

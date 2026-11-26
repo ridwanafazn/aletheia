@@ -2,7 +2,7 @@
 
 * **Status Dokumen:** Peta Jalan Eksekusi (*Single Source of Truth* untuk Agen OpenCode)
 * **Strategi:** *Contract-First, Vertical Slice, Evidence-Driven, Zero Context Drift*
-* **Kondisi Saat Ini:** Fase 0, M1.1–M1.3, M2.1–M2.3, M3.1–M3.4, M4.1, M4.2, M5.1–M5.4, dan M6.1 selesai. M5.4 live di Render, Neon, Upstash, Cloudinary, dan Cloudflare; smoke production 15/15, async QStash/worker ~5 detik, login enam peran, UI web, serta rollback edge, Pages, dan Render terverifikasi. M6.2 live dengan monitoring 24 jam via workflow Production Monitor; sisa monitoring 24 jam, freeze deploy, dan sign-off. Render free tier memiliki cold start; jalankan `pnpm warm:production` sebelum demo. Bukti: `docs/evidence/m5.4-verification.md`, `docs/evidence/m6.1-verification.md`, `docs/evidence/m6.2-verification.md`.
+* **Kondisi Saat Ini:** Fase 0, M1.1–M1.3, M2.1–M2.3, M3.1–M3.4, M4.1, M4.2, M5.1–M5.4, dan M6.1 selesai. M5.4 live di Render, Neon, Upstash, Cloudinary, dan Cloudflare; smoke production 15/15, async QStash/worker ~5 detik, login enam peran, UI web, serta rollback edge, Pages, dan Render terverifikasi. M6.2 live; Production Monitor baseline `45816325368` dan pasca-drill `45821314200` lulus. Sisa 4 run terjadwal (24 jam), freeze deploy, dan sign-off. Render free tier memiliki cold start; jalankan `pnpm warm:production` sebelum demo. Bukti: `docs/evidence/m5.4-verification.md`, `docs/evidence/m6.1-verification.md`, `docs/evidence/m6.2-verification.md`.
 
 ## 1. Protokol Kerja Agen
 
@@ -56,7 +56,7 @@
   * Migrasi 4 skema + `governance.tenants`, `refresh_tokens`, `mfa_recovery_codes`, `claims.disbursements`, `payroll.sales_achievements`, `attendance_summaries`, `leave_requests`, `payslips`, `tax_reports`, `tax_reconciliations`, `payments`.
   * RLS policies, audit trigger + `append_audit_log()` + advisory lock, UUIDv7.
   * Index strategis, materialized view, seed idempoten.
-* **Gerbang:** migrasi bersih di PostgreSQL 16 lokal; I-04, I-06, I-15 lulus; `EXPLAIN` untuk query kunci. Neon branch masih pending.
+* **Gerbang:** migrasi bersih di PostgreSQL 16 lokal; I-04, I-06, I-15 lulus; `EXPLAIN` untuk query kunci. Neon branch production sudah dibuat dan dimigrasi (0000–0011).
 
 #### `TASK-03A` — CI Quality Gate & Security Baseline
 * **Status:** sebagian. Job typecheck, lint, test, format, Go, compose, Gitleaks, Semgrep, Trivy, pnpm audit, govulncheck, RLS audit, PII scan, dan audit chain aktif. Coverage gate aktif dengan threshold 90% dan lulus di M5.3. Workflow sudah dijalankan pada push `main`; PR nyata dan E2E full-stack belum menjadi job CI.
@@ -103,14 +103,14 @@
 * **Konteks Wajib:** `docs/01`, `docs/03`, `docs/08`.
 * **Cakupan:** Hono, JWT verify, rate limit, HMAC headers, REST proxy, GraphQL Yoga (`misExecutiveSummary`, `claimAuditDetail`, `whatIfSimulations`), depth limit, DataLoader.
 * **Gerbang:** `wrangler dev` smoke; header valid; GraphQL tanpa N+1; 429 berfungsi.
-* **Catatan:** Worker pernah live di `aletheia-edge-preview.ridwanafzn.workers.dev`; hostname perlu deploy ulang pada TASK-18. Upstash belum dikonfigurasi, rate limit memakai memori per isolate dengan fallback teruji.
+* **Catatan:** Live di `aletheia-edge.ridwanafzn.workers.dev`; preview lama `aletheia-edge-preview.ridwanafzn.workers.dev` juga masih aktif. Upstash Redis production aktif untuk rate limit.
 
 #### `TASK-09` — Web Shell, Claims Workbench & Approval Queue
 * **Status:** selesai 26 November 2026. Bukti: `docs/evidence/m2.3-verification.md`.
 * **Konteks Wajib:** `docs/07`, `PRODUCT.md`, `DESIGN.md`, skill `impeccable`.
 * **Cakupan:** app shell, auth, route guard, claims list/form/detail, upload, approval queue, decision dialog, audit drawer.
 * **Gerbang:** typecheck/build < 200 KB; Playwright smoke; axe; screenshot desktop/mobile.
-* **Catatan:** live di `aletheia-web-preview.pages.dev`. Initial JavaScript 140,7 KB gzip. Service backend masih melalui tunnel sementara sampai deployment Koyeb/Render dan Neon selesai.
+* **Catatan:** live di `aletheia-web-preview.pages.dev`. Initial JavaScript 140,7 KB gzip. Backend production live di Render; tidak ada tunnel.
 
 ---
 
@@ -156,14 +156,14 @@
 * **Konteks Wajib:** `docs/08`, `docs/10`, ADR-003/004.
 * **Cakupan:** audit RLS semua tabel (policy sudah dibuat di TASK-03), cross-tenant read/write tests, rate limit, CSP/CORS, PII scan, dependency dan image scan, audit verification job.
 * **Gerbang:** I-06, I-11, I-15 lulus; RLS audit 35/35; Gitleaks, Semgrep, Trivy, pnpm audit, dan govulncheck bersih; security checklist lulus.
-* **Catatan:** temuan role pemilik database ditutup pada M5.4. Service runtime memakai `aletheia_app` dengan tenant binding per request/transaksi; provisioning password role production dilakukan saat TASK-18. Bukti: `docs/evidence/m5.4-verification.md`.
+* **Catatan:** temuan role pemilik database ditutup pada M5.4. Service runtime memakai `aletheia_app` dengan tenant binding per request/transaksi; provisioning password role production sudah dilakukan. Bukti: `docs/evidence/m5.4-verification.md`.
 
 #### `TASK-16` — Observability, SLO & Load Test
 * **Status:** selesai 26 November 2026. Bukti: `docs/evidence/m5.2-verification.md`.
 * **Konteks Wajib:** `docs/09`, `docs/05`.
 * **Cakupan:** OTel trace/metrics/logs, dashboard, alert, k6 7 skenario, query optimization, evidence.
 * **Gerbang:** SLO terukur; 7 skenario k6 lulus; dashboard dan alert aktif; query plan membaik; bukti di `docs/evidence/`.
-* **Catatan:** QStash token tidak tersedia sehingga load test payroll memanggil worker langsung. Edge hanya meneruskan `traceparent`; exporter span edge dan RUM LCP/INP ditunda ke TASK-18.
+* **Catatan:** QStash kini aktif; load test historis memanggil worker langsung. Edge hanya meneruskan `traceparent`; exporter span edge dan RUM LCP/INP ditunda ke task lanjutan.
 
 #### `TASK-17` — E2E, Accessibility & Final QA
 * **Status:** selesai 26 November 2026. Bukti: `docs/evidence/m5.3-verification.md`.
@@ -172,9 +172,9 @@
 * **Gerbang:** 21/21 lulus dua run berturut-turut; 0 flaky; axe 0 serious/critical; coverage domain 96,26% lines; integration 27/36/34 lulus; Go race lulus.
 
 #### `TASK-18` — CI/CD Production & Deployment
-* **Status:** selesai live 26 November 2026. Render menjalankan governance, claims, payroll, dan worker; Neon production aktif; Upstash QStash dan Cloudinary aktif; edge Workers dan web Pages live. Smoke production 15/15; async QStash/worker ~5 detik; web UI 3 peran; rollback edge, Pages, dan Render diuji. Monitoring 24 jam berjalan di M6.2.
+* **Status:** selesai live 26 November 2026. Render menjalankan governance, claims, payroll, dan worker; Neon production aktif; Upstash QStash dan Cloudinary aktif; edge Workers dan web Pages live. Smoke production 15/15; async QStash/worker ~5 detik; web UI 3 peran; rollback edge, Pages, dan Render diuji. Production Monitor baseline `45816325368` dan pasca-drill `45821314200` lulus; sign-off menunggu 4 run terjadwal.
 * **Konteks Wajib:** `docs/05`, `docs/12`.
-* **Cakupan:** pipeline deploy, Cloudflare Pages/Workers, Koyeb/Render, Neon/Upstash/Cloudinary, smoke test, rollback.
+* **Cakupan:** pipeline deploy, Cloudflare Pages/Workers, Render, Neon/Upstash/Cloudinary, smoke test, rollback.
 * **Gerbang:** `/readyz` 200; demo live; rollback diuji; tidak ada secret.
 * **Catatan:** bukti prasyarat ada di `docs/evidence/m5.4-verification.md`. CI database job sekarang mem-provision role dan menjalankan integration test dengan `DATABASE_URL_APP`. Runbook launch/rollback ada di `docs/runbooks/m6.2-launch.md`; preflight `pnpm deploy:check`; smoke `pnpm smoke:production`.
 
@@ -183,7 +183,7 @@
 ### FASE 6 — Portofolio
 
 #### `TASK-19` — README, Screenshot, Video & Job Matrix
-* **Status:** aset selesai 26 November 2026. README final, 8 screenshot inti + 3 mobile, video 2:16, akun demo, CHANGELOG, dan job matrix aktual tersedia. Live URL production aktif; async QStash lulus; M6.2 menjalankan monitoring 24 jam.
+* **Status:** aset selesai 26 November 2026. README final, 8 screenshot inti + 3 mobile, video 2:16, akun demo, CHANGELOG, dan job matrix aktual tersedia. Live URL production aktif; async QStash dan rollback edge/Pages/Render lulus; M6.2 tinggal monitoring 24 jam dan sign-off.
 * **Konteks Wajib:** `docs/12`, `docs/13`.
 * **Cakupan:** README final, 8 screenshot desktop/mobile, video 2–3 menit, akun demo, CHANGELOG, job matrix status 3/4.
 * **Gerbang:** reviewer dapat menjalankan demo < 3 menit; semua evidence ada; matrix ≥ 100%.
