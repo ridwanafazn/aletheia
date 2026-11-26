@@ -120,6 +120,9 @@ reportRouter.post(
   async (request, response) => {
     const auth = request.auth!;
     const input = GenerateReportRequestSchema.parse(request.body);
+    if (input.report_type === "PAYROLL_COST_INVOICE") {
+      await assertTenantFeature(auth.tenantId, "PAYROLL_COST_INVOICE");
+    }
     const key = requireIdempotencyKey(request);
     const requestHash = idempotencyRequestHash(input);
     const client = await pool.connect();
@@ -143,10 +146,7 @@ reportRouter.post(
 
       const policy =
         input.report_type === "PAYROLL_COST_INVOICE"
-          ? await (async () => {
-              await assertTenantFeature(auth.tenantId, "PAYROLL_COST_INVOICE");
-              return getActivePayrollCostPolicy(client, auth.tenantId);
-            })()
+          ? await getActivePayrollCostPolicy(client, auth.tenantId)
           : await getActivePayrollPolicy(client, auth.tenantId);
       const branchId = input.branch_id ?? null;
       if (branchId !== null) {
