@@ -1,12 +1,15 @@
 import { mkdirSync } from "node:fs";
-import { resolve } from "node:path";
+import { dirname, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
 
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
 
 const PASSWORD = "AletheiaDemo!2026";
 const API_URL = process.env.PLAYWRIGHT_API_URL ?? "http://127.0.0.1:8787";
-const EVIDENCE = resolve("../../docs/evidence/m2.3");
+const HERE = dirname(fileURLToPath(import.meta.url));
+const EVIDENCE = resolve(HERE, "../../../docs/evidence/m2.3");
+const IDENTITY_CARD = resolve(HERE, "fixtures/identity-card.pdf");
 mkdirSync(EVIDENCE, { recursive: true });
 
 async function login(page: Page, roleLabel: string): Promise<void> {
@@ -62,9 +65,9 @@ test("claim flows from draft to disbursement", async ({ page }) => {
   await page.getByLabel(/Rekening penerima/).fill(`8800${suffix}3344`);
   await page.getByLabel(/Nominal diajukan/).fill("4250000.00");
 
-  await page.getByLabel("Unggah Kartu identitas").setInputFiles("e2e/fixtures/identity-card.pdf");
+  await page.getByLabel("Unggah Kartu identitas").setInputFiles(IDENTITY_CARD);
   await expect(page.getByText(/demo\/identity_card/)).toBeVisible();
-  await page.getByLabel("Unggah Tagihan medis").setInputFiles("e2e/fixtures/identity-card.pdf");
+  await page.getByLabel("Unggah Tagihan medis").setInputFiles(IDENTITY_CARD);
   await expect(page.getByText(/demo\/medical_invoice/)).toBeVisible();
 
   await page.getByRole("button", { name: "Simpan draf" }).click();
