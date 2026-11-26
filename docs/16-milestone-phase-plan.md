@@ -70,7 +70,7 @@
 - Cloudinary → folder `preview/`.
 
 **Demo:** login 6 role → buat klaim → risk/conflict → approve/SoD → audit.
-**Status 26 November 2026:** M5.3 selesai. M5.4 live: service Render, Neon, Upstash QStash, Cloudinary, edge Workers, dan web Pages aktif; smoke production 15/15 lulus; async QStash/worker lulus (~5 detik); login enam peran, UI web, dan rollback edge terverifikasi. M6.2 live dengan monitoring 24 jam via workflow Production Monitor; sisa rollback Render/Pages dan sign-off. Render free tier memiliki cold start; jalankan `pnpm warm:production` sebelum demo.
+**Status 26 November 2026:** M5.3 selesai. M5.4 live: service Render, Neon, Upstash QStash, Cloudinary, edge Workers, dan web Pages aktif; smoke production 15/15 lulus; async QStash/worker lulus (~5 detik); login enam peran, UI web, serta rollback edge dan Pages terverifikasi. M6.2 live dengan monitoring 24 jam via workflow Production Monitor; sisa rollback Render service dan sign-off. Render free tier memiliki cold start; jalankan `pnpm warm:production` sebelum demo.
 **Catatan:** payroll BE (TASK-06/07) boleh berjalan paralel setelah kontrak stabil, tetapi tidak menghambat demo klaim.
 
 ---
@@ -109,7 +109,7 @@
 | M5.1 | TASK-15 | **Selesai 26 November 2026.** Audit RLS 26 tabel, cross-tenant read/write, security headers dan CSP, PII scan, Gitleaks, Semgrep, Trivy, pnpm audit, govulncheck, audit chain job. | I-06/I-11/I-15 lulus; 35/35 RLS checks; 0 secret, 0 SAST, 0 dependency/image CVE; security checklist lulus. Bukti: `docs/evidence/m5.1-verification.md` |
 | M5.2 | TASK-16 | **Selesai 26 November 2026.** OTel trace/metrics/logs, 3 dashboard Grafana, 8 alert Prometheus, 7 skenario k6, query optimization, dan evidence. | SLO terukur; seluruh threshold k6 lulus; daftar klaim 5,85 ms menjadi 1,18 ms; 0 error. Bukti: `docs/evidence/m5.2-verification.md` |
 | M5.3 | TASK-17 | **Selesai 26 November 2026.** 21 test Playwright, 10 alur peran, axe, keyboard, race, coverage domain, flaky policy. | 21/21 lulus dua run; 0 flaky; axe 0 serious; coverage 96,26% lines; Go race dan integration lulus. Bukti: `docs/evidence/m5.3-verification.md` |
-| M5.4 | TASK-18 | **Live 26 November 2026.** Render (governance, claims, payroll, worker), Neon, Upstash QStash, Cloudinary, Cloudflare Workers, dan Pages aktif. Runtime RLS 36/36; smoke production 15/15; web UI 3 peran; rollback edge diuji. | `/readyz` 200; demo live; rollback edge diuji; tidak ada secret. Bukti: `docs/evidence/m5.4-verification.md`, `docs/evidence/m6.2-verification.md` |
+| M5.4 | TASK-18 | **Live 26 November 2026.** Render (governance, claims, payroll, worker), Neon, Upstash QStash, Cloudinary, Cloudflare Workers, dan Pages aktif. Runtime RLS 36/36; smoke production 15/15; web UI 3 peran; rollback edge dan Pages diuji. | `/readyz` 200; demo live; rollback edge/Pages diuji; tidak ada secret. Bukti: `docs/evidence/m5.4-verification.md`, `docs/evidence/m6.2-verification.md` |
 
 **Deploy:**
 - **Staging full** (Neon staging, Upstash staging, Cloudinary staging).
@@ -123,7 +123,7 @@
 | Fase | Task | Yang dituntaskan | Gate |
 | --- | --- | --- | --- |
 | M6.1 | TASK-19 | **Aset selesai 26 November 2026.** README final, 8 screenshot inti + 3 mobile, video 2:16, akun demo, CHANGELOG, job matrix aktual. | Reviewer dapat menjalankan demo < 3 menit via `dev-up.sh`; evidence lengkap; live URL pending M5.4. Bukti: `docs/evidence/m6.1-verification.md` |
-| M6.2 | Launch (bagian dari TASK-19/18) | **Live, monitoring berjalan.** Smoke production 15/15, web UI 3 peran, async QStash/worker (~5 detik), rollback edge, dan CSP lulus. Sisa: rollback Render/Pages, 4 run Production Monitor (24 jam), freeze deploy, sign-off. Runbook: `docs/runbooks/m6.2-launch.md`; bukti: `docs/evidence/m6.2-verification.md`. | Semua endpoint sehat; tidak ada P0; matrix ≥ 100% |
+| M6.2 | Launch (bagian dari TASK-19/18) | **Live, monitoring berjalan.** Smoke production 15/15, web UI 3 peran, async QStash/worker (~5 detik), rollback edge/Pages, dan CSP lulus. Sisa: rollback Render service, 4 run Production Monitor (24 jam), freeze deploy, sign-off. Runbook: `docs/runbooks/m6.2-launch.md`; bukti: `docs/evidence/m6.2-verification.md`. | Semua endpoint sehat; tidak ada P0; matrix ≥ 100% |
 
 **Deploy final:** production demo di free-tier, dengan akun demo dan data sintetis.
 **Demo:** 6 role → claims → payroll → payslip/report → MIS → policy/audit.

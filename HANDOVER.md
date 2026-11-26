@@ -1,6 +1,6 @@
 # Aletheia — Handover
 
-* **Status:** M1 sampai M5.4 live. Web, edge, empat service Render, Neon, Upstash QStash, dan Cloudinary aktif; smoke production 15/15 lulus; async QStash/worker terverifikasi; login enam peran, UI web, dan rollback edge terverifikasi. M6.2 live dengan monitoring 24 jam berjalan via workflow Production Monitor.
+* **Status:** M1 sampai M5.4 live. Web, edge, empat service Render, Neon, Upstash QStash, dan Cloudinary aktif; smoke production 15/15 lulus; async QStash/worker terverifikasi; login enam peran, UI web, serta rollback edge dan Pages terverifikasi. M6.2 live dengan monitoring 24 jam berjalan via workflow Production Monitor.
 * **Tanggal handover:** 26 November 2026
 * **Data:** seluruhnya sintetis. Tidak ada uang nyata atau PII nyata.
 * **Server demo:** dihentikan. Nyalakan ulang dengan `bash scripts/dev-up.sh`.
