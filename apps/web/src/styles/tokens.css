@@ -1,48 +1,53 @@
 :root {
-  --font-sans: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  --font-sans: "Plus Jakarta Sans Variable", "Plus Jakarta Sans", "Segoe UI", system-ui, sans-serif;
   --font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
 
-  --ink-900: #0f172a;
-  --ink-700: #334155;
-  --ink-500: #64748b;
-  --ink-300: #cbd5e1;
+  /* Warm ledger surfaces */
+  --ink-900: #17211f;
+  --ink-700: #34433f;
+  --ink-500: #5f6c67;
+  --ink-300: #a7b0aa;
 
-  --surface-0: #ffffff;
-  --surface-50: #f8fafc;
-  --surface-100: #f1f5f9;
+  --surface-0: #fffdf8;
+  --surface-50: #f5f2ea;
+  --surface-100: #efeae0;
+  --surface-200: #e4ddd0;
 
-  --border-200: #e2e8f0;
-  --border-300: #cbd5e1;
+  --border-200: #e3dccf;
+  --border-300: #cfc6b6;
 
-  --primary-700: #1d4ed8;
-  --primary-800: #1e40af;
-  --primary-50: #eff6ff;
+  /* Jade action */
+  --primary-700: #0f6b5c;
+  --primary-800: #0a5548;
+  --primary-50: #e6f2ed;
 
-  --success-700: #047857;
-  --success-50: #ecfdf5;
-  --warning-700: #b45309;
-  --warning-50: #fffbeb;
-  --danger-700: #be123c;
-  --danger-50: #fff1f2;
-  --info-700: #0369a1;
-  --info-50: #f0f9ff;
+  --success-700: #0f6b5c;
+  --success-50: #e7f3ed;
+  --success-100: #cfe8de;
 
-  --focus-ring: #2563eb;
-}
+  --warning-700: #8f5511;
+  --warning-50: #fbf1df;
+  --warning-100: #f2dfbd;
 
-:root {
-  --surface-200: #e8edf4;
-  --success-100: #d1fae5;
-  --warning-100: #fef3c7;
-  --danger-100: #ffe4e6;
-  --info-100: #e0f2fe;
+  --danger-700: #a8323e;
+  --danger-50: #fbeaea;
+  --danger-100: #f4d2d4;
 
-  --shadow-card: 0 1px 2px rgba(15, 23, 42, 0.06);
-  --shadow-dialog: 0 4px 12px rgba(15, 23, 42, 0.08);
+  --info-700: #2c5c7a;
+  --info-50: #eaf2f7;
+  --info-100: #d3e5ef;
 
-  --radius-sm: 4px;
-  --radius-md: 6px;
-  --radius-lg: 8px;
+  --focus-ring: #0f6b5c;
+
+  /* Elevation and shape */
+  --shadow-card: 0 1px 2px rgba(38, 31, 19, 0.05);
+  --shadow-raised: 0 2px 4px rgba(38, 31, 19, 0.04), 0 18px 40px -28px rgba(38, 31, 19, 0.38);
+  --shadow-dialog: 0 18px 50px -18px rgba(23, 33, 31, 0.42), 0 4px 12px rgba(23, 33, 31, 0.08);
+
+  --radius-sm: 8px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 18px;
 
   --space-1: 4px;
   --space-2: 8px;
@@ -55,6 +60,6 @@
   --space-12: 48px;
   --space-16: 64px;
 
-  --sidebar-width: 240px;
-  --topbar-height: 56px;
+  --sidebar-width: 248px;
+  --topbar-height: 64px;
 }

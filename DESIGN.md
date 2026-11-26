@@ -1,6 +1,6 @@
 # DESIGN.md — Aletheia Design System
 
-**Direction:** *Calm control room.* A financial operations surface that feels precise, quiet, and trustworthy. Dense where operators need density, spacious where they need to decide. No decorative gradients, no glassmorphism, no playful illustration in operational screens.
+**Direction:** *Quiet ledger.* A financial operations surface that feels warm, exact, and trustworthy. Warm paper surfaces, jade action, amber caution, and generous rhythm. Dense where operators need density, spacious where they need to decide. No decorative gradients, no glassmorphism, no playful illustration in operational screens.
 
 **Mode:** Operate (primary), Read (reports), Persuade (login/marketing only). Ambition shows as precision and restraint.
 
@@ -18,40 +18,40 @@
 
 | Token | Hex | Use |
 | --- | --- | --- |
-| `--ink-900` | `#0F172A` | primary text, headings |
-| `--ink-700` | `#334155` | body text |
-| `--ink-500` | `#64748B` | secondary text, metadata |
-| `--ink-300` | `#CBD5E1` | disabled text, dividers strong |
-| `--surface-0` | `#FFFFFF` | cards, tables, dialogs |
-| `--surface-50` | `#F8FAFC` | app background |
-| `--surface-100` | `#F1F5F9` | sunken areas, table header |
-| `--border-200` | `#E2E8F0` | default border |
-| `--border-300` | `#CBD5E1` | strong border, focus-adjacent |
+| `--ink-900` | `#17211F` | primary text, headings |
+| `--ink-700` | `#34433F` | body text |
+| `--ink-500` | `#5F6C67` | secondary text, metadata |
+| `--ink-300` | `#A7B0AA` | disabled text, dividers strong |
+| `--surface-0` | `#FFFDF8` | cards, tables, dialogs |
+| `--surface-50` | `#F5F2EA` | app background |
+| `--surface-100` | `#EFEAE0` | sunken areas, table header |
+| `--border-200` | `#E3DCCF` | default border |
+| `--border-300` | `#CFC6B6` | strong border, focus-adjacent |
 
 ### Action
 
 | Token | Hex | Use |
 | --- | --- | --- |
-| `--primary-700` | `#1D4ED8` | primary button, active nav |
-| `--primary-800` | `#1E40AF` | hover/pressed |
-| `--primary-50` | `#EFF6FF` | selected row, subtle background |
-| `--focus-ring` | `#2563EB` | focus outline (2px, offset 2px) |
+| `--primary-700` | `#0F6B5C` | primary button, active nav |
+| `--primary-800` | `#0A5548` | hover/pressed |
+| `--primary-50` | `#E6F2ED` | selected row, subtle background |
+| `--focus-ring` | `#0F6B5C` | focus outline (2px, offset 2px) |
 
 ### Status
 
 | Token | Hex | Background | Use |
 | --- | --- | --- | --- |
-| `--success-700` | `#047857` | `#ECFDF5` | approved, paid, valid |
-| `--warning-700` | `#B45309` | `#FFFBEB` | review, escalated, pending |
-| `--danger-700` | `#BE123C` | `#FFF1F2` | rejected, failed, conflict |
-| `--info-700` | `#0369A1` | `#F0F9FF` | informational, draft |
+| `--success-700` | `#0F6B5C` | `#E7F3ED` | approved, paid, valid |
+| `--warning-700` | `#8F5511` | `#FBF1DF` | review, escalated, pending |
+| `--danger-700` | `#A8323E` | `#FBEAEA` | rejected, failed, conflict |
+| `--info-700` | `#2C5C7A` | `#EAF2F7` | informational, draft |
 | `--neutral-700` | `#475569` | `#F1F5F9` | draft, archived, inactive |
 
 **Rule:** status is never color-only. Always pair with text and/or icon.
 
 ### Data visualization
 
-`#1D4ED8`, `#0F766E`, `#B45309`, `#BE123C`, `#6D28D9`, `#475569`, `#0891B2`, `#65A30D`.
+`#0F6B5C`, `#2C5C7A`, `#8F5511`, `#A8323E`, `#6D28D9`, `#475569`, `#0891B2`, `#65A30D`.
 
 - Use at most 5 series per chart.
 - Direct-label series; avoid legend-only.
@@ -60,7 +60,7 @@
 
 ## 3. Typography
 
-- **Family:** `"IBM Plex Sans", "Segoe UI", system-ui, -apple-system, sans-serif`.
+- **Family:** `"Plus Jakarta Sans Variable", "Plus Jakarta Sans", "Segoe UI", system-ui, -apple-system, sans-serif`.
 - **Mono:** `"IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace`.
 - **Numeric:** `font-variant-numeric: tabular-nums lining-nums;` untuk semua nominal uang, hitungan, dan tanggal.
 - **Loading:** self-host WOFF2 di `apps/web/public/fonts` dengan `font-display: swap`. Jangan memakai lebih dari satu keluarga sans untuk antarmuka.
@@ -68,13 +68,13 @@
 | Style | Size / line-height | Weight | Use |
 | --- | --- | --- | --- |
 | Display | 32 / 40 | 600 | login/empty hero only |
-| H1 | 24 / 32 | 600 | page title |
+| H1 | 28 / 36 | 600 | page title |
 | H2 | 20 / 28 | 600 | section |
 | H3 | 16 / 24 | 600 | card title |
-| Body | 14 / 20 | 400 | default |
-| Body strong | 14 / 20 | 500 | labels, emphasis |
+| Body | 14 / 21 | 400 | default |
+| Body strong | 14 / 21 | 600 | labels, emphasis |
 | Small | 12 / 16 | 400 | metadata, helper |
-| Micro | 11 / 14 | 500 | badges, table captions |
+| Micro | 10 / 14 | 600 | badges, table captions |
 
 **Rules:** max 3 weights per screen; no all-caps except micro labels with letter-spacing 0.04em; numbers right-aligned in tables.
 
@@ -215,7 +215,7 @@
 - No exclamation marks, emoji, hashtags, or hype words such as "seamless", "unlock", "empower", "supercharge".
 - No slash-heavy shorthand. Tulis "klaim dan payroll", bukan "klaim/payroll".
 - One idea per sentence. Helper text maksimal dua baris.
-- Use IBM Plex Sans for all UI copy. Jangan memakai font display di layar operasional.
+- Use Plus Jakarta Sans for all UI copy. IBM Plex Mono only for numerals, codes, and measurements. Jangan memakai font display di layar operasional.
 
 ## 11. Dark Mode
 

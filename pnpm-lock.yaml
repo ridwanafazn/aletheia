@@ -214,6 +214,9 @@ importers:
       jose:
         specifier: ^6.2.18
         version: 6.2.18
+      tslib:
+        specifier: ^2.9.1
+        version: 2.9.1
     devDependencies:
       wrangler:
         specifier: ^4.168.0
@@ -224,10 +227,10 @@ importers:
       '@aletheia/shared-contracts':
         specifier: workspace:*
         version: link:../../packages/shared-contracts
-      '@fontsource/ibm-plex-mono':
+      '@fontsource-variable/plus-jakarta-sans':
         specifier: ^5.3.0
         version: 5.3.0
-      '@fontsource/ibm-plex-sans':
+      '@fontsource/ibm-plex-mono':
         specifier: ^5.3.0
         version: 5.3.0
       '@hookform/resolvers':
@@ -1108,11 +1111,11 @@ packages:
   '@fastify/busboy@3.2.6':
     resolution: {integrity: sha512-UPXdyAMbz/gNvjS8HONpJR2TDaHM3wQKMtSRPFkoh2LTeRRtnm+ICVYKgBYkTwlPOVzDNynOd34EH8qapwfelQ==}
 
+  '@fontsource-variable/plus-jakarta-sans@5.3.0':
+    resolution: {integrity: sha512-/l/4r0yyWK9JzAlmA0LiYgGgmJe/Gswt4jTJEzr5QhJfwMbvJZDmYWyW0M4X7yCK69BajMVlV/Lx8g7WDc1+sw==}
+
   '@fontsource/ibm-plex-mono@5.3.0':
     resolution: {integrity: sha512-eTgnZjZEGk1QtD3ZstF+Vclo2HLAni8YMy34/DxllwZvyz1lR/1RF/xTiAquOBO7MvqBx8D2Ig2WCPMVfdZu7Q==}
-
-  '@fontsource/ibm-plex-sans@5.3.0':
-    resolution: {integrity: sha512-CbE4CbbEEZJX860XyUiRpsksXIQR8Rp2XDva2VO53NJox9tVNtusrysd2x5YkUEY3ErQ66W1IiiQL8/wihhw5w==}
 
   '@graphql-hive/logger@1.2.0':
     resolution: {integrity: sha512-ebU1EVSPbd44EAGgyu7G9x9MgE7Pr4naR05d3kfQBnPal/Myqhx1AQqwZ8/DmYJn+vDuIeETOW5IAArSxPFgXQ==}
@@ -4066,9 +4069,9 @@ snapshots:
 
   '@fastify/busboy@3.2.6': {}
 
-  '@fontsource/ibm-plex-mono@5.3.0': {}
+  '@fontsource-variable/plus-jakarta-sans@5.3.0': {}
 
-  '@fontsource/ibm-plex-sans@5.3.0': {}
+  '@fontsource/ibm-plex-mono@5.3.0': {}
 
   '@graphql-hive/logger@1.2.0(pino@10.4.0)':
     optionalDependencies:

@@ -28,6 +28,7 @@ Folder ini menyimpan bukti yang dapat diperiksa reviewer: verifikasi milestone, 
 | `m6.4-verification.md` | Employee self-service, e-cuti, e-lembur, SoD, E2E, axe | Selesai 26 November 2026 |
 | `m6.5-verification.md` | Reimburse, organization management, E2E, axe | Selesai 27 November 2026 |
 | `m6.6-verification.md` | Paket tenant, feature gating, invoice biaya payroll, E2E, axe | Selesai 27 November 2026 |
+| `design-phase1-verification.md` | Quiet Ledger foundation, tokens, shell, komponen, E2E, axe | Selesai 27 November 2026 |
 
 ## Load test
 
@@ -77,6 +78,7 @@ Hasil utama: daftar klaim per cabang 5,853 ms menjadi 1,183 ms; daftar klaim per
 * `m6.4/` — screenshot Ruang Saya, absensi, cuti/lembur, workforce, dan mobile.
 * `m6.5/` — screenshot reimburse dan struktur organisasi.
 * `m6.6/` — screenshot invoice biaya payroll dan badge paket tenant.
+* `design-phase1/` — screenshot Quiet Ledger foundation: login, payroll, reports, organization, mobile reports.
 
 ## Metadata
 
