@@ -123,7 +123,7 @@
 | Fase | Task | Yang dituntaskan | Gate |
 | --- | --- | --- | --- |
 | M6.1 | TASK-19 | **Aset selesai 26 November 2026.** README final, 8 screenshot inti + 3 mobile, video 2:16, akun demo, CHANGELOG, job matrix aktual. | Reviewer dapat menjalankan demo < 3 menit via `dev-up.sh`; evidence lengkap; live URL pending M5.4. Bukti: `docs/evidence/m6.1-verification.md` |
-| M6.2 | Launch (bagian dari TASK-19/18) | Smoke production, reset seed, monitoring 24 jam, freeze deploy, final checklist | Semua endpoint sehat; tidak ada P0; matrix ≥ 100% |
+| M6.2 | Launch (bagian dari TASK-19/18) | **Blocked 26 November 2026.** Smoke production, reset seed, monitoring 24 jam, freeze deploy, dan final checklist belum dijalankan karena kredensial Upstash/Cloudinary/Koyeb-Render belum tersedia. Runbook: `docs/runbooks/m6.2-launch.md`; template bukti: `docs/evidence/m6.2-verification.md`. | Semua endpoint sehat; tidak ada P0; matrix ≥ 100% |
 
 **Deploy final:** production demo di free-tier, dengan akun demo dan data sintetis.
 **Demo:** 6 role → claims → payroll → payslip/report → MIS → policy/audit.

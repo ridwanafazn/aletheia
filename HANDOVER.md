@@ -24,7 +24,7 @@ Aletheia adalah platform governance pencairan klaim dan payroll dengan:
 **Yang belum selesai:**
 
 * M5.4 deployment production, rollback, Upstash, Cloudinary, Koyeb/Render. Runtime RLS dan Neon production sudah selesai; deployment eksternal menunggu kredensial provider.
-* M6.2 live demo dan monitoring 24 jam, menunggu M5.4.
+* M6.2 live demo dan monitoring 24 jam, menunggu M5.4. Jalankan `pnpm deploy:check`, lalu ikuti `docs/runbooks/m6.2-launch.md`.
 * UI payslip dan laporan. API-nya sudah ada dan diverifikasi di M3.4.
 * Edge preview live perlu deploy ulang.
 * RUM LCP/INP, exporter span edge, dan label Prometheus kardinalitas tinggi.

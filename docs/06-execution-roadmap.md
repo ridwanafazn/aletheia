@@ -176,7 +176,7 @@
 * **Konteks Wajib:** `docs/05`, `docs/12`.
 * **Cakupan:** pipeline deploy, Cloudflare Pages/Workers, Koyeb/Render, Neon/Upstash/Cloudinary, smoke test, rollback.
 * **Gerbang:** `/readyz` 200; demo live; rollback diuji; tidak ada secret.
-* **Catatan:** bukti prasyarat ada di `docs/evidence/m5.4-verification.md`. CI database job sekarang mem-provision role dan menjalankan integration test dengan `DATABASE_URL_APP`.
+* **Catatan:** bukti prasyarat ada di `docs/evidence/m5.4-verification.md`. CI database job sekarang mem-provision role dan menjalankan integration test dengan `DATABASE_URL_APP`. Runbook launch/rollback ada di `docs/runbooks/m6.2-launch.md`; preflight `pnpm deploy:check`; smoke `pnpm smoke:production`.
 
 ---
 

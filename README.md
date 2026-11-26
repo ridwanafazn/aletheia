@@ -4,7 +4,7 @@
 
 Aletheia (Greek: *unconcealment*) is a reference implementation for governed money movement: customer claims, payroll, agent commissions, tax withholding, and cross-domain risk intelligence — built around **versioned policy references**, **zero double-disbursement**, and an **immutable audit trail**.
 
-> **Status:** M1 sampai M5.3 selesai. M5.4 sedang berjalan: runtime RLS, worker Go, dan Neon production sudah siap (security gate 36/36, integration 27/36/34). M6.1 portofolio siap: README, 8 screenshot, video demo 2:16, akun demo, dan CHANGELOG. Deployment Cloudflare/Upstash/Cloudinary/Koyeb-Render menunggu kredensial provider. Server demo dihentikan; nyalakan dengan `bash scripts/dev-up.sh`. Baca [`HANDOVER.md`](HANDOVER.md) sebelum melanjutkan.
+> **Status:** M1 sampai M5.3 selesai. M5.4 sedang berjalan: runtime RLS, worker Go, dan Neon production sudah siap (security gate 36/36, integration 27/36/34). M6.1 portofolio siap: README, 8 screenshot, video demo 2:16, akun demo, dan CHANGELOG. M6.2 sudah disiapkan (preflight env, smoke, runbook launch/rollback), tetapi live launch menunggu kredensial Upstash/Cloudinary/Koyeb-Render. Server demo dihentikan; nyalakan dengan `bash scripts/dev-up.sh`. Baca [`HANDOVER.md`](HANDOVER.md) sebelum melanjutkan.
 
 ## Why this exists
 
@@ -102,6 +102,7 @@ flowchart TB
 | [`16-milestone-phase-plan.md`](docs/16-milestone-phase-plan.md) | 7 milestone, 19 fase, deployment free-tier |
 | [`CHANGELOG.md`](CHANGELOG.md) | Riwayat rilis dan perubahan |
 | [`docs/evidence/m6.1-verification.md`](docs/evidence/m6.1-verification.md) | Verifikasi portofolio M6.1 |
+| [`docs/runbooks/m6.2-launch.md`](docs/runbooks/m6.2-launch.md) | Runbook launch, smoke, rollback, monitoring M6.2 |
 
 ## Getting started
 
