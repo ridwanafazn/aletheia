@@ -3,6 +3,7 @@ import { Navigate, Outlet, useNavigate, useRouterState } from "@tanstack/react-r
 import {
   BarChart3,
   ClipboardList,
+  FileText,
   FlaskConical,
   Inbox,
   LayoutList,
@@ -19,7 +20,15 @@ import { roleLabel, initials } from "../shared/lib/format";
 import { Button } from "../shared/ui";
 
 interface NavItem {
-  to: "/claims" | "/approvals" | "/payroll" | "/employees" | "/mis" | "/mis/what-if" | "/audit";
+  to:
+    | "/claims"
+    | "/approvals"
+    | "/payroll"
+    | "/employees"
+    | "/payslips"
+    | "/mis"
+    | "/mis/what-if"
+    | "/audit";
   label: string;
   icon: typeof LayoutList;
   roles: string[];
@@ -69,6 +78,12 @@ const NAV_GROUPS: NavGroup[] = [
         icon: Users,
         roles: ["HR_SPECIALIST", "FINANCE_MANAGER", "COMPLIANCE_ADMIN", "MIS_ANALYST"],
       },
+      {
+        to: "/payslips",
+        label: "Slip Gaji",
+        icon: FileText,
+        roles: ["HR_SPECIALIST", "FINANCE_MANAGER", "COMPLIANCE_ADMIN"],
+      },
     ],
   },
   {
@@ -107,13 +122,19 @@ const PAGE_TITLES: Record<string, string> = {
   "/approvals": "Antrean Persetujuan",
   "/payroll": "Konsol Payroll",
   "/employees": "Karyawan dan Agen",
+  "/payslips": "Slip Gaji",
   "/mis": "MIS Intelligence",
   "/mis/what-if": "What-If Sandbox",
   "/audit": "Jejak Audit",
 };
 
 function sectionFor(pathname: string): string {
-  if (pathname.startsWith("/payroll") || pathname.startsWith("/employees")) {
+  if (
+    pathname.startsWith("/payroll") ||
+    pathname.startsWith("/employees") ||
+    pathname.startsWith("/payslips") ||
+    pathname.startsWith("/reports")
+  ) {
     return "Payroll";
   }
   if (pathname.startsWith("/mis")) {

@@ -562,9 +562,11 @@ export type PayrollBatchPage = z.infer<typeof PayrollBatchPageSchema>;
 export const PayslipPageSchema = z
   .object({ items: z.array(PayslipSchema), meta: ApiMetaSchema })
   .strict();
+export type PayslipPage = z.infer<typeof PayslipPageSchema>;
 export const TaxReportPageSchema = z
   .object({ items: z.array(TaxReportSchema), meta: ApiMetaSchema })
   .strict();
+export type TaxReportPage = z.infer<typeof TaxReportPageSchema>;
 
 export const ReversePaymentRequestSchema = z
   .object({ reason: z.string().trim().min(15).max(500) })

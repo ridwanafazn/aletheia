@@ -13,6 +13,7 @@ import { claimsSearchSchema } from "../features/claims/search";
 import { employeeSearchSchema } from "../features/employees/search";
 import { misSearchSchema } from "../features/mis/search";
 import { payrollSearchSchema } from "../features/payroll/search";
+import { payslipSearchSchema } from "../features/reports/search";
 
 const rootRoute = createRootRoute({
   component: () => <Outlet />,
@@ -102,6 +103,13 @@ const employeesRoute = createRoute({
   component: lazyRouteComponent(() => import("../features/employees/EmployeesPage")),
 });
 
+const payslipsRoute = createRoute({
+  getParentRoute: () => appRoute,
+  path: "/payslips",
+  validateSearch: (search) => payslipSearchSchema.parse(search),
+  component: lazyRouteComponent(() => import("../features/reports/PayslipCenterPage")),
+});
+
 const misRoute = createRoute({
   getParentRoute: () => appRoute,
   path: "/mis",
@@ -127,6 +135,7 @@ const routeTree = rootRoute.addChildren([
     payrollRoute,
     payrollBatchRoute,
     employeesRoute,
+    payslipsRoute,
     misRoute,
     whatIfRoute,
   ]),
