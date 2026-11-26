@@ -2,7 +2,7 @@
 
 * **Status Dokumen:** Peta Jalan Eksekusi (*Single Source of Truth* untuk Agen OpenCode)
 * **Strategi:** *Contract-First, Vertical Slice, Evidence-Driven, Zero Context Drift*
-* **Kondisi Saat Ini:** Fase 0, M1.1–M1.3, M2.1–M2.3, M3.1–M3.4, M4.1, M4.2, M5.1–M5.4, dan M6.1 selesai. M5.4 live di Render, Neon, Upstash, Cloudinary, dan Cloudflare; smoke production 15/15, async QStash/worker ~5 detik, login enam peran, UI web, serta rollback edge, Pages, dan Render terverifikasi. M6.2 live; Production Monitor baseline `45816325368` dan pasca-drill `45821314200` lulus. Sisa 4 run terjadwal (24 jam), freeze deploy, dan sign-off. Render free tier memiliki cold start; jalankan `pnpm warm:production` sebelum demo. Bukti: `docs/evidence/m5.4-verification.md`, `docs/evidence/m6.1-verification.md`, `docs/evidence/m6.2-verification.md`.
+* **Kondisi Saat Ini:** Fase 0, M1.1–M1.3, M2.1–M2.3, M3.1–M3.4, M4.1, M4.2, M5.1–M5.4, M6.1, dan M6.3 selesai. M5.4 live di Render, Neon, Upstash, Cloudinary, dan Cloudflare; smoke production 15/15, async QStash/worker ~5 detik, login enam peran, UI web, serta rollback edge, Pages, dan Render terverifikasi. M6.2 live; Production Monitor baseline `45816325368` dan pasca-drill `45821314200` lulus. Sisa 4 run terjadwal (24 jam), freeze deploy, dan sign-off. M6.3 menambahkan pusat slip gaji dan laporan di web. Render free tier memiliki cold start; jalankan `pnpm warm:production` sebelum demo. Bukti: `docs/evidence/m5.4-verification.md`, `docs/evidence/m6.1-verification.md`, `docs/evidence/m6.2-verification.md`, `docs/evidence/m6.3-verification.md`.
 
 ## 1. Protokol Kerja Agen
 
@@ -187,7 +187,7 @@
 * **Konteks Wajib:** `docs/12`, `docs/13`.
 * **Cakupan:** README final, 8 screenshot desktop/mobile, video 2–3 menit, akun demo, CHANGELOG, job matrix status 3/4.
 * **Gerbang:** reviewer dapat menjalankan demo < 3 menit; semua evidence ada; matrix ≥ 100%.
-* **Catatan:** bukti di `docs/evidence/m6.1-verification.md`; screenshot dan video di `docs/evidence/m6.1/`. UI payslip/report belum ada sehingga dua layar tersebut masih API-only.
+* **Catatan:** bukti di `docs/evidence/m6.1-verification.md`; screenshot dan video di `docs/evidence/m6.1/`. UI payslip/report selesai di M6.3; bukti di `docs/evidence/m6.3-verification.md`.
 
 ---
 

@@ -24,6 +24,7 @@ Folder ini menyimpan bukti yang dapat diperiksa reviewer: verifikasi milestone, 
 | `m5.4-verification.md` | Runtime RLS, role `aletheia_app`, tenant binding, worker Go, deployment | Live di Render/Cloudflare/Neon/Upstash/Cloudinary |
 | `m6.1-verification.md` | README, screenshot, video, akun demo, CHANGELOG, job matrix | Aset selesai; live URL aktif |
 | `m6.2-verification.md` | Smoke, web UI, async QStash, rollback edge/Pages/Render, cold start, monitoring | Live; monitoring 24 jam berjalan |
+| `m6.3-verification.md` | Pusat slip gaji, laporan PPh 21/BPJS, E2E, axe, bundle | Selesai 26 November 2026 |
 
 ## Load test
 
@@ -68,7 +69,8 @@ Hasil utama: daftar klaim per cabang 5,853 ms menjadi 1,183 ms; daftar klaim per
 * `demo-access.md` — akun, role, URL, cara menjalankan ulang.
 * `m5.3/coverage-summary.json` — ringkasan coverage domain.
 * `m6.1/` — 8 screenshot inti, 3 mobile, dan `aletheia-demo.webm` (2:16).
-* `m6.1/screenshots.md` — indeks screenshot dan catatan gap payslip/report UI.
+* `m6.1/screenshots.md` — indeks screenshot inti.
+* `m6.3/` — screenshot slip gaji, laporan, dan slip gaji mobile.
 
 ## Metadata
 

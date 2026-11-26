@@ -12,11 +12,11 @@
 | --- | --- | --- |
 | Requirement teknis wajib tercakup di desain | 100% | 100% |
 | Preferred qualification tercakup di desain | 100% | 100% |
-| Kesiapan bukti saat ini | 100% requirement yang dapat dibuktikan (M1–M6.2); live URL aktif | 100% requirement yang dapat dibuktikan (M1–M6.2); live URL aktif |
+| Kesiapan bukti saat ini | 100% requirement yang dapat dibuktikan (M1–M6.3); live URL aktif | 100% requirement yang dapat dibuktikan (M1–M6.3); live URL aktif |
 | Target setelah implementasi | 120%+ | 120%+ |
 | Gap yang tidak bisa ditutup proyek | Pengalaman formal 2 tahun | — |
 
-**Kesimpulan:** seluruh requirement teknis dan preferred qualification sudah diimplementasikan dengan artefak yang dapat diperiksa: kode, test, screenshot, video 2:16, load test, query plan, security evidence, live URL production, dan Neon production. J1-R1 (gelar) dan J1-R2 (pengalaman formal 2 tahun) tetap `N/A` dan dikompensasi dengan portfolio. Gap yang tersisa adalah **UI payslip/laporan**; live URL sudah aktif dan tidak lagi menjadi residual gap.
+**Kesimpulan:** seluruh requirement teknis dan preferred qualification sudah diimplementasikan dengan artefak yang dapat diperiksa: kode, test, screenshot, video 2:16, load test, query plan, security evidence, live URL production, dan Neon production. J1-R1 (gelar) dan J1-R2 (pengalaman formal 2 tahun) tetap `N/A` dan dikompensasi dengan portfolio. UI payslip dan laporan selesai di M6.3. Gap berikutnya adalah **employee self-service, e-cuti, e-lembur, reimburse, dan performance**; itu dicatat sebagai backlog, bukan diklaim sebagai fitur yang sudah ada.
 
 ## 1. Metode Penilaian
 
@@ -36,7 +36,7 @@
 | --- | --- | --- | --- | --- | --- |
 | J1-R1 | S1 Informatika/SI | — | — | N/A | pribadi |
 | J1-R2 | Min. 2 tahun full-stack | Riwayat commit/PR + demo live + studi kasus | `12`, README | N/A (pengalaman formal) | kompensasi: demo/portfolio |
-| J1-R3 | HRIS/payroll experience | Modul HRIS-lite + payslip + PPh 21/BPJS | `11`, TASK-10/11 | 4 | master data, absensi, cuti, payroll console, kalkulasi TER/BPJS, approval, disbursement, payslip PDF, laporan CSV, dan rekonsiliasi live; UI payslip dan laporan belum |
+| J1-R3 | HRIS/payroll experience | Modul HRIS-lite + payslip + PPh 21/BPJS | `11`, TASK-10/11 | 4 | master data, absensi, cuti, payroll console, kalkulasi TER/BPJS, approval, disbursement, payslip PDF, laporan CSV, rekonsiliasi, serta UI slip gaji dan laporan live; ESS, e-cuti, e-lembur, reimburse, dan performance belum |
 | J1-R4 | Frontend JS/TS + React/Vue/Next | React 19 + TS + Vite | `07`, TASK-09/10/14 | 3 | UI klaim, payroll, employee directory, MIS dashboard, dan What-If sandbox live; screenshot + video M6.1 |
 | J1-R5 | Backend Node/Go/Java | Express TS + Go worker | `01`, TASK-04..07 | 4 (dua bahasa) | 3 Express service dan Go worker live; race test lulus |
 | J1-R6 | PostgreSQL design & query | ERD, migrasi, index, query plan | `02`, TASK-03 | 4 | selesai; bukti M1.3 |
@@ -49,7 +49,7 @@
 | J1-P3 | **Large-scale & anti-duplikasi** | Goroutine pool, idempotency, `FOR UPDATE` | `02`, `04` | 4 | Go worker pool, idempotency, constraint, dan row lock live; batch 500 dalam 214 ms |
 | J1-P4 | **Docker/CI-CD/cloud** | Multi-stage, GH Actions, deploy | `05`, `12` | 3 | Docker multi-stage, image scan, CI/Security hijau, Cloudflare Pages/Workers, 4 service Render, Neon production; smoke 15/15 dan rollback drills lulus |
 
-**Kesimpulan Job 1:** implementasi dan bukti sudah mencakup **semua** requirement teknis; HRIS-lite menutup gap "HRIS". Live URL production aktif. Residual gap: UI payslip/laporan.
+**Kesimpulan Job 1:** implementasi dan bukti sudah mencakup **semua** requirement teknis; HRIS-lite menutup gap "HRIS". Live URL production aktif. UI payslip dan laporan selesai di M6.3. Residual gap: ESS, e-cuti, e-lembur, reimburse, performance, dan organization management.
 
 ### 2A. Cakupan Opsi Stack (Job 1)
 
@@ -108,7 +108,7 @@ Lowongan memakai frasa "at least one of" dan "one of", jadi pilihan berikut seng
 - [x] Bundle analyzer + ukuran gzip.
 - [x] Security checklist + hasil probe (SoD, replay, cross-tenant, audit tamper).
 - [x] 5–8 ADR yang menjelaskan trade-off.
-- [x] 8 screenshot inti + 3 mobile; payslip/report UI masih API-only.
+- [x] 8 screenshot inti + 3 mobile + 3 screenshot M6.3 untuk slip gaji dan laporan.
 - [x] Video walkthrough 2:16 (`docs/evidence/m6.1/aletheia-demo.webm`).
 - [x] CHANGELOG + riwayat commit yang rapi.
 - [x] Job matrix ini diperbarui dengan status aktual.
@@ -118,7 +118,8 @@ Lowongan memakai frasa "at least one of" dan "one of", jadi pilihan berikut seng
 | Prioritas | Gap | Dampak | Aksi |
 | --- | --- | --- | --- |
 | ~~P0~~ | ~~Live URL production~~ | Selesai 26 November 2026 | Web, edge, 4 service Render, Neon, Upstash, dan Cloudinary live |
-| P1 | UI payslip dan laporan | Screenshot payslip/report belum ada | Bangun layar payslip/PPh 21/BPJS di atas API M3.4 |
+| ~~P1~~ | ~~UI payslip dan laporan~~ | Selesai 26 November 2026, M6.3 | `/payslips`, `/reports`, dan tombol buat slip di detail batch |
+| P1 | Employee self-service, e-cuti, e-lembur | Tiga modul inti SAU belum ada | Bangun `/me`, saldo cuti, pengajuan lembur, dan approval |
 | P1 | Video MP4/narasi | WebM diterima, tetapi MP4 lebih universal | Konversi dengan ffmpeg + narasi opsional |
 | P2 | RUM LCP/INP, edge span OTLP | SLO web/edge belum terukur production | Tambah web-vitals dan exporter edge |
 | P2 | CI E2E full-stack | E2E belum otomatis di CI | Tambah job service stack di task lanjutan |

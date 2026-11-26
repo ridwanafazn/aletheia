@@ -1,6 +1,6 @@
 # Aletheia — Handover
 
-* **Status:** M1–M5.4 live di production. Web, edge, empat service Render, Neon, Upstash QStash, dan Cloudinary aktif; smoke production 15/15 lulus; async QStash/worker terverifikasi; login enam peran, UI web, serta rollback edge, Pages, dan Render terverifikasi. M6.2 live dengan monitoring 24 jam berjalan via workflow Production Monitor.
+* **Status:** M1–M5.4 live di production. Web, edge, empat service Render, Neon, Upstash QStash, dan Cloudinary aktif; smoke production 15/15 lulus; async QStash/worker terverifikasi; login enam peran, UI web, serta rollback edge, Pages, dan Render terverifikasi. M6.2 live dengan monitoring 24 jam berjalan via workflow Production Monitor. M6.3 menambahkan pusat slip gaji dan laporan di web.
 * **Tanggal handover:** 26 November 2026
 * **Data:** seluruhnya sintetis. Tidak ada uang nyata atau PII nyata.
 * **Server demo:** dihentikan. Nyalakan ulang dengan `bash scripts/dev-up.sh`.
@@ -19,13 +19,13 @@ Aletheia adalah platform governance pencairan klaim dan payroll dengan:
 * OpenTelemetry, Prometheus, Grafana, dan Jaeger untuk observability.
 * k6 untuk load test dan Playwright untuk E2E.
 
-**Yang sudah selesai:** M1 fondasi, M2 governance dan claims, M3 payroll dan disbursement, M4 MIS, M5.1 security hardening, M5.2 observability dan load test, M5.3 E2E/accessibility/final QA, M5.4 production live di Render/Neon/Cloudflare/Upstash/Cloudinary, dan M6.1 README/screenshot/video/CHANGELOG/job matrix.
+**Yang sudah selesai:** M1 fondasi, M2 governance dan claims, M3 payroll dan disbursement, M4 MIS, M5.1 security hardening, M5.2 observability dan load test, M5.3 E2E/accessibility/final QA, M5.4 production live di Render/Neon/Cloudflare/Upstash/Cloudinary, M6.1 README/screenshot/video/CHANGELOG/job matrix, dan M6.3 pusat slip gaji dan laporan di web.
 
 **Yang belum selesai:**
 
 * M6.2 finalisasi: monitoring 24 jam (Production Monitor tiap 6 jam; 2 run hijau sejauh ini), freeze deploy, dan sign-off akhir.
 * Cold start Render free tier; mitigasi `pnpm warm:production`. `pnpm deploy:check` sudah lulus; runbook ada di `docs/runbooks/m6.2-launch.md`.
-* UI payslip dan laporan. API-nya sudah ada dan diverifikasi di M3.4.
+* Employee self-service, e-cuti, e-lembur, reimburse, performance, dan organization management. Ini modul HRIS berikutnya.
 * RUM LCP/INP, exporter span edge, dan label Prometheus kardinalitas tinggi.
 * CI E2E full-stack belum menjadi job CI.
 
@@ -263,6 +263,7 @@ pnpm load:seed
 
 Indeks lengkap ada di `docs/evidence/README.md`. Mulai dari:
 
+* `docs/evidence/m6.3-verification.md` — pusat slip gaji, laporan, E2E, axe, bundle.
 * `docs/evidence/m6.1-verification.md` — README, screenshot, video 2:16, CHANGELOG, job matrix.
 * `docs/evidence/m5.3-verification.md` — E2E, axe, coverage, race.
 * `docs/evidence/m5.2-verification.md` — OTel, SLO, load test, query plan.
@@ -280,7 +281,7 @@ Indeks lengkap ada di `docs/evidence/README.md`. Mulai dari:
 | QStash belum aktif | Selesai | Upstash QStash aktif; `WORKER_URL` ke `-zjnt`; async What-If diproses worker ~5 detik |
 | Monitoring 24 jam M6.2 | Berjalan | Baseline `45816325368` dan pasca-drill `45821314200` hijau; sign-off setelah 4 run terjadwal |
 | Cold start Render free tier | Terbuka | Jalankan `pnpm warm:production`; pertimbangkan plan berbayar untuk demo tanpa jeda |
-| UI payslip dan laporan belum ada | Terbuka | API sudah diverifikasi M3.4; UI dapat menjadi task lanjutan |
+| UI payslip dan laporan | Selesai M6.3 | `/payslips`, `/reports`, dan tombol buat slip di detail batch; bukti `docs/evidence/m6.3-verification.md` |
 | RUM LCP/INP belum ada | Terbuka | Tambah web-vitals atau RUM di task lanjutan |
 | Label Prometheus kardinalitas tinggi | Terbuka | Gunakan `resource_constant_labels` atau transform collector |
 | Perubahan M5.4–M6.2 | Selesai | Commit `e81fca0`, `b829b94`, `fb10579`, `3209231`, `08ad6d7`; lihat riwayat Git |
@@ -316,12 +317,13 @@ Jalankan `bash scripts/dev-up.sh`; skrip memilih container 55432 atau Compose 54
 
 ## 12. Langkah berikutnya
 
-M6.1 selesai: lihat `README.md`, `docs/evidence/m6.1-verification.md`, dan `docs/evidence/m6.1/aletheia-demo.webm`.
+M6.1 selesai: lihat `README.md`, `docs/evidence/m6.1-verification.md`, dan `docs/evidence/m6.1/aletheia-demo.webm`. M6.3 selesai: lihat `docs/evidence/m6.3-verification.md`.
 
 M5.4 live, smoke 15/15, async QStash lulus, dan rollback edge/Pages/Render sudah diuji. Sisa M6.2:
 
 1. Monitoring 24 jam: `.github/workflows/production-monitor.yml` berjalan setiap 6 jam; butuh minimal 4 run sukses.
 2. Freeze deploy dan sign-off akhir.
 3. Tandai M6.2 selesai hanya setelah seluruh bukti terisi di `docs/evidence/m6.2-verification.md`.
+4. Setelah freeze dicabut, deploy M6.3 dan lanjut ke employee self-service serta e-cuti/e-lembur.
 
 Untuk demo, jalankan `pnpm warm:production` lebih dulu.

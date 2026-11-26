@@ -156,7 +156,7 @@ Route guard memeriksa `role`, `branch_id`, dan `tenant_id` dari sesi. Guard UI *
 - Unduh PDF; tampilkan checksum; jangan pernah menampilkan NIK/rekening penuh.
 - Self-service hanya untuk payslip milik sendiri; backend memverifikasi kepemilikan.
 
-> **Status M3.4:** API payslip PDF, daftar, detail, dan tautan unduhan bertanda tangan sudah tersedia. Layar Payslip Center belum dibuat.
+> **Status M6.3:** `/payslips` sudah berjalan. Daftar slip, filter periode dan personel, rincian checksum, serta unduhan PDF bertanda tangan tersedia untuk HR, Finance, dan Compliance. Employee self-service belum termasuk.
 
 ### 6.6 Reports & Exports (`HR_SPECIALIST`, `FINANCE_MANAGER`, `COMPLIANCE_ADMIN`)
 
@@ -165,7 +165,7 @@ Route guard memeriksa `role`, `branch_id`, dan `tenant_id` dari sesi. Guard UI *
 - Hasil: metadata (generated_at, by, policy, checksum), tombol unduh, audit trail.
 - Format: CSV + XLSX untuk rekap; PDF untuk payslip; CSV bank file sesuai template.
 
-> **Status M3.4:** API pembuatan, daftar, detail, dan unduhan laporan CSV sudah tersedia. Layar Reports & Exports dan format XLSX belum dibuat.
+> **Status M6.3:** `/reports` sudah berjalan. Pembuatan, daftar, status, checksum, dan unduhan PPh 21 bulanan/tahunan, BPJS bulanan, bank file, serta varians payroll tersedia. Format XLSX belum dibuat.
 
 ### 6.7 MIS Intelligence (`MIS_ANALYST`)
 

@@ -19,6 +19,11 @@ Semua perubahan penting pada Aletheia. Format mengikuti [Keep a Changelog](https
 - Rollback drill edge Workers, Cloudflare Pages, dan Render `aletheia-claims`.
 - `pnpm warm:production`, `pnpm async:production`, dan workflow `Production Monitor` tiap 6 jam.
 - Bukti M6.2: `docs/evidence/m6.2-verification.md` dan screenshot web production.
+- M6.3: pusat slip gaji `/payslips` dan layar laporan `/reports` untuk PPh 21 bulanan/tahunan, BPJS, bank file, dan varians payroll.
+- M6.3: tombol “Buat slip gaji” pada batch payroll yang sudah disetujui atau dicairkan.
+- M6.3: seed berkas slip dan laporan yang dapat diunduh untuk demo dan E2E.
+- M6.3: test E2E slip gaji dan laporan, termasuk akses peran, unduhan, dan mobile.
+- Bukti M6.3: `docs/evidence/m6.3-verification.md` dan tiga screenshot baru.
 
 ### Changed
 
@@ -36,6 +41,9 @@ Semua perubahan penting pada Aletheia. Format mengikuti [Keep a Changelog](https
 - `db:check` dan `security:db` gagal pada Neon karena owner bukan member `aletheia_app`.
 - RLS cast error ketika `app.tenant_id` kosong; policy sekarang memakai `nullif(..., '')`.
 - Tenant binding pada koneksi pool yang dipakai ulang, webhook, signed file download, dan worker Go.
+- Filter `period_month` pada slip gaji dan laporan mengirim tanggal pertama bulan sesuai kontrak.
+- Kontras label ledger dinaikkan agar lulus WCAG AA.
+- Path fixture E2E klaim memakai lokasi absolut sehingga suite berjalan dari root repository.
 
 ## [0.5.3] — 2026-11-26
 

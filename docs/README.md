@@ -39,6 +39,7 @@ Mulai dari `HANDOVER.md` di root repository. Dokumen ini adalah indeks spesifika
 | `16-milestone-phase-plan.md` | Rencana fase dan status milestone |
 | `runbooks/m6.2-launch.md` | Launch, smoke, rollback, dan monitoring production |
 | `evidence/m6.2-verification.md` | Bukti production: smoke, web UI, async QStash, rollback, monitoring |
+| `evidence/m6.3-verification.md` | Bukti slip gaji, laporan PPh 21/BPJS, E2E, axe, dan bundle |
 
 ## Evidence
 
