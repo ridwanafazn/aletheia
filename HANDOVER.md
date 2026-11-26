@@ -91,7 +91,7 @@ Kata sandi semua akun: **`AletheiaDemo!2026`**. MFA nonaktif.
 | Komponen | URL |
 | --- | --- |
 | Web | `https://aletheia-web-preview.pages.dev` |
-| Edge | `https://aletheia-edge.ridwanafazn.workers.dev` |
+| Edge | `https://aletheia-edge.ridwanafzn.workers.dev` |
 | Governance | `https://aletheia-governance.onrender.com` |
 | Claims | `https://aletheia-claims.onrender.com` |
 | Payroll | `https://aletheia-payroll.onrender.com` |
@@ -277,7 +277,7 @@ Indeks lengkap ada di `docs/evidence/README.md`. Mulai dari:
 | Item | Status | Tindakan |
 | --- | --- | --- |
 | Service memakai role pemilik DB | Selesai | Semua service production memakai `aletheia_app` + tenant binding |
-| Edge preview tidak resolve | Selesai | Edge live di `aletheia-edge.ridwanafazn.workers.dev` |
+| Edge preview tidak resolve | Selesai | Edge live di `aletheia-edge.ridwanafzn.workers.dev` |
 | QStash belum aktif | Selesai | Upstash QStash aktif; `WORKER_URL` ke `-zjnt`; async What-If diproses worker ~5 detik |
 | Cold start Render free tier | Terbuka | Jalankan `pnpm warm:production`; pertimbangkan plan berbayar untuk demo tanpa jeda |
 | UI payslip dan laporan belum ada | Terbuka | API sudah diverifikasi M3.4; UI dapat menjadi task lanjutan |

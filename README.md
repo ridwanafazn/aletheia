@@ -153,7 +153,7 @@ Halaman login menyediakan tombol peran demo yang mengisi email dan kata sandi ot
 ## Live preview
 
 - Web: [aletheia-web-preview.pages.dev](https://aletheia-web-preview.pages.dev)
-- Edge: [aletheia-edge.ridwanafazn.workers.dev](https://aletheia-edge.ridwanafazn.workers.dev)
+- Edge: [aletheia-edge.ridwanafzn.workers.dev](https://aletheia-edge.ridwanafzn.workers.dev)
 - Governance: [aletheia-governance.onrender.com](https://aletheia-governance.onrender.com)
 - Claims: [aletheia-claims.onrender.com](https://aletheia-claims.onrender.com)
 - Payroll: [aletheia-payroll.onrender.com](https://aletheia-payroll.onrender.com)

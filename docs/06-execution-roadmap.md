@@ -103,7 +103,7 @@
 * **Konteks Wajib:** `docs/01`, `docs/03`, `docs/08`.
 * **Cakupan:** Hono, JWT verify, rate limit, HMAC headers, REST proxy, GraphQL Yoga (`misExecutiveSummary`, `claimAuditDetail`, `whatIfSimulations`), depth limit, DataLoader.
 * **Gerbang:** `wrangler dev` smoke; header valid; GraphQL tanpa N+1; 429 berfungsi.
-* **Catatan:** Worker pernah live di `aletheia-edge-preview.ridwanafazn.workers.dev`; hostname perlu deploy ulang pada TASK-18. Upstash belum dikonfigurasi, rate limit memakai memori per isolate dengan fallback teruji.
+* **Catatan:** Worker pernah live di `aletheia-edge-preview.ridwanafzn.workers.dev`; hostname perlu deploy ulang pada TASK-18. Upstash belum dikonfigurasi, rate limit memakai memori per isolate dengan fallback teruji.
 
 #### `TASK-09` — Web Shell, Claims Workbench & Approval Queue
 * **Status:** selesai 26 November 2026. Bukti: `docs/evidence/m2.3-verification.md`.
