@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Navigate, Outlet, useNavigate, useRouterState } from "@tanstack/react-router";
 import {
   BarChart3,
+  CalendarDays,
   ClipboardList,
   FileSpreadsheet,
   FileText,
@@ -11,6 +12,7 @@ import {
   LogOut,
   Menu,
   ShieldCheck,
+  UserRound,
   Users,
   Wallet,
   X,
@@ -28,6 +30,8 @@ interface NavItem {
     | "/employees"
     | "/payslips"
     | "/reports"
+    | "/workforce"
+    | "/me"
     | "/mis"
     | "/mis/what-if"
     | "/audit";
@@ -42,6 +46,17 @@ interface NavGroup {
 }
 
 const NAV_GROUPS: NavGroup[] = [
+  {
+    label: "Saya",
+    items: [
+      {
+        to: "/me",
+        label: "Ruang Saya",
+        icon: UserRound,
+        roles: ["EMPLOYEE"],
+      },
+    ],
+  },
   {
     label: "Operasional",
     items: [
@@ -92,6 +107,12 @@ const NAV_GROUPS: NavGroup[] = [
         icon: FileSpreadsheet,
         roles: ["HR_SPECIALIST", "FINANCE_MANAGER", "COMPLIANCE_ADMIN"],
       },
+      {
+        to: "/workforce",
+        label: "Cuti dan Lembur",
+        icon: CalendarDays,
+        roles: ["HR_SPECIALIST", "BRANCH_MANAGER", "FINANCE_MANAGER"],
+      },
     ],
   },
   {
@@ -132,17 +153,23 @@ const PAGE_TITLES: Record<string, string> = {
   "/employees": "Karyawan dan Agen",
   "/payslips": "Slip Gaji",
   "/reports": "Laporan dan Ekspor",
+  "/workforce": "Cuti dan Lembur",
+  "/me": "Ruang Saya",
   "/mis": "MIS Intelligence",
   "/mis/what-if": "What-If Sandbox",
   "/audit": "Jejak Audit",
 };
 
 function sectionFor(pathname: string): string {
+  if (pathname.startsWith("/me")) {
+    return "Saya";
+  }
   if (
     pathname.startsWith("/payroll") ||
     pathname.startsWith("/employees") ||
     pathname.startsWith("/payslips") ||
-    pathname.startsWith("/reports")
+    pathname.startsWith("/reports") ||
+    pathname.startsWith("/workforce")
   ) {
     return "Payroll";
   }

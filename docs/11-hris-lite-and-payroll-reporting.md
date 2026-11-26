@@ -392,6 +392,8 @@ Semua mutasi finansial memakai `Idempotency-Key`; semua endpoint memakai tenant/
 - [x] Payslip PDF dari breakdown; checksum; tautan bertanda tangan dan audit unduhan.
 - [x] Laporan PPh 21 bulanan dan tahunan, BPJS, bank file, dan variance; checksum; audit unduhan.
 - [x] Semua perhitungan memakai policy version yang terikat.
+- [x] Employee self-service untuk slip, absensi, saldo cuti, e-cuti, dan e-lembur (M6.4).
+- [ ] Persetujuan cuti otomatis memperbarui attendance summary payroll.
 - [x] Tidak ada PII mentah di UI/log/ekspor.
 - [ ] Test U-01..U-20 + I-08..I-10 lulus.
 
@@ -403,7 +405,7 @@ Semua mutasi finansial memakai `Idempotency-Key`; semua endpoint memakai tenant/
 - Performance review, recruitment, onboarding.
 - Integrasi e-Bupot/SPT DJP dan API BPJS.
 - Multi-currency dan payroll lintas negara.
-- Employee self-service portal penuh + mobile app.
+- Portal employee penuh + mobile app. Self-service web untuk slip, absensi, cuti, dan lembur sudah ada di M6.4.
 - Data warehouse/BI self-service.
 
 Future items **tidak** boleh masuk milestone tanpa persetujuan eksplisit; dokumen ini menandainya sebagai backlog.

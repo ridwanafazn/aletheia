@@ -56,8 +56,10 @@ apps/web/
 | `/payroll` | Payroll Console | `HR_SPECIALIST` | batch, periode, status kalkulasi |
 | `/payroll/:id` | Detail batch | HR, Finance | item, breakdown, variance, approval |
 | `/employees` | Employee & Agent Directory | HR | profil, kontrak, status |
-| `/payslips` | Payslip Center | HR, karyawan (self) | payslip per periode, unduh |
+| `/payslips` | Payslip Center | HR, Finance, Compliance | payslip per periode, unduh |
 | `/reports` | Reports & Exports | HR, Finance, Compliance | PPh 21, BPJS, bank file |
+| `/me` | Ruang Saya | `EMPLOYEE` | profil, slip sendiri, absensi, saldo cuti, e-cuti, e-lembur |
+| `/workforce` | Cuti dan Lembur | HR, Branch Manager, Finance | antrean dan keputusan cuti/lembur |
 | `/mis` | MIS Intelligence | `MIS_ANALYST` | KPI lintas cabang, tren, what-if |
 | `/mis/what-if` | What-If Sandbox | `MIS_ANALYST` | skenario, variance |
 | `/policy` | Policy Ledger | `COMPLIANCE_ADMIN` | versi kebijakan, publish |
@@ -185,6 +187,17 @@ Route guard memeriksa `role`, `branch_id`, dan `tenant_id` dari sesi. Guard UI *
 - Publish: tampilkan versi lama yang akan diarsipkan; satu transaksi atomik.
 - Audit explorer: filter domain/entity/actor/date; timeline; detail decision context; verifikasi hash chain.
 - Verifikasi: tampilkan status `VALID`/`BROKEN` per rentang; jangan pernah menawarkan edit/delete.
+
+### 6.9 Employee Self-Service dan Workforce Queue (`EMPLOYEE`, HR, Manager)
+
+- `/me`: profil personel, slip gaji sendiri, ringkasan absensi, saldo cuti, form cuti, form lembur, dan riwayat.
+- Self-scope selalu berasal dari sesi; UI tidak mengirim `personnel_id` ke endpoint `/api/v1/me/*`.
+- `/workforce`: antrean cuti dan lembur dengan filter cabang, aksi setujui/tolak, dan catatan keputusan.
+- Maker tidak dapat menyetujui pengajuannya sendiri; UI menampilkan “Menunggu approver lain”.
+- Saldo cuti dan status keputusan ditampilkan dengan teks, bukan hanya warna.
+- Mobile tetap dapat membaca slip, absensi, dan mengajukan cuti/lembur.
+
+> **Status M6.4:** `/me` dan `/workforce` sudah berjalan. Persetujuan cuti belum otomatis memperbarui `attendance_summaries`; ringkasan absensi masih berasal dari impor HR.
 
 ## 7. Form & Validasi
 

@@ -14,9 +14,17 @@ import {
 } from "./routes/payments-extra.js";
 import { fileRouter } from "./routes/files.js";
 import { healthRouter } from "./routes/health.js";
+import { meRouter } from "./routes/me.js";
 import { reconciliationRouter } from "./routes/reconciliations.js";
 import { payslipRequestRouter, payslipRouter, reportRouter } from "./routes/reports.js";
-import { attendanceRouter, employeeRouter, leaveRouter, salesRouter } from "./routes/workforce.js";
+import {
+  attendanceRouter,
+  employeeRouter,
+  leaveBalanceRouter,
+  leaveRouter,
+  overtimeRouter,
+  salesRouter,
+} from "./routes/workforce.js";
 
 export function createApp(): express.Express {
   const app = express();
@@ -38,10 +46,13 @@ export function createApp(): express.Express {
   app.use(tenantContext);
 
   app.use(healthRouter);
+  app.use("/api/v1/me", meRouter);
   app.use("/api/v1/employees", employeeRouter);
   app.use("/api/v1/attendance", attendanceRouter);
   app.use("/api/v1/sales-achievements", salesRouter);
   app.use("/api/v1/leave-requests", leaveRouter);
+  app.use("/api/v1/leave-balances", leaveBalanceRouter);
+  app.use("/api/v1/overtime-requests", overtimeRouter);
   app.use("/api/v1/payroll/reconciliations", reconciliationRouter);
   app.use("/api/v1/payroll", payrollReferenceRouter);
   app.use("/api/v1/payroll/batches", payslipRequestRouter);

@@ -9,9 +9,15 @@ import {
   EmployeePageSchema,
   EmployeeSchema,
   EmployeeUpdateRequestSchema,
+  LeaveBalanceListResponseSchema,
+  LeaveBalanceSchema,
+  LeaveBalanceUpsertSchema,
   LeaveDecisionRequestSchema,
   LeaveRequestCreateSchema,
   LeaveRequestSchema,
+  OvertimeDecisionRequestSchema,
+  OvertimeRequestListResponseSchema,
+  OvertimeRequestSchema,
   SalesAchievementSchema,
   SalesAchievementUpsertSchema,
   type AttendanceSummary,
@@ -34,6 +40,17 @@ import { isUniqueViolation } from "../lib/db-errors.js";
 import { decodeCursor, encodeCursor } from "../lib/pagination.js";
 import { hashBankAccount, hashNik, maskBankAccount, maskNik } from "../lib/pii.js";
 import { sendData } from "../lib/response.js";
+import {
+  leaveYear,
+  lockLeaveBalance,
+  recomputeOvertimeSummary,
+  remainingDays,
+  requiresLeaveBalance,
+  toLeaveBalance,
+  toOvertimeRequest,
+  type LeaveBalanceRow,
+  type OvertimeRequestRow,
+} from "../lib/workforce.js";
 import { requireRoles } from "../middleware/authorize.js";
 
 const IdParamSchema = z.string().uuid();
@@ -706,6 +723,34 @@ leaveRouter.post("/", requireRoles("HR_SPECIALIST"), async (request, response) =
     if (employee === null) {
       throw ApiError.notFound("Karyawan tidak ditemukan");
     }
+    if (requiresLeaveBalance(input.leave_type)) {
+      const balance = await lockLeaveBalance(
+        client,
+        auth.tenantId,
+        input.personnel_id,
+        input.leave_type,
+        leaveYear(input.start_date),
+      );
+      const remaining = remainingDays(
+        balance.entitlement_days,
+        balance.used_days,
+        balance.pending_days,
+      );
+      if (remaining < input.days) {
+        throw new ApiError(
+          422,
+          "ERR_LEAVE_BALANCE_INSUFFICIENT",
+          "Saldo cuti tidak mencukupi untuk pengajuan ini",
+        );
+      }
+      await client.query(
+        `update payroll.leave_balances
+            set pending_days = pending_days + $4::numeric,
+                updated_at = now()
+          where tenant_id = $1 and personnel_id = $2 and id = $3`,
+        [auth.tenantId, input.personnel_id, balance.id, input.days],
+      );
+    }
     const id = randomUUID();
     const result = await client.query<LeaveRow>(
       `insert into payroll.leave_requests
@@ -756,7 +801,7 @@ leaveRouter.post("/", requireRoles("HR_SPECIALIST"), async (request, response) =
 
 leaveRouter.post(
   "/:id/decide",
-  requireRoles("BRANCH_MANAGER", "FINANCE_MANAGER"),
+  requireRoles("BRANCH_MANAGER", "FINANCE_MANAGER", "HR_SPECIALIST"),
   async (request, response) => {
     const auth = request.auth!;
     const id = IdParamSchema.parse(request.params.id);
@@ -787,6 +832,41 @@ leaveRouter.post(
       }
       if (row.status !== "PENDING") {
         throw new ApiError(409, "ERR_CONCURRENT_LOCK", "Cuti sudah diputuskan");
+      }
+
+      if (requiresLeaveBalance(row.leave_type)) {
+        const balance = await lockLeaveBalance(
+          client,
+          auth.tenantId,
+          row.personnel_id,
+          row.leave_type,
+          leaveYear(row.start_date),
+        );
+        if (input.decision === "APPROVED") {
+          if (Number(balance.pending_days) < Number(row.days)) {
+            throw new ApiError(
+              409,
+              "ERR_CONCURRENT_LOCK",
+              "Saldo cuti pending tidak konsisten dengan pengajuan",
+            );
+          }
+          await client.query(
+            `update payroll.leave_balances
+                set pending_days = pending_days - $4::numeric,
+                    used_days = used_days + $4::numeric,
+                    updated_at = now()
+              where tenant_id = $1 and personnel_id = $2 and id = $3`,
+            [auth.tenantId, row.personnel_id, balance.id, row.days],
+          );
+        } else {
+          await client.query(
+            `update payroll.leave_balances
+                set pending_days = greatest(pending_days - $4::numeric, 0),
+                    updated_at = now()
+              where tenant_id = $1 and personnel_id = $2 and id = $3`,
+            [auth.tenantId, row.personnel_id, balance.id, row.days],
+          );
+        }
       }
 
       const result = await client.query<LeaveRow>(
@@ -823,6 +903,258 @@ leaveRouter.post(
       );
       await client.query("COMMIT");
       sendData(response, LeaveRequestSchema.parse(toLeave(result.rows[0]!)));
+    } catch (error) {
+      await client.query("ROLLBACK").catch(() => undefined);
+      throw error;
+    } finally {
+      client.release();
+    }
+  },
+);
+
+const LeaveTypeParamSchema = z.enum(["ANNUAL", "SICK", "MATERNITY", "UNPAID", "OTHER"]);
+const YearParamSchema = z.coerce.number().int().min(2000).max(2100);
+
+export const leaveBalanceRouter: RouterType = Router();
+
+leaveBalanceRouter.get(
+  "/",
+  requireRoles("HR_SPECIALIST", "FINANCE_MANAGER", "COMPLIANCE_ADMIN"),
+  async (request, response) => {
+    const auth = request.auth!;
+    const conditions = ["b.tenant_id = $1"];
+    const values: unknown[] = [auth.tenantId];
+    if (request.query.personnel_id !== undefined) {
+      values.push(IdParamSchema.parse(request.query.personnel_id));
+      conditions.push(`b.personnel_id = $${values.length}`);
+    }
+    if (request.query.year !== undefined) {
+      values.push(YearParamSchema.parse(request.query.year));
+      conditions.push(`b.year = $${values.length}`);
+    }
+    const result = await pool.query<LeaveBalanceRow>(
+      `select b.id, b.personnel_id, b.leave_type, b.year, b.entitlement_days,
+              b.used_days, b.pending_days
+         from payroll.leave_balances b
+        where ${conditions.join(" AND ")}
+        order by b.year desc, b.personnel_id asc, b.leave_type asc
+        limit 200`,
+      values,
+    );
+    const data = { items: result.rows.map(toLeaveBalance) };
+    LeaveBalanceListResponseSchema.parse(data);
+    sendData(response, data);
+  },
+);
+
+leaveBalanceRouter.put(
+  "/:personnelId/:year/:leaveType",
+  requireRoles("HR_SPECIALIST"),
+  async (request, response) => {
+    const auth = request.auth!;
+    const personnelId = IdParamSchema.parse(request.params.personnelId);
+    const year = YearParamSchema.parse(request.params.year);
+    const leaveType = LeaveTypeParamSchema.parse(request.params.leaveType);
+    const input = LeaveBalanceUpsertSchema.parse(request.body);
+    const client = await pool.connect();
+
+    try {
+      await client.query("BEGIN");
+      const employee = await findEmployee(client, auth.tenantId, personnelId);
+      if (employee === null) {
+        throw ApiError.notFound("Karyawan tidak ditemukan");
+      }
+      const existing = await client.query<LeaveBalanceRow>(
+        `select id, personnel_id, leave_type, year, entitlement_days, used_days, pending_days
+           from payroll.leave_balances
+          where tenant_id = $1 and personnel_id = $2 and leave_type = $3 and year = $4
+          for update`,
+        [auth.tenantId, personnelId, leaveType, year],
+      );
+      const current = existing.rows[0];
+      if (
+        current !== undefined &&
+        input.entitlement_days < Number(current.used_days) + Number(current.pending_days)
+      ) {
+        throw new ApiError(
+          422,
+          "ERR_LEAVE_BALANCE_INSUFFICIENT",
+          "Hak cuti tidak boleh lebih kecil dari cuti terpakai dan pending",
+        );
+      }
+      const result = await client.query<LeaveBalanceRow>(
+        `insert into payroll.leave_balances
+           (id, tenant_id, personnel_id, leave_type, year, entitlement_days, used_days, pending_days)
+         values ($1,$2,$3,$4,$5,$6,$7,$8)
+         on conflict (tenant_id, personnel_id, leave_type, year)
+         do update set entitlement_days = excluded.entitlement_days,
+                       updated_at = now()
+         returning id, personnel_id, leave_type, year, entitlement_days, used_days, pending_days`,
+        [
+          randomUUID(),
+          auth.tenantId,
+          personnelId,
+          leaveType,
+          year,
+          input.entitlement_days,
+          current?.used_days ?? "0",
+          current?.pending_days ?? "0",
+        ],
+      );
+      await appendAudit(
+        {
+          tenantId: auth.tenantId,
+          actorId: auth.userId,
+          actorRole: auth.role,
+          domain: "PAYROLL",
+          entityType: "LEAVE_BALANCE",
+          entityId: result.rows[0]!.id,
+          action: "LEAVE_BALANCE_UPDATED",
+          policyVersionId: null,
+          decisionContext: {
+            personnel_id: personnelId,
+            leave_type: leaveType,
+            year,
+            entitlement_days: input.entitlement_days,
+          },
+          correlationId: request.correlationId,
+        },
+        client,
+      );
+      await client.query("COMMIT");
+      sendData(response, LeaveBalanceSchema.parse(toLeaveBalance(result.rows[0]!)));
+    } catch (error) {
+      await client.query("ROLLBACK").catch(() => undefined);
+      throw error;
+    } finally {
+      client.release();
+    }
+  },
+);
+
+const OvertimeStatusQuerySchema = z.enum(["PENDING", "APPROVED", "REJECTED", "CANCELLED"]);
+
+export const overtimeRouter: RouterType = Router();
+
+overtimeRouter.get(
+  "/",
+  requireRoles("HR_SPECIALIST", "BRANCH_MANAGER", "FINANCE_MANAGER", "COMPLIANCE_ADMIN"),
+  async (request, response) => {
+    const auth = request.auth!;
+    const conditions = ["o.tenant_id = $1"];
+    const values: unknown[] = [auth.tenantId];
+    if (request.query.status !== undefined) {
+      values.push(OvertimeStatusQuerySchema.parse(request.query.status));
+      conditions.push(`o.status = $${values.length}`);
+    }
+    if (request.query.personnel_id !== undefined) {
+      values.push(IdParamSchema.parse(request.query.personnel_id));
+      conditions.push(`o.personnel_id = $${values.length}`);
+    }
+    if (request.query.branch_id !== undefined) {
+      values.push(IdParamSchema.parse(request.query.branch_id));
+      conditions.push(`p.branch_id = $${values.length}`);
+    }
+    if (auth.role === "BRANCH_MANAGER") {
+      values.push(auth.branchId);
+      conditions.push(`p.branch_id = $${values.length}`);
+    }
+    const result = await pool.query<OvertimeRequestRow>(
+      `select o.id, o.personnel_id, o.work_date::text as work_date, o.hours, o.reason,
+              o.status, o.decided_by, o.decided_at, o.decision_notes, o.created_at
+         from payroll.overtime_requests o
+         join payroll.personnel p on p.id = o.personnel_id and p.tenant_id = o.tenant_id
+        where ${conditions.join(" AND ")}
+        order by o.work_date desc, o.created_at desc
+        limit 200`,
+      values,
+    );
+    const data = { items: result.rows.map(toOvertimeRequest) };
+    OvertimeRequestListResponseSchema.parse(data);
+    sendData(response, data);
+  },
+);
+
+overtimeRouter.post(
+  "/:id/decide",
+  requireRoles("HR_SPECIALIST", "BRANCH_MANAGER", "FINANCE_MANAGER"),
+  async (request, response) => {
+    const auth = request.auth!;
+    const id = IdParamSchema.parse(request.params.id);
+    const input = OvertimeDecisionRequestSchema.parse(request.body);
+    const client = await pool.connect();
+
+    try {
+      await client.query("BEGIN");
+      const existing = await client.query<
+        OvertimeRequestRow & { user_id: string | null; branch_id: string }
+      >(
+        `select o.id, o.personnel_id, o.work_date::text as work_date, o.hours, o.reason,
+                o.status, o.decided_by, o.decided_at, o.decision_notes, o.created_at,
+                p.user_id, p.branch_id
+           from payroll.overtime_requests o
+           join payroll.personnel p on p.id = o.personnel_id and p.tenant_id = o.tenant_id
+          where o.tenant_id = $1 and o.id = $2
+          for update of o`,
+        [auth.tenantId, id],
+      );
+      const row = existing.rows[0];
+      if (row === undefined) {
+        throw ApiError.notFound("Pengajuan lembur tidak ditemukan");
+      }
+      if (auth.role === "BRANCH_MANAGER" && row.branch_id !== auth.branchId) {
+        throw ApiError.notFound("Pengajuan lembur tidak ditemukan");
+      }
+      if (row.user_id !== null && row.user_id === auth.userId) {
+        throw new ApiError(403, "ERR_SOD_VIOLATION", "Tidak dapat memutuskan lembur sendiri");
+      }
+      if (row.status !== "PENDING") {
+        throw new ApiError(409, "ERR_CONCURRENT_LOCK", "Lembur sudah diputuskan");
+      }
+      const result = await client.query<OvertimeRequestRow>(
+        `update payroll.overtime_requests
+            set status = $3,
+                decided_by = $4,
+                decided_at = now(),
+                decision_notes = $5,
+                updated_at = now()
+          where tenant_id = $1 and id = $2
+          returning id, personnel_id, work_date::text as work_date, hours, reason, status,
+                    decided_by, decided_at, decision_notes, created_at`,
+        [auth.tenantId, id, input.decision, auth.userId, input.notes ?? null],
+      );
+      if (input.decision === "APPROVED") {
+        await recomputeOvertimeSummary(
+          client,
+          auth.tenantId,
+          row.personnel_id,
+          row.work_date,
+          auth.userId,
+        );
+      }
+      await appendAudit(
+        {
+          tenantId: auth.tenantId,
+          actorId: auth.userId,
+          actorRole: auth.role,
+          domain: "PAYROLL",
+          entityType: "OVERTIME_REQUEST",
+          entityId: id,
+          action: "OVERTIME_DECIDED",
+          policyVersionId: null,
+          decisionContext: {
+            decision: input.decision,
+            notes: input.notes ?? null,
+            personnel_id: row.personnel_id,
+            work_date: row.work_date,
+            hours: row.hours,
+          },
+          correlationId: request.correlationId,
+        },
+        client,
+      );
+      await client.query("COMMIT");
+      sendData(response, OvertimeRequestSchema.parse(toOvertimeRequest(result.rows[0]!)));
     } catch (error) {
       await client.query("ROLLBACK").catch(() => undefined);
       throw error;

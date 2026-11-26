@@ -4,7 +4,7 @@
 
 Aletheia (Greek: *unconcealment*) is a reference implementation for governed money movement: customer claims, payroll, agent commissions, tax withholding, and cross-domain risk intelligence — built around **versioned policy references**, **zero double-disbursement**, and an **immutable audit trail**.
 
-> **Status:** M1–M5.4 live di production. Web, edge, empat service Render, Neon, Upstash QStash, dan Cloudinary aktif; smoke production **15/15 lulus**, async QStash/worker terverifikasi, login enam peran dan UI web terverifikasi, serta rollback edge, Pages, dan Render diuji. M6.1 portofolio siap (README, 8 screenshot, video 2:16, CHANGELOG). M6.2 live dengan monitoring 24 jam berjalan via `.github/workflows/production-monitor.yml`. M6.3 menambahkan pusat slip gaji dan layar laporan PPh 21/BPJS di web. Render free tier memiliki cold start; jalankan `pnpm warm:production` sebelum demo. Baca [`HANDOVER.md`](HANDOVER.md) sebelum melanjutkan.
+> **Status:** M1–M5.4 live di production. Web, edge, empat service Render, Neon, Upstash QStash, dan Cloudinary aktif; smoke production **15/15 lulus**, async QStash/worker terverifikasi, login tujuh peran dan UI web terverifikasi, serta rollback edge, Pages, dan Render diuji. M6.1 portofolio siap (README, 8 screenshot, video 2:16, CHANGELOG). M6.2 live dengan monitoring 24 jam berjalan via `.github/workflows/production-monitor.yml`. M6.3 menambahkan pusat slip gaji dan layar laporan PPh 21/BPJS. M6.4 menambahkan employee self-service, e-cuti, dan e-lembur. Render free tier memiliki cold start; jalankan `pnpm warm:production` sebelum demo. Baca [`HANDOVER.md`](HANDOVER.md) sebelum melanjutkan.
 
 ## Why this exists
 
@@ -19,7 +19,7 @@ Aletheia separates:
 
 - **Claims operations** — submission, document upload, risk scoring, tiered approval/escalation, disbursement.
 - **Payroll & incentives** — employee/agent master, attendance/leave summary, payroll console, batch calculation, breakdown, variance, approval, disbursement, PPh 21 TER, BPJS employee/employer, agent commission tiers.
-- **HRIS-lite** — payslip PDF, PPh 21 monthly and annual reports, BPJS reports, bank transfer files, payroll variance, annual reconciliation, serta layar Slip Gaji dan Laporan dan Ekspor di web.
+- **HRIS-lite** — payslip PDF, PPh 21 monthly and annual reports, BPJS reports, bank transfer files, payroll variance, annual reconciliation, layar Slip Gaji dan Laporan dan Ekspor, serta employee self-service untuk slip, absensi, e-cuti, dan e-lembur.
 - **MIS intelligence** — cross-branch KPIs, tren, materialized views, cache dan invalidasi, What-If policy simulation read-only melalui GraphQL.
 - **Governance** — versioned policies with checksums, RBAC, segregation of duties, hash-chained audit, tenant-ready schema.
 - **Payments** — provider-agnostic adapter, idempotent webhook, reversal, retry with attempt numbers, and a mock provider for demos.
@@ -37,8 +37,10 @@ Aletheia separates:
 | <img src="docs/evidence/m6.1/08-what-if.png" alt="What-If sandbox" width="100%"> | <img src="docs/evidence/m6.1/09-audit.png" alt="Jejak audit" width="100%"> |
 | **Slip gaji** | **Laporan dan ekspor** |
 | <img src="docs/evidence/m6.3/payslips.png" alt="Pusat slip gaji" width="100%"> | <img src="docs/evidence/m6.3/reports.png" alt="Laporan dan ekspor" width="100%"> |
+| **Ruang Saya** | **Cuti dan lembur** |
+| <img src="docs/evidence/m6.4/me-payslips.png" alt="Ruang Saya karyawan" width="100%"> | <img src="docs/evidence/m6.4/me-leave.png" alt="Pengajuan cuti dan lembur" width="100%"> |
 
-Mobile: [`claims`](docs/evidence/m6.1/mobile-claims.png) · [`payroll`](docs/evidence/m6.1/mobile-payroll.png) · [`MIS`](docs/evidence/m6.1/mobile-mis.png) · [`slip gaji`](docs/evidence/m6.3/payslips-mobile.png). Semua data sintetis. Indeks lengkap ada di [`docs/evidence/m6.1/screenshots.md`](docs/evidence/m6.1/screenshots.md).
+Mobile: [`claims`](docs/evidence/m6.1/mobile-claims.png) · [`payroll`](docs/evidence/m6.1/mobile-payroll.png) · [`MIS`](docs/evidence/m6.1/mobile-mis.png) · [`slip gaji`](docs/evidence/m6.3/payslips-mobile.png) · [`Ruang Saya`](docs/evidence/m6.4/me-mobile.png). Semua data sintetis. Indeks lengkap ada di [`docs/evidence/m6.1/screenshots.md`](docs/evidence/m6.1/screenshots.md).
 
 ## Demo video
 
@@ -146,11 +148,12 @@ Kata sandi semua akun: **`AletheiaDemo!2026`**. MFA nonaktif pada demo.
 | `manager.bdg@aletheia.id` | BRANCH_MANAGER | SAU | BDG-01 |
 | `finance.vp@aletheia.id` | FINANCE_MANAGER | SAU | JKT-HQ |
 | `hr.ops@aletheia.id` | HR_SPECIALIST | SAU | JKT-HQ |
+| `employee.siti@aletheia.id` | EMPLOYEE | SAU | BDG-01 |
 | `compliance@aletheia.id` | COMPLIANCE_ADMIN | SAU | JKT-HQ |
 | `mis.analyst@aletheia.id` | MIS_ANALYST | SAU | JKT-HQ |
 | `compliance@bpui.id` | COMPLIANCE_ADMIN | BPUI | JKT-HQ |
 
-Halaman login menyediakan tombol peran demo yang mengisi email dan kata sandi otomatis. Untuk alur < 3 menit: jalankan `bash scripts/dev-up.sh`, buka `http://localhost:5173`, pilih **Spesialis SDM** untuk payroll atau **Petugas Klaim** untuk klaim, lalu jelajahi menu sesuai peran.
+Halaman login menyediakan tombol peran demo yang mengisi email dan kata sandi otomatis. Untuk alur < 3 menit: jalankan `bash scripts/dev-up.sh`, buka `http://localhost:5173`, pilih **Spesialis SDM** untuk payroll, **Petugas Klaim** untuk klaim, atau **Karyawan** untuk Ruang Saya, lalu jelajahi menu sesuai peran.
 
 ## Live production
 

@@ -24,6 +24,11 @@ Semua perubahan penting pada Aletheia. Format mengikuti [Keep a Changelog](https
 - M6.3: seed berkas slip dan laporan yang dapat diunduh untuk demo dan E2E.
 - M6.3: test E2E slip gaji dan laporan, termasuk akses peran, unduhan, dan mobile.
 - Bukti M6.3: `docs/evidence/m6.3-verification.md` dan tiga screenshot baru.
+- M6.4: role `EMPLOYEE`, akun demo karyawan, dan self-service `/me` untuk slip, absensi, saldo cuti, e-cuti, dan e-lembur.
+- M6.4: tabel `payroll.leave_balances` dan `payroll.overtime_requests` dengan RLS.
+- M6.4: endpoint self-scope `/api/v1/me/*` dan antrean HR `/workforce` untuk keputusan cuti dan lembur.
+- M6.4: SoD cuti/lembur, validasi saldo, dan rekalkulasi lembur ke attendance summary.
+- Bukti M6.4: `docs/evidence/m6.4-verification.md` dan empat screenshot Ruang Saya.
 
 ### Changed
 

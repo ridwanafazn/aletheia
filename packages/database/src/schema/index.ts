@@ -626,9 +626,7 @@ export const leaveBalances = payroll.table(
       .references(() => personnel.id),
     leaveType: varchar("leave_type", { length: 24 }).notNull(),
     year: smallint("year").notNull(),
-    entitlementDays: numeric("entitlement_days", { precision: 6, scale: 2 })
-      .notNull()
-      .default("0"),
+    entitlementDays: numeric("entitlement_days", { precision: 6, scale: 2 }).notNull().default("0"),
     usedDays: numeric("used_days", { precision: 6, scale: 2 }).notNull().default("0"),
     pendingDays: numeric("pending_days", { precision: 6, scale: 2 }).notNull().default("0"),
     createdAt: createdAt(),

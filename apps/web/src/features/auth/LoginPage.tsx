@@ -10,6 +10,11 @@ import { useAuth } from "./AuthProvider";
 
 const DEMO_USERS = [
   {
+    label: "Karyawan",
+    email: "employee.siti@aletheia.id",
+    note: "Melihat slip, absensi, cuti, dan lembur",
+  },
+  {
     label: "Spesialis SDM",
     email: "hr.ops@aletheia.id",
     note: "Menjalankan batch dan mengelola personel",
@@ -41,7 +46,10 @@ const DEMO_USERS = [
   },
 ];
 
-function landingFor(role: Role | undefined): "/payroll" | "/mis" | "/claims" {
+function landingFor(role: Role | undefined): "/payroll" | "/mis" | "/claims" | "/me" {
+  if (role === "EMPLOYEE") {
+    return "/me";
+  }
   if (role === "HR_SPECIALIST") {
     return "/payroll";
   }
