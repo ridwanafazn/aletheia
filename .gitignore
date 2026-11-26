@@ -27,3 +27,5 @@ services/analytics-worker-go/worker
 .dev/
 playwright-report/
 skills-lock.json.*.tmp
+
+apps/edge-gateway/wrangler.production.toml

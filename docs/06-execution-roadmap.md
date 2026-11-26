@@ -2,7 +2,7 @@
 
 * **Status Dokumen:** Peta Jalan Eksekusi (*Single Source of Truth* untuk Agen OpenCode)
 * **Strategi:** *Contract-First, Vertical Slice, Evidence-Driven, Zero Context Drift*
-* **Kondisi Saat Ini:** Fase 0, M1.1–M1.3, M2.1–M2.3, M3.1–M3.4, M4.1, M4.2, M5.1, M5.2, M5.3, dan M6.1 selesai. M5.4 sedang berjalan: prasyarat runtime selesai (pool `aletheia_app`, tenant binding per request/transaksi, worker Go, webhook, dan signed file token), security gate 36/36, integration test 27/36/34 lulus dengan RLS aktif pada database baru, dan Neon production sudah dimigrasi/seed. Deployment Koyeb/Render, Upstash, Cloudinary, dan Cloudflare production menunggu kredensial. M6.1 menghasilkan README final, 8 screenshot inti, video 2:16, CHANGELOG, dan job matrix aktual. Server demo sudah dihentikan; nyalakan dengan `bash scripts/dev-up.sh` dan baca `HANDOVER.md`. Bukti: `docs/evidence/m5.4-verification.md` dan `docs/evidence/m6.1-verification.md`.
+* **Kondisi Saat Ini:** Fase 0, M1.1–M1.3, M2.1–M2.3, M3.1–M3.4, M4.1, M4.2, M5.1–M5.4, dan M6.1 selesai. M5.4 live di Render, Neon, Upstash, Cloudinary, dan Cloudflare; smoke production 15/15, login enam peran, UI web, dan rollback edge terverifikasi. M6.2 sedang menyelesaikan sinkronisasi `WORKER_URL`, uji async QStash, rollback Render/Pages, dan monitoring 24 jam. Render free tier memiliki cold start; jalankan `pnpm warm:production` sebelum demo. Server demo lokal dapat dinyalakan dengan `bash scripts/dev-up.sh`. Bukti: `docs/evidence/m5.4-verification.md`, `docs/evidence/m6.1-verification.md`, `docs/evidence/m6.2-verification.md`.
 
 ## 1. Protokol Kerja Agen
 
@@ -172,7 +172,7 @@
 * **Gerbang:** 21/21 lulus dua run berturut-turut; 0 flaky; axe 0 serious/critical; coverage domain 96,26% lines; integration 27/36/34 lulus; Go race lulus.
 
 #### `TASK-18` — CI/CD Production & Deployment
-* **Status:** sebagian. Prasyarat runtime selesai 26 November 2026: service memakai role non-owner `aletheia_app`, tenant binding per request/transaksi, worker Go dan webhook terverifikasi, security gate 36/36. Neon production sudah dibuat, dimigrasi 0000–0011, di-seed, dan lulus `db:check`/`security:db` 36/36. Deployment Koyeb/Render, Upstash, Cloudinary, dan Cloudflare masih menunggu kredensial/config.
+* **Status:** selesai live 26 November 2026. Render menjalankan governance, claims, payroll, dan worker; Neon production aktif; Upstash QStash dan Cloudinary aktif; edge Workers dan web Pages live. Smoke production 15/15; web UI 3 peran; rollback edge diuji. Sisa sinkronisasi `WORKER_URL` final dan uji async QStash masuk M6.2.
 * **Konteks Wajib:** `docs/05`, `docs/12`.
 * **Cakupan:** pipeline deploy, Cloudflare Pages/Workers, Koyeb/Render, Neon/Upstash/Cloudinary, smoke test, rollback.
 * **Gerbang:** `/readyz` 200; demo live; rollback diuji; tidak ada secret.
@@ -183,7 +183,7 @@
 ### FASE 6 — Portofolio
 
 #### `TASK-19` — README, Screenshot, Video & Job Matrix
-* **Status:** aset selesai 26 November 2026. README final, 8 screenshot inti + 3 mobile, video 2:16, akun demo, CHANGELOG, dan job matrix aktual tersedia. Live URL production masih menunggu M5.4.
+* **Status:** aset selesai 26 November 2026. README final, 8 screenshot inti + 3 mobile, video 2:16, akun demo, CHANGELOG, dan job matrix aktual tersedia. Live URL production sudah aktif; M6.2 menyelesaikan monitoring 24 jam.
 * **Konteks Wajib:** `docs/12`, `docs/13`.
 * **Cakupan:** README final, 8 screenshot desktop/mobile, video 2–3 menit, akun demo, CHANGELOG, job matrix status 3/4.
 * **Gerbang:** reviewer dapat menjalankan demo < 3 menit; semua evidence ada; matrix ≥ 100%.

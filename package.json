@@ -39,6 +39,7 @@
     "demo:record": "node scripts/record-demo.mjs",
     "deploy:check": "node scripts/check-production-env.mjs",
     "smoke:production": "node scripts/production-smoke.mjs",
+    "warm:production": "node scripts/warm-production.mjs",
     "test:a11y": "node apps/web/node_modules/@playwright/test/cli.js test --config apps/web/playwright.config.ts e2e/a11y.spec.ts"
   },
   "devDependencies": {

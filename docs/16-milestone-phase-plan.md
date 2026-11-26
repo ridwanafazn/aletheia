@@ -70,7 +70,7 @@
 - Cloudinary → folder `preview/`.
 
 **Demo:** login 6 role → buat klaim → risk/conflict → approve/SoD → audit.
-**Status 26 November 2026:** M5.3 selesai. M5.4 prasyarat runtime selesai: service memakai `aletheia_app` dengan tenant binding, worker Go terverifikasi, security gate 36/36, dan integration test 27/36/34 lulus dengan RLS aktif. Neon production sudah dibuat (PG16, Singapore), migrasi 0000–0011, seed, provisioning `aletheia_app`, `db:check` dan `security:db` 36/36 lulus. Cloudflare Pages preview aktif di `aletheia-web-preview.pages.dev` dan menyajikan CSP serta security header. Edge preview perlu deploy ulang. Server demo lokal sudah dihentikan; nyalakan dengan `bash scripts/dev-up.sh`. Koyeb/Render, Upstash Redis/QStash, dan Cloudinary production belum dikonfigurasi.
+**Status 26 November 2026:** M5.3 selesai. M5.4 live: service Render, Neon, Upstash QStash, Cloudinary, edge Workers, dan web Pages aktif; smoke production 15/15 lulus; login enam peran, UI web, dan rollback edge terverifikasi. M6.2 sedang menyelesaikan sinkronisasi `WORKER_URL` final, uji async QStash, rollback Render/Pages, dan monitoring 24 jam. Render free tier memiliki cold start; jalankan `pnpm warm:production` sebelum demo.
 **Catatan:** payroll BE (TASK-06/07) boleh berjalan paralel setelah kontrak stabil, tetapi tidak menghambat demo klaim.
 
 ---
@@ -109,7 +109,7 @@
 | M5.1 | TASK-15 | **Selesai 26 November 2026.** Audit RLS 26 tabel, cross-tenant read/write, security headers dan CSP, PII scan, Gitleaks, Semgrep, Trivy, pnpm audit, govulncheck, audit chain job. | I-06/I-11/I-15 lulus; 35/35 RLS checks; 0 secret, 0 SAST, 0 dependency/image CVE; security checklist lulus. Bukti: `docs/evidence/m5.1-verification.md` |
 | M5.2 | TASK-16 | **Selesai 26 November 2026.** OTel trace/metrics/logs, 3 dashboard Grafana, 8 alert Prometheus, 7 skenario k6, query optimization, dan evidence. | SLO terukur; seluruh threshold k6 lulus; daftar klaim 5,85 ms menjadi 1,18 ms; 0 error. Bukti: `docs/evidence/m5.2-verification.md` |
 | M5.3 | TASK-17 | **Selesai 26 November 2026.** 21 test Playwright, 10 alur peran, axe, keyboard, race, coverage domain, flaky policy. | 21/21 lulus dua run; 0 flaky; axe 0 serious; coverage 96,26% lines; Go race dan integration lulus. Bukti: `docs/evidence/m5.3-verification.md` |
-| M5.4 | TASK-18 | **Sebagian, 26 November 2026.** Prasyarat runtime selesai: role non-owner `aletheia_app`, tenant binding per request/transaksi, worker Go, webhook, signed file token, gate 36/36, integration 27/36/34. Pipeline deploy production, Cloudflare Pages/Workers, Koyeb/Render, Neon/Upstash/Cloudinary, smoke, dan rollback menunggu kredensial. | `/readyz` 200; rollback diuji; tidak ada secret. Bukti prasyarat: `docs/evidence/m5.4-verification.md` |
+| M5.4 | TASK-18 | **Live 26 November 2026.** Render (governance, claims, payroll, worker), Neon, Upstash QStash, Cloudinary, Cloudflare Workers, dan Pages aktif. Runtime RLS 36/36; smoke production 15/15; web UI 3 peran; rollback edge diuji. | `/readyz` 200; demo live; rollback edge diuji; tidak ada secret. Bukti: `docs/evidence/m5.4-verification.md`, `docs/evidence/m6.2-verification.md` |
 
 **Deploy:**
 - **Staging full** (Neon staging, Upstash staging, Cloudinary staging).
@@ -123,7 +123,7 @@
 | Fase | Task | Yang dituntaskan | Gate |
 | --- | --- | --- | --- |
 | M6.1 | TASK-19 | **Aset selesai 26 November 2026.** README final, 8 screenshot inti + 3 mobile, video 2:16, akun demo, CHANGELOG, job matrix aktual. | Reviewer dapat menjalankan demo < 3 menit via `dev-up.sh`; evidence lengkap; live URL pending M5.4. Bukti: `docs/evidence/m6.1-verification.md` |
-| M6.2 | Launch (bagian dari TASK-19/18) | **Blocked 26 November 2026.** Smoke production, reset seed, monitoring 24 jam, freeze deploy, dan final checklist belum dijalankan karena kredensial Upstash/Cloudinary/Koyeb-Render belum tersedia. Runbook: `docs/runbooks/m6.2-launch.md`; template bukti: `docs/evidence/m6.2-verification.md`. | Semua endpoint sehat; tidak ada P0; matrix ≥ 100% |
+| M6.2 | Launch (bagian dari TASK-19/18) | **Live, monitoring berjalan.** Smoke production 15/15, web UI 3 peran, rollback edge, dan CSP lulus. Sisa: sinkronisasi `WORKER_URL` final, uji async QStash, rollback Render/Pages, monitoring 24 jam, freeze deploy. Runbook: `docs/runbooks/m6.2-launch.md`; bukti: `docs/evidence/m6.2-verification.md`. | Semua endpoint sehat; tidak ada P0; matrix ≥ 100% |
 
 **Deploy final:** production demo di free-tier, dengan akun demo dan data sintetis.
 **Demo:** 6 role → claims → payroll → payslip/report → MIS → policy/audit.

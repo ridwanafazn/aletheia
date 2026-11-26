@@ -1,6 +1,6 @@
 # Aletheia — Handover
 
-* **Status:** M1 sampai M5.3 selesai. M5.4 sedang berjalan: prasyarat runtime (role `aletheia_app`, tenant binding, worker) selesai; Neon production sudah dimigrasi, di-seed, dan lulus 36/36. Deployment Koyeb/Render, Upstash, Cloudinary, dan Cloudflare menunggu kredensial/config.
+* **Status:** M1 sampai M5.4 live. Web, edge, empat service Render, Neon, Upstash, dan Cloudinary aktif; smoke production 15/15 lulus; login enam peran, UI web, dan rollback edge terverifikasi. M6.2 sedang menyelesaikan sinkronisasi `WORKER_URL`, uji async QStash, dan monitoring 24 jam.
 * **Tanggal handover:** 26 November 2026
 * **Data:** seluruhnya sintetis. Tidak ada uang nyata atau PII nyata.
 * **Server demo:** dihentikan. Nyalakan ulang dengan `bash scripts/dev-up.sh`.
@@ -19,12 +19,12 @@ Aletheia adalah platform governance pencairan klaim dan payroll dengan:
 * OpenTelemetry, Prometheus, Grafana, dan Jaeger untuk observability.
 * k6 untuk load test dan Playwright untuk E2E.
 
-**Yang sudah selesai:** M1 fondasi, M2 governance dan claims, M3 payroll dan disbursement, M4 MIS, M5.1 security hardening, M5.2 observability dan load test, M5.3 E2E/accessibility/final QA, dan M6.1 README/screenshot/video/CHANGELOG/job matrix.
+**Yang sudah selesai:** M1 fondasi, M2 governance dan claims, M3 payroll dan disbursement, M4 MIS, M5.1 security hardening, M5.2 observability dan load test, M5.3 E2E/accessibility/final QA, M5.4 production live di Render/Neon/Cloudflare/Upstash/Cloudinary, dan M6.1 README/screenshot/video/CHANGELOG/job matrix.
 
 **Yang belum selesai:**
 
-* M5.4 deployment production, rollback, Upstash, Cloudinary, Koyeb/Render. Runtime RLS dan Neon production sudah selesai; deployment eksternal menunggu kredensial provider.
-* M6.2 live demo dan monitoring 24 jam, menunggu M5.4. Jalankan `pnpm deploy:check`, lalu ikuti `docs/runbooks/m6.2-launch.md`.
+* M6.2 finalisasi: sinkronisasi `WORKER_URL`/`WORKER_PUBLIC_URL` ke `https://aletheia-worker-zjnt.onrender.com`, uji async QStash, rollback Render/Pages drill, dan monitoring 24 jam.
+* Cold start Render free tier; mitigasi `pnpm warm:production`. Jalankan `pnpm deploy:check`, lalu ikuti `docs/runbooks/m6.2-launch.md`.
 * UI payslip dan laporan. API-nya sudah ada dan diverifikasi di M3.4.
 * Edge preview live perlu deploy ulang.
 * RUM LCP/INP, exporter span edge, dan label Prometheus kardinalitas tinggi.
@@ -86,7 +86,20 @@ Kata sandi semua akun: **`AletheiaDemo!2026`**. MFA nonaktif.
 | `mis.analyst@aletheia.id` | MIS_ANALYST | SAU | JKT-HQ |
 | `compliance@bpui.id` | COMPLIANCE_ADMIN | BPUI | JKT-HQ |
 
-## 4. URL lokal
+## 4. URL production
+
+| Komponen | URL |
+| --- | --- |
+| Web | `https://aletheia-web-preview.pages.dev` |
+| Edge | `https://aletheia-edge.ridwanafazn.workers.dev` |
+| Governance | `https://aletheia-governance.onrender.com` |
+| Claims | `https://aletheia-claims.onrender.com` |
+| Payroll | `https://aletheia-payroll.onrender.com` |
+| Worker | `https://aletheia-worker-zjnt.onrender.com` |
+
+Jalankan `pnpm warm:production` sebelum demo karena Render free tier tidur saat idle.
+
+## 4A. URL lokal
 
 | Komponen | URL |
 | --- | --- |
@@ -263,14 +276,15 @@ Indeks lengkap ada di `docs/evidence/README.md`. Mulai dari:
 
 | Item | Status | Tindakan |
 | --- | --- | --- |
-| Service memakai role pemilik DB | Selesai (runtime) | Pool service memakai `aletheia_app` + tenant binding; provisioning password role production dilakukan saat TASK-18 |
-| Edge preview tidak resolve | Terbuka | Deploy ulang edge di TASK-18 |
-| QStash belum aktif | Terbuka | Konfigurasi Upstash di TASK-18; load test memakai worker langsung |
+| Service memakai role pemilik DB | Selesai | Semua service production memakai `aletheia_app` + tenant binding |
+| Edge preview tidak resolve | Selesai | Edge live di `aletheia-edge.ridwanafazn.workers.dev` |
+| QStash belum aktif | Selesai | Upstash QStash aktif; sinkronisasi `WORKER_URL` final ke `-zjnt` sedang diselesaikan |
+| Cold start Render free tier | Terbuka | Jalankan `pnpm warm:production`; pertimbangkan plan berbayar untuk demo tanpa jeda |
 | UI payslip dan laporan belum ada | Terbuka | API sudah diverifikasi M3.4; UI dapat menjadi task lanjutan |
-| RUM LCP/INP belum ada | Terbuka | Tambah web-vitals atau RUM di TASK-18 |
+| RUM LCP/INP belum ada | Terbuka | Tambah web-vitals atau RUM di task lanjutan |
 | Label Prometheus kardinalitas tinggi | Terbuka | Gunakan `resource_constant_labels` atau transform collector |
-| Perubahan M5.4 runtime | Selesai | Commit terpisah setelah baseline `a302555`; lihat riwayat Git |
-| CI E2E full-stack belum ada | Terbuka | TASK-18 menambahkan job E2E dengan service stack |
+| Perubahan M5.4 | Selesai | Commit `e81fca0`, `b829b94`, `fb10579`; lihat riwayat Git |
+| CI E2E full-stack belum ada | Terbuka | Tambah job E2E dengan service stack |
 
 ## 11. Troubleshooting
 
@@ -304,14 +318,12 @@ Jalankan `bash scripts/dev-up.sh`; skrip memilih container 55432 atau Compose 54
 
 M6.1 selesai: lihat `README.md`, `docs/evidence/m6.1-verification.md`, dan `docs/evidence/m6.1/aletheia-demo.webm`.
 
-M5.4 TASK-18:
+M5.4 live dan smoke 15/15 lulus. Sisa M6.2:
 
-0. Siapkan kredensial provider: Neon, Upstash Redis/QStash, Cloudinary, Koyeb/Render, dan Cloudflare.
-1. Neon project/branch production; jalankan migrasi 0000–0010 dan provisioning role.
-2. Deploy service dan worker ke Koyeb/Render dengan `DATABASE_URL_APP`.
-3. Deploy edge ke Cloudflare Workers dan web ke Cloudflare Pages.
-4. Konfigurasi Upstash Redis, QStash, dan Cloudinary production.
-5. Smoke test `/readyz`, login enam peran, alur klaim/payroll/MIS, rollback, dan observability production.
-6. Monitoring 24 jam dan freeze deploy.
+1. Update `WORKER_URL` di governance/claims/payroll dan `WORKER_PUBLIC_URL` di worker ke `https://aletheia-worker-zjnt.onrender.com`; `render.yaml` sudah diperbarui, jalankan Manual sync atau update dashboard.
+2. Uji async QStash (What-If atau payroll calculate).
+3. Rollback Render/Pages drill.
+4. Monitoring 24 jam dan freeze deploy.
+5. Tandai M6.2 selesai hanya setelah seluruh bukti terisi di `docs/evidence/m6.2-verification.md`.
 
-Langkah 0–4 memerlukan persetujuan dan kredensial pemilik proyek.
+Untuk demo, jalankan `pnpm warm:production` lebih dulu.

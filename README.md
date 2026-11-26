@@ -4,7 +4,7 @@
 
 Aletheia (Greek: *unconcealment*) is a reference implementation for governed money movement: customer claims, payroll, agent commissions, tax withholding, and cross-domain risk intelligence — built around **versioned policy references**, **zero double-disbursement**, and an **immutable audit trail**.
 
-> **Status:** M1 sampai M5.3 selesai. M5.4 sedang berjalan: runtime RLS, worker Go, dan Neon production sudah siap (security gate 36/36, integration 27/36/34). M6.1 portofolio siap: README, 8 screenshot, video demo 2:16, akun demo, dan CHANGELOG. M6.2 sudah disiapkan (preflight env, smoke, runbook launch/rollback), tetapi live launch menunggu kredensial Upstash/Cloudinary/Koyeb-Render. Server demo dihentikan; nyalakan dengan `bash scripts/dev-up.sh`. Baca [`HANDOVER.md`](HANDOVER.md) sebelum melanjutkan.
+> **Status:** M1 sampai M5.4 live. Web, edge, empat service Render, Neon, Upstash, dan Cloudinary sudah aktif; smoke production **15/15 lulus**, login enam peran dan UI web terverifikasi, dan rollback edge diuji. M6.1 portofolio siap (README, 8 screenshot, video 2:16, CHANGELOG). M6.2 sedang menyelesaikan sinkronisasi `WORKER_URL`, uji async QStash, dan monitoring 24 jam. Render free tier memiliki cold start; jalankan `pnpm warm:production` sebelum demo. Baca [`HANDOVER.md`](HANDOVER.md) sebelum melanjutkan.
 
 ## Why this exists
 
@@ -103,6 +103,7 @@ flowchart TB
 | [`CHANGELOG.md`](CHANGELOG.md) | Riwayat rilis dan perubahan |
 | [`docs/evidence/m6.1-verification.md`](docs/evidence/m6.1-verification.md) | Verifikasi portofolio M6.1 |
 | [`docs/runbooks/m6.2-launch.md`](docs/runbooks/m6.2-launch.md) | Runbook launch, smoke, rollback, monitoring M6.2 |
+| [`docs/evidence/m6.2-verification.md`](docs/evidence/m6.2-verification.md) | Bukti smoke production, web UI, rollback edge, cold start |
 
 ## Getting started
 
@@ -152,14 +153,25 @@ Halaman login menyediakan tombol peran demo yang mengisi email dan kata sandi ot
 ## Live preview
 
 - Web: [aletheia-web-preview.pages.dev](https://aletheia-web-preview.pages.dev)
-- Edge: belum dideploy ulang. Hostname `aletheia-edge-preview.ridwanafazn.workers.dev` tidak lagi resolve per 26 November 2026.
-- Neon production: project `aletheia` (PG16, Singapore) sudah dimigrasi, di-seed, dan lulus RLS 36/36.
+- Edge: [aletheia-edge.ridwanafazn.workers.dev](https://aletheia-edge.ridwanafazn.workers.dev)
+- Governance: [aletheia-governance.onrender.com](https://aletheia-governance.onrender.com)
+- Claims: [aletheia-claims.onrender.com](https://aletheia-claims.onrender.com)
+- Payroll: [aletheia-payroll.onrender.com](https://aletheia-payroll.onrender.com)
+- Worker: [aletheia-worker-zjnt.onrender.com](https://aletheia-worker-zjnt.onrender.com)
+- Neon production: project `aletheia` (PG16, Singapore), migrasi 0000–0011, RLS 36/36.
+- Upstash QStash dan Cloudinary aktif.
 
-Web preview statis menyajikan CSP, HSTS, COOP, dan Permissions-Policy. Service backend, worker, dan edge production masih menunggu kredensial Koyeb/Render, Upstash, dan Cloudinary. Untuk demo yang dapat dijalankan sekarang, gunakan stack lokal: `bash scripts/dev-up.sh`, lalu buka `http://localhost:5173` dan masuk dengan akun demo di atas.
+Web production menyajikan CSP, HSTS, COOP, dan Permissions-Policy. Render free tier tidur saat idle; cold start bisa lebih dari 2 menit. Sebelum demo:
+
+```bash
+pnpm warm:production
+```
+
+Lalu buka web production dan masuk dengan akun demo di atas. Untuk stack lokal, gunakan `bash scripts/dev-up.sh` dan `http://localhost:5173`.
 
 Semua endpoint selain health, login, refresh, dan webhook payment memerlukan header bertanda tangan gateway. Produksi wajib mengisi `INTERNAL_GATEWAY_SECRET`, `JWT_PRIVATE_KEY`, `JWT_PUBLIC_KEY`, `REFRESH_TOKEN_PEPPER`, `MFA_ENCRYPTION_KEY`, `PII_PEPPER`, kredensial Cloudinary, `PAYMENT_WEBHOOK_SECRET`, dan `FILE_SIGNING_SECRET`.
 
-Payroll Console mencakup daftar batch, pembuatan batch, progres kalkulasi, rincian komponen per personel, varians, persetujuan, dan pencairan. Employee Directory menampilkan profil personel, rekening masked, ringkasan absensi, dan riwayat cuti. Go worker mengisi kalkulasi PPh 21 TER, BPJS karyawan dan pemberi kerja, komisi agen, anomali klaim, What-If read-only, dan refresh KPI. Karena token QStash belum aktif pada demo, batch baru tetap `CALCULATING` sampai event dikirim manual atau token QStash diisi.
+Payroll Console mencakup daftar batch, pembuatan batch, progres kalkulasi, rincian komponen per personel, varians, persetujuan, dan pencairan. Employee Directory menampilkan profil personel, rekening masked, ringkasan absensi, dan riwayat cuti. Go worker mengisi kalkulasi PPh 21 TER, BPJS karyawan dan pemberi kerja, komisi agen, anomali klaim, What-If read-only, dan refresh KPI. QStash production sudah aktif; `WORKER_URL` disinkronkan ke URL worker Render yang sebenarnya sebelum uji async final.
 
 ## Testing
 
@@ -216,8 +228,8 @@ Dashboard dan alert disimpan di `infra/observability/`. Bukti M5.2 ada di `docs/
 | 2 | Claims vertical slice | done: M2.1, M2.2, M2.3 |
 | 3 | Payroll + HRIS-lite | done: M3.1–M3.4 |
 | 4 | MIS + GraphQL BFF | done: M4.1 dan M4.2 |
-| 5 | Hardening: RLS audit, observability, load, security, E2E | done: M5.1–M5.3; M5.4 runtime + Neon ready, deployment provider pending |
-| 6 | Portfolio: deploy, README, video, evidence | in progress: M6.1 assets ready; M6.2 live demo pending |
+| 5 | Hardening: RLS audit, observability, load, security, E2E | done: M5.1–M5.4 live di Render, Neon, Cloudflare, Upstash, Cloudinary |
+| 6 | Portfolio: deploy, README, video, evidence | in progress: M6.1 selesai; M6.2 live, monitoring 24 jam dan uji async pending |
 
 See [`docs/06-execution-roadmap.md`](docs/06-execution-roadmap.md) for task-level detail.
 
