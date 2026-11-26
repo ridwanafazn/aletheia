@@ -1,10 +1,15 @@
-import type { Pool, PoolClient } from "pg";
+import type { QueryResult, QueryResultRow } from "pg";
 
 import { PayrollPolicySchema, type PayrollPolicy } from "@aletheia/shared-contracts";
 
 import { ApiError } from "./errors.js";
 
-export type Queryable = Pick<Pool | PoolClient, "query">;
+export interface Queryable {
+  query<R extends QueryResultRow = QueryResultRow>(
+    text: string,
+    values?: unknown[],
+  ): Promise<QueryResult<R>>;
+}
 
 export interface BoundPayrollPolicy {
   id: string;

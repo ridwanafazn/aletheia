@@ -2,7 +2,7 @@ import { fileURLToPath } from "node:url";
 
 import { migrate } from "drizzle-orm/node-postgres/migrator";
 
-import { closeDatabase, db } from "./client.js";
+import { closeAdminDatabase, db } from "./admin.js";
 
 const migrationsFolder = fileURLToPath(new URL("../migrations", import.meta.url));
 
@@ -18,5 +18,5 @@ main()
     process.exitCode = 1;
   })
   .finally(async () => {
-    await closeDatabase();
+    await closeAdminDatabase();
   });

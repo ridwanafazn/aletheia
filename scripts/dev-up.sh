@@ -45,11 +45,23 @@ info "Apply migrations and seed"
 pnpm db:migrate
 pnpm db:seed
 
-info "Build packages and services"
+info "Build packages"
 pnpm --filter @aletheia/shared-contracts build
 pnpm --filter @aletheia/database build
 pnpm --filter @aletheia/payments build
 pnpm --filter @aletheia/observability build
+
+APP_DB_PASSWORD="${APP_DB_PASSWORD:-aletheia_app}"
+export APP_DB_PASSWORD
+info "Provision application database role"
+node scripts/provision-app-role.mjs
+
+DATABASE_URL_APP="$(
+  node -e 'const url = new URL(process.env.DATABASE_URL); url.username = "aletheia_app"; url.password = process.env.APP_DB_PASSWORD; console.log(url.toString())'
+)"
+export DATABASE_URL_APP
+
+info "Build services"
 pnpm --filter @aletheia/governance-service build
 pnpm --filter @aletheia/claims-service build
 pnpm --filter @aletheia/payroll-service build
@@ -70,16 +82,16 @@ start_process() {
 }
 
 info "Start backend services"
-start_process governance env DATABASE_URL="$DATABASE_URL" PORT=4101 WORKER_URL=http://127.0.0.1:4004 \
+start_process governance env DATABASE_URL_APP="$DATABASE_URL_APP" PORT=4101 WORKER_URL=http://127.0.0.1:4004 \
   OTEL_EXPORTER_OTLP_ENDPOINT=http://127.0.0.1:4318 OTEL_SERVICE_NAMESPACE=aletheia \
   node --import ./services/governance-service/dist/instrumentation.js services/governance-service/dist/index.js
-start_process claims env DATABASE_URL="$DATABASE_URL" PORT=4102 WORKER_URL=http://127.0.0.1:4004 \
+start_process claims env DATABASE_URL_APP="$DATABASE_URL_APP" PORT=4102 WORKER_URL=http://127.0.0.1:4004 \
   OTEL_EXPORTER_OTLP_ENDPOINT=http://127.0.0.1:4318 OTEL_SERVICE_NAMESPACE=aletheia \
   node --import ./services/claims-service/dist/instrumentation.js services/claims-service/dist/index.js
-start_process payroll env DATABASE_URL="$DATABASE_URL" PORT=4103 WORKER_URL=http://127.0.0.1:4004 \
+start_process payroll env DATABASE_URL_APP="$DATABASE_URL_APP" PORT=4103 WORKER_URL=http://127.0.0.1:4004 \
   OTEL_EXPORTER_OTLP_ENDPOINT=http://127.0.0.1:4318 OTEL_SERVICE_NAMESPACE=aletheia \
   node --import ./services/payroll-service/dist/instrumentation.js services/payroll-service/dist/index.js
-start_process worker env DATABASE_URL="$DATABASE_URL" PORT=4004 ALLOW_UNSIGNED_EVENTS=true \
+start_process worker env DATABASE_URL="$DATABASE_URL_APP" PORT=4004 ALLOW_UNSIGNED_EVENTS=true \
   OTEL_EXPORTER_OTLP_ENDPOINT=http://127.0.0.1:4318 OTEL_SERVICE_NAMESPACE=aletheia "$WORKER_BIN"
 
 info "Start edge and web"

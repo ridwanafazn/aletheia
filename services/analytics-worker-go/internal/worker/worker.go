@@ -14,6 +14,8 @@ import (
 	"go.opentelemetry.io/otel/codes"
 	"go.opentelemetry.io/otel/metric"
 	"go.opentelemetry.io/otel/trace"
+
+	"github.com/ridwanafazn/aletheia/services/analytics-worker-go/internal/tenantctx"
 )
 
 const (
@@ -95,6 +97,7 @@ func (w *Worker) Handle(ctx context.Context, event Event) (result map[string]any
 	if event.EventType == "" || event.TenantID == "" {
 		return nil, fmt.Errorf("event_type dan tenant_id wajib diisi")
 	}
+	ctx = tenantctx.WithTenant(ctx, event.TenantID)
 	started := time.Now()
 	ctx, span := otel.Tracer("analytics-worker-go").Start(ctx, "queue.consume",
 		trace.WithAttributes(

@@ -1,4 +1,4 @@
-import { closeDatabase, pool } from "../packages/database/dist/index.js";
+import { adminPool as pool, closeAdminDatabase } from "../packages/database/dist/admin.js";
 
 const failures = [];
 const checks = [];
@@ -69,6 +69,11 @@ async function main() {
       "aletheia_app cannot bypass RLS",
       appRole.rolbypassrls === false,
       `rolbypassrls=${appRole.rolbypassrls}`,
+    );
+    record(
+      "aletheia_app can login",
+      appRole.rolcanlogin === true,
+      `rolcanlogin=${appRole.rolcanlogin}`,
     );
   }
 
@@ -164,7 +169,7 @@ async function main() {
     console.log(`${check.ok ? "PASS" : "BLOCKER"} ${check.name} — ${check.detail}`);
   }
   console.log(`\n${checks.filter((item) => item.ok).length}/${checks.length} checks passed`);
-  await closeDatabase();
+  await closeAdminDatabase();
   if (failures.length > 0) {
     process.exitCode = 1;
   }
@@ -172,6 +177,6 @@ async function main() {
 
 main().catch(async (error) => {
   console.error("SECURITY_AUDIT_FAILED", error);
-  await closeDatabase();
+  await closeAdminDatabase();
   process.exitCode = 1;
 });

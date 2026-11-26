@@ -342,7 +342,13 @@ batchRouter.get(
     const id = IdParamSchema.parse(request.params.id);
     const client = await pool.connect();
     try {
-      sendData(response, await detailFor(client, auth.tenantId, id));
+      await client.query("BEGIN");
+      const detail = await detailFor(client, auth.tenantId, id);
+      await client.query("COMMIT");
+      sendData(response, detail);
+    } catch (error) {
+      await client.query("ROLLBACK").catch(() => undefined);
+      throw error;
     } finally {
       client.release();
     }

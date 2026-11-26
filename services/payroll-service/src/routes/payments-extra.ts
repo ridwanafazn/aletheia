@@ -1,6 +1,6 @@
 import { randomUUID } from "node:crypto";
 
-import { pool } from "@aletheia/database";
+import { pool, runWithTenant, systemQuery } from "@aletheia/database";
 import { incrementCounter, withSpan } from "@aletheia/observability";
 import {
   PaymentWebhookEventSchema,
@@ -90,11 +90,21 @@ paymentWebhookRouter.post("/webhook/:provider", async (request, response) => {
     throw new ApiError(401, "ERR_UNAUTHORIZED_ACCESS", "Signature webhook tidak valid");
   }
 
-  const client = await pool.connect();
-  try {
-    await client.query("BEGIN");
-    const payments = await client.query<PaymentRow & { tenant_id: string }>(
-      `select id, tenant_id, batch_id, personnel_id, policy_version_id, provider,
+  const resolved = await systemQuery<{ tenant_id: string }>(
+    `select payroll.resolve_payment_tenant($1, $2) as tenant_id`,
+    [provider, event.provider_reference],
+  );
+  const tenantId = resolved.rows[0]?.tenant_id;
+  if (tenantId === undefined) {
+    throw new ApiError(404, "ERR_NOT_FOUND", "Payment payroll untuk webhook tidak ditemukan");
+  }
+
+  await runWithTenant(tenantId, async () => {
+    const client = await pool.connect();
+    try {
+      await client.query("BEGIN");
+      const payments = await client.query<PaymentRow & { tenant_id: string }>(
+        `select id, tenant_id, batch_id, personnel_id, policy_version_id, provider,
               provider_reference, amount, status, idempotency_key, attempt_no,
               requested_by, approved_by, requested_at, paid_at, failure_reason
          from payroll.payments
@@ -102,134 +112,135 @@ paymentWebhookRouter.post("/webhook/:provider", async (request, response) => {
         order by requested_at desc
         limit 1
         for update`,
-      [provider, event.provider_reference],
-    );
-    const payment = payments.rows[0];
-    if (payment === undefined) {
-      throw new ApiError(404, "ERR_NOT_FOUND", "Payment payroll untuk webhook tidak ditemukan");
-    }
-    if (Number(event.amount) !== Number(payment.amount)) {
-      throw new ApiError(422, "ERR_PAYMENT_STATE_CONFLICT", "Nominal webhook tidak cocok");
-    }
+        [provider, event.provider_reference],
+      );
+      const payment = payments.rows[0];
+      if (payment === undefined) {
+        throw new ApiError(404, "ERR_NOT_FOUND", "Payment payroll untuk webhook tidak ditemukan");
+      }
+      if (Number(event.amount) !== Number(payment.amount)) {
+        throw new ApiError(422, "ERR_PAYMENT_STATE_CONFLICT", "Nominal webhook tidak cocok");
+      }
 
-    const inserted = await client.query(
-      `insert into payroll.payment_webhook_events
+      const inserted = await client.query(
+        `insert into payroll.payment_webhook_events
          (id, tenant_id, provider, event_id, payment_id, event_type, status, payload)
        values (gen_random_uuid(),$1,$2,$3,$4,$5,$6,$7::jsonb)
        on conflict (tenant_id, provider, event_id) do nothing
        returning id`,
-      [
-        payment.tenant_id,
-        provider,
-        event.event_id,
-        payment.id,
-        event.event_type,
-        event.status,
-        JSON.stringify(event.payload),
-      ],
-    );
-    if (inserted.rowCount === 0) {
-      await client.query("COMMIT");
-      sendData(response, { received: true });
-      return;
-    }
-
-    if (event.status === "PAID") {
-      if (!["PENDING", "PROCESSING", "FAILED"].includes(payment.status)) {
-        throw new ApiError(
-          409,
-          "ERR_PAYMENT_STATE_CONFLICT",
-          "Payment tidak dapat berpindah ke PAID dari status saat ini",
-        );
+        [
+          payment.tenant_id,
+          provider,
+          event.event_id,
+          payment.id,
+          event.event_type,
+          event.status,
+          JSON.stringify(event.payload),
+        ],
+      );
+      if (inserted.rowCount === 0) {
+        await client.query("COMMIT");
+        sendData(response, { received: true });
+        return;
       }
-      await client.query(
-        `update payroll.payments
+
+      if (event.status === "PAID") {
+        if (!["PENDING", "PROCESSING", "FAILED"].includes(payment.status)) {
+          throw new ApiError(
+            409,
+            "ERR_PAYMENT_STATE_CONFLICT",
+            "Payment tidak dapat berpindah ke PAID dari status saat ini",
+          );
+        }
+        await client.query(
+          `update payroll.payments
             set status = 'PAID', paid_at = $2, failure_reason = null
           where id = $1`,
-        [payment.id, event.occurred_at],
-      );
-      await client.query(
-        `update payroll.items set payment_status = 'PAID'
-          where tenant_id = $1 and payment_intent_id = $2`,
-        [payment.tenant_id, payment.id],
-      );
-    } else if (event.status === "FAILED") {
-      if (!["PENDING", "PROCESSING"].includes(payment.status)) {
-        throw new ApiError(
-          409,
-          "ERR_PAYMENT_STATE_CONFLICT",
-          "Payment tidak dapat berpindah ke FAILED dari status saat ini",
+          [payment.id, event.occurred_at],
         );
-      }
-      await client.query(
-        `update payroll.payments
+        await client.query(
+          `update payroll.items set payment_status = 'PAID'
+          where tenant_id = $1 and payment_intent_id = $2`,
+          [payment.tenant_id, payment.id],
+        );
+      } else if (event.status === "FAILED") {
+        if (!["PENDING", "PROCESSING"].includes(payment.status)) {
+          throw new ApiError(
+            409,
+            "ERR_PAYMENT_STATE_CONFLICT",
+            "Payment tidak dapat berpindah ke FAILED dari status saat ini",
+          );
+        }
+        await client.query(
+          `update payroll.payments
             set status = 'FAILED', failure_reason = 'Provider melaporkan kegagalan'
           where id = $1`,
-        [payment.id],
-      );
-      await client.query(
-        `update payroll.items set payment_status = 'FAILED'
-          where tenant_id = $1 and payment_intent_id = $2`,
-        [payment.tenant_id, payment.id],
-      );
-    } else {
-      if (payment.status !== "PAID") {
-        throw new ApiError(
-          409,
-          "ERR_PAYMENT_STATE_CONFLICT",
-          "Hanya payment PAID yang dapat di-reverse",
+          [payment.id],
         );
-      }
-      await client.query(
-        `update payroll.payments
+        await client.query(
+          `update payroll.items set payment_status = 'FAILED'
+          where tenant_id = $1 and payment_intent_id = $2`,
+          [payment.tenant_id, payment.id],
+        );
+      } else {
+        if (payment.status !== "PAID") {
+          throw new ApiError(
+            409,
+            "ERR_PAYMENT_STATE_CONFLICT",
+            "Hanya payment PAID yang dapat di-reverse",
+          );
+        }
+        await client.query(
+          `update payroll.payments
             set status = 'REVERSED', failure_reason = 'Provider melaporkan reversal'
           where id = $1`,
-        [payment.id],
-      );
-      await client.query(
-        `update payroll.items set payment_status = 'REVERSED'
+          [payment.id],
+        );
+        await client.query(
+          `update payroll.items set payment_status = 'REVERSED'
           where tenant_id = $1 and payment_intent_id = $2`,
-        [payment.tenant_id, payment.id],
-      );
-    }
+          [payment.tenant_id, payment.id],
+        );
+      }
 
-    const batchStatus = await syncBatchPaymentState(client, payment.tenant_id, payment.batch_id);
-    await appendAudit(
-      {
-        tenantId: payment.tenant_id,
-        actorId: payment.requested_by,
-        actorRole: "FINANCE_MANAGER",
-        domain: "PAYROLL",
-        entityType: "PAYROLL_BATCH",
-        entityId: payment.batch_id,
-        action:
-          event.status === "PAID"
-            ? "PAYROLL_PAYMENT_PAID"
-            : event.status === "FAILED"
-              ? "PAYROLL_PAYMENT_FAILED"
-              : "PAYROLL_PAYMENT_REVERSED",
-        policyVersionId: payment.policy_version_id,
-        decisionContext: {
-          payment_id: payment.id,
-          provider: payment.provider,
-          provider_reference: payment.provider_reference,
-          amount: payment.amount,
-          batch_status: batchStatus,
-          source: "PROVIDER_WEBHOOK",
-          event_id: event.event_id,
+      const batchStatus = await syncBatchPaymentState(client, payment.tenant_id, payment.batch_id);
+      await appendAudit(
+        {
+          tenantId: payment.tenant_id,
+          actorId: payment.requested_by,
+          actorRole: "FINANCE_MANAGER",
+          domain: "PAYROLL",
+          entityType: "PAYROLL_BATCH",
+          entityId: payment.batch_id,
+          action:
+            event.status === "PAID"
+              ? "PAYROLL_PAYMENT_PAID"
+              : event.status === "FAILED"
+                ? "PAYROLL_PAYMENT_FAILED"
+                : "PAYROLL_PAYMENT_REVERSED",
+          policyVersionId: payment.policy_version_id,
+          decisionContext: {
+            payment_id: payment.id,
+            provider: payment.provider,
+            provider_reference: payment.provider_reference,
+            amount: payment.amount,
+            batch_status: batchStatus,
+            source: "PROVIDER_WEBHOOK",
+            event_id: event.event_id,
+          },
+          correlationId: request.correlationId,
         },
-        correlationId: request.correlationId,
-      },
-      client,
-    );
-    await client.query("COMMIT");
-    sendData(response, { received: true });
-  } catch (error) {
-    await client.query("ROLLBACK").catch(() => undefined);
-    throw error;
-  } finally {
-    client.release();
-  }
+        client,
+      );
+      await client.query("COMMIT");
+      sendData(response, { received: true });
+    } catch (error) {
+      await client.query("ROLLBACK").catch(() => undefined);
+      throw error;
+    } finally {
+      client.release();
+    }
+  });
 });
 
 export const paymentActionRouter: RouterType = Router();

@@ -102,7 +102,7 @@
 | Invalidasi cache KPI | FIXED | Cache 300 detik, header `x-cache`, dan endpoint invalidasi per tenant. Refresh MV belum memanggil invalidasi otomatis. |
 | Aksesibilitas grafik MIS | FIXED | Grafik memiliki ringkasan teks dan tabel data alternatif; axe 0 serious pada desktop dan mobile. |
 | GCM authentication tag MFA | FIXED | Semgrep menemukan tag length tidak eksplisit; cipher dan decipher kini memakai `authTagLength=16` dan validasi panjang tag. |
-| RLS runtime service pool | OPEN | Policy RLS dan role `aletheia_app` lulus probe. Service demo masih memakai role pemilik database; pengikatan sesi tenant per transaksi wajib sebelum production di TASK-18. |
+| RLS runtime service pool | FIXED | Pool service memakai `aletheia_app` dengan tenant binding per request/transaksi; worker Go memakai hook `pgxpool`. Security gate 36/36 dan integration test 27/36/34 lulus dengan RLS aktif. Bukti: `docs/evidence/m5.4-verification.md`. |
 | Dependency dan image CVE | FIXED | pnpm audit, Trivy lockfile, Trivy image, dan govulncheck 0 HIGH/CRITICAL. Go dinaikkan ke 1.26.11. |
 | OTel histogram bucket | FIXED | Node dan Go histogram memakai boundary detik eksplisit. Sebelumnya boundary default milidetik membuat p95 dashboard terbaca 4,8 detik. |
 | Go semconv schema | FIXED | Resource Go memakai schema semconv yang sama dengan SDK untuk menghindari konflik schema URL. |

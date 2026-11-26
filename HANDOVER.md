@@ -1,6 +1,6 @@
 # Aletheia — Handover
 
-* **Status:** M1 sampai M5.3 selesai. M5.4 deployment production belum dimulai.
+* **Status:** M1 sampai M5.3 selesai. M5.4 sedang berjalan: prasyarat runtime (role `aletheia_app`, tenant binding, worker) selesai; deployment provider eksternal menunggu kredensial.
 * **Tanggal handover:** 26 November 2026
 * **Data:** seluruhnya sintetis. Tidak ada uang nyata atau PII nyata.
 * **Server demo:** dihentikan. Nyalakan ulang dengan `bash scripts/dev-up.sh`.
@@ -23,11 +23,18 @@ Aletheia adalah platform governance pencairan klaim dan payroll dengan:
 
 **Yang belum selesai:**
 
-* M5.4 deployment production, rollback, Neon, Upstash, Cloudinary, Koyeb/Render.
+* M5.4 deployment production, rollback, Neon, Upstash, Cloudinary, Koyeb/Render. Prasyarat runtime sudah selesai; deployment eksternal menunggu kredensial provider.
 * UI payslip dan laporan. API-nya sudah ada dan diverifikasi di M3.4.
-* Service demo masih memakai role pemilik database. RLS sudah diverifikasi dengan role `aletheia_app`; pengikatan tenant per transaksi wajib sebelum production.
 * Edge preview live perlu deploy ulang.
-* Semua perubahan belum di-commit.
+* RUM LCP/INP, exporter span edge, dan label Prometheus kardinalitas tinggi.
+* CI E2E full-stack belum menjadi job CI.
+
+**Sudah selesai pada M5.4 (prasyarat):**
+
+* Pool service runtime memakai role non-owner `aletheia_app` dengan tenant binding per request/transaksi; RLS aktif.
+* Worker Go mengikat tenant dari event ke koneksi `pgxpool`.
+* Login, refresh, webhook, dan file download memakai fungsi `SECURITY DEFINER`/signed token untuk resolve tenant.
+* Security gate 36/36 dan integration test 27/36/34 lulus dengan role non-owner. Bukti: `docs/evidence/m5.4-verification.md`.
 
 ## 2. Quick start
 
@@ -124,9 +131,16 @@ pnpm db:check
 Evidence database terakhir:
 
 * 26 tabel, 26 policy RLS.
-* Audit chain valid; SAU 29.328 baris saat verifikasi M5.2.
-* `pnpm security:db`: 35/35 checks lulus.
+* Audit chain valid; SAU 29.682 baris saat verifikasi M5.4.
+* `pnpm security:db`: 36/36 checks lulus.
 * `pnpm security:audit`: semua tenant valid.
+
+Runtime role:
+
+* Service memakai `DATABASE_URL_APP` dengan role `aletheia_app`; `DATABASE_URL` hanya untuk migrasi, seed, check, dan audit.
+* `bash scripts/dev-up.sh` mem-provision password role dan menyusun `DATABASE_URL_APP` otomatis.
+* `APP_DB_PASSWORD` wajib diisi minimal 12 karakter saat provisioning manual:
+  `DATABASE_URL=... APP_DB_PASSWORD=... node scripts/provision-app-role.mjs`.
 
 ## 6. Verifikasi
 
@@ -160,7 +174,7 @@ Hasil terakhir:
 | Axe | 0 serious/critical pada 9 layar |
 | Integration | 27 governance, 36 claims, 34 payroll |
 | Go race | Lulus |
-| RLS | 35/35 |
+| RLS | 36/36 |
 | Audit chain | Valid |
 | PII scan | 191 file, 0 temuan |
 | Gitleaks, Semgrep, Trivy, pnpm audit, govulncheck | 0 temuan |
@@ -247,13 +261,13 @@ Indeks lengkap ada di `docs/evidence/README.md`. Mulai dari:
 
 | Item | Status | Tindakan |
 | --- | --- | --- |
-| Service memakai role pemilik DB | Terbuka | TASK-18: pool service sebagai `aletheia_app`, set `app.tenant_id` per transaksi |
+| Service memakai role pemilik DB | Selesai (runtime) | Pool service memakai `aletheia_app` + tenant binding; provisioning password role production dilakukan saat TASK-18 |
 | Edge preview tidak resolve | Terbuka | Deploy ulang edge di TASK-18 |
 | QStash belum aktif | Terbuka | Konfigurasi Upstash di TASK-18; load test memakai worker langsung |
 | UI payslip dan laporan belum ada | Terbuka | API sudah diverifikasi M3.4; UI dapat menjadi task lanjutan |
 | RUM LCP/INP belum ada | Terbuka | Tambah web-vitals atau RUM di TASK-18 |
 | Label Prometheus kardinalitas tinggi | Terbuka | Gunakan `resource_constant_labels` atau transform collector |
-| Semua perubahan belum di-commit | Terbuka | Commit sebelum handover ke mesin lain |
+| Perubahan M5.4 runtime | Selesai | Commit terpisah setelah baseline `a302555`; lihat riwayat Git |
 | CI E2E full-stack belum ada | Terbuka | TASK-18 menambahkan job E2E dengan service stack |
 
 ## 11. Troubleshooting
@@ -288,11 +302,12 @@ Jalankan `bash scripts/dev-up.sh`; skrip memilih container 55432 atau Compose 54
 
 M5.4 TASK-18:
 
-1. Deploy web ke Cloudflare Pages production.
-2. Deploy edge ke Cloudflare Workers.
-3. Deploy service dan worker ke Koyeb/Render.
-4. Neon branch, Upstash Redis, QStash, Cloudinary.
-5. Smoke test `/readyz`, rollback, dan observability production.
-6. Uji pool service sebagai role non-owner dengan RLS aktif.
+0. Siapkan kredensial provider: Neon, Upstash Redis/QStash, Cloudinary, Koyeb/Render, dan Cloudflare.
+1. Neon project/branch production; jalankan migrasi 0000–0010 dan provisioning role.
+2. Deploy service dan worker ke Koyeb/Render dengan `DATABASE_URL_APP`.
+3. Deploy edge ke Cloudflare Workers dan web ke Cloudflare Pages.
+4. Konfigurasi Upstash Redis, QStash, dan Cloudinary production.
+5. Smoke test `/readyz`, login enam peran, alur klaim/payroll/MIS, rollback, dan observability production.
+6. Monitoring 24 jam dan freeze deploy.
 
-Jangan mulai M5.4 tanpa persetujuan pemilik proyek.
+Langkah 0–4 memerlukan persetujuan dan kredensial pemilik proyek.

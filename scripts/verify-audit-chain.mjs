@@ -1,4 +1,4 @@
-import { closeDatabase, pool } from "../packages/database/dist/index.js";
+import { adminPool as pool, closeAdminDatabase } from "../packages/database/dist/admin.js";
 
 const failures = [];
 
@@ -57,7 +57,7 @@ async function main() {
       `${result.valid ? "PASS" : "BROKEN"} audit-chain tenant=${tenant.code} checked=${result.checked} broken_at=${result.brokenAt ?? "-"}`,
     );
   }
-  await closeDatabase();
+  await closeAdminDatabase();
   if (failures.length > 0) {
     process.exitCode = 1;
   }
@@ -65,6 +65,6 @@ async function main() {
 
 main().catch(async (error) => {
   console.error("AUDIT_VERIFY_FAILED", error);
-  await closeDatabase();
+  await closeAdminDatabase();
   process.exitCode = 1;
 });

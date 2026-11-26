@@ -6,6 +6,7 @@ import { errorHandler, notFoundHandler } from "./middleware/error-handler.js";
 import { gatewayAuth } from "./middleware/gateway-auth.js";
 import { requestContext } from "./middleware/context.js";
 import { requestLogger } from "./middleware/request-logger.js";
+import { tenantContext } from "./middleware/tenant-context.js";
 import { analyticsRouter } from "./routes/analytics.js";
 import { auditRouter } from "./routes/audit.js";
 import { authRouter } from "./routes/auth.js";
@@ -29,6 +30,7 @@ export function createApp(): express.Express {
   );
   app.use(cookieParser());
   app.use(gatewayAuth);
+  app.use(tenantContext);
 
   app.use(healthRouter);
   app.use("/api/v1/auth", authRouter);

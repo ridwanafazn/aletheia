@@ -1,6 +1,6 @@
 import { randomUUID } from "node:crypto";
 
-import { pool } from "@aletheia/database";
+import { pool, runWithTenant, systemQuery } from "@aletheia/database";
 import {
   LoginRequestSchema,
   MfaRecoveryRequestSchema,
@@ -62,22 +62,22 @@ export const authRouter: RouterType = Router();
 
 authRouter.post("/login", async (request, response) => {
   const input = LoginRequestSchema.parse(request.body);
-  const users = await pool.query<UserRow>(
+  const users = await systemQuery<UserRow>(
     `select id, tenant_id, branch_id, full_name, email, password_hash, role,
             mfa_enabled, mfa_secret_encrypted, is_active
-       from governance.users
-      where email = $1
-        and is_active = true`,
+       from governance.resolve_login_user($1)`,
     [input.email],
   );
 
-  if (users.rows.length !== 1) {
-    throw ApiError.unauthorized("Email atau kata sandi salah");
+  let user: UserRow | undefined;
+  for (const candidate of users.rows) {
+    if (await verifyPassword(candidate.password_hash, input.password)) {
+      user = candidate;
+      break;
+    }
   }
 
-  const user = users.rows[0]!;
-  const passwordValid = await verifyPassword(user.password_hash, input.password);
-  if (!passwordValid) {
+  if (user === undefined) {
     throw ApiError.unauthorized("Email atau kata sandi salah");
   }
 
@@ -117,46 +117,48 @@ authRouter.post("/login", async (request, response) => {
   const familyId = randomUUID();
   const expiresAt = refreshExpiry();
 
-  const client = await pool.connect();
-  try {
-    await client.query("BEGIN");
-    await client.query(
-      `insert into governance.refresh_tokens
+  await runWithTenant(user.tenant_id, async () => {
+    const client = await pool.connect();
+    try {
+      await client.query("BEGIN");
+      await client.query(
+        `insert into governance.refresh_tokens
         (id, tenant_id, user_id, token_hash, family_id, expires_at, user_agent, ip_hash)
        values ($1,$2,$3,$4,$5,$6,$7,$8)`,
-      [
-        refreshTokenId,
-        user.tenant_id,
-        user.id,
-        refreshTokenHash,
-        familyId,
-        expiresAt,
-        request.header("user-agent") ?? null,
-        hashIp(request.ip),
-      ],
-    );
-    await appendAudit(
-      {
-        tenantId: user.tenant_id,
-        actorId: user.id,
-        actorRole: role,
-        domain: "GOVERNANCE",
-        entityType: "USER",
-        entityId: user.id,
-        action: "USER_LOGGED_IN",
-        policyVersionId: null,
-        decisionContext: { role },
-        correlationId: request.correlationId,
-      },
-      client,
-    );
-    await client.query("COMMIT");
-  } catch (error) {
-    await client.query("ROLLBACK");
-    throw error;
-  } finally {
-    client.release();
-  }
+        [
+          refreshTokenId,
+          user.tenant_id,
+          user.id,
+          refreshTokenHash,
+          familyId,
+          expiresAt,
+          request.header("user-agent") ?? null,
+          hashIp(request.ip),
+        ],
+      );
+      await appendAudit(
+        {
+          tenantId: user.tenant_id,
+          actorId: user.id,
+          actorRole: role,
+          domain: "GOVERNANCE",
+          entityType: "USER",
+          entityId: user.id,
+          action: "USER_LOGGED_IN",
+          policyVersionId: null,
+          decisionContext: { role },
+          correlationId: request.correlationId,
+        },
+        client,
+      );
+      await client.query("COMMIT");
+    } catch (error) {
+      await client.query("ROLLBACK");
+      throw error;
+    } finally {
+      client.release();
+    }
+  });
 
   setRefreshCookie(response, refreshToken);
   sendData(response, {
@@ -182,153 +184,164 @@ authRouter.post("/refresh", async (request, response) => {
   }
 
   const currentHash = hashRefreshToken(currentToken);
-  const client = await pool.connect();
-  let committed = false;
+  const resolved = await systemQuery<{ tenant_id: string }>(
+    `select tenant_id from governance.resolve_refresh_token($1)`,
+    [currentHash],
+  );
+  const tenantId = resolved.rows[0]?.tenant_id;
+  if (tenantId === undefined) {
+    throw ApiError.unauthorized("Refresh token tidak valid");
+  }
 
-  try {
-    await client.query("BEGIN");
-    const tokens = await client.query<RefreshTokenRow>(
-      `select id, tenant_id, user_id, family_id, expires_at, revoked_at
+  await runWithTenant(tenantId, async () => {
+    const client = await pool.connect();
+    let committed = false;
+
+    try {
+      await client.query("BEGIN");
+      const tokens = await client.query<RefreshTokenRow>(
+        `select id, tenant_id, user_id, family_id, expires_at, revoked_at
          from governance.refresh_tokens
         where token_hash = $1
         for update`,
-      [currentHash],
-    );
+        [currentHash],
+      );
 
-    if (tokens.rows.length !== 1) {
-      await client.query("ROLLBACK");
-      throw ApiError.unauthorized("Refresh token tidak valid");
-    }
+      if (tokens.rows.length !== 1) {
+        await client.query("ROLLBACK");
+        throw ApiError.unauthorized("Refresh token tidak valid");
+      }
 
-    const current = tokens.rows[0]!;
+      const current = tokens.rows[0]!;
 
-    if (current.revoked_at !== null) {
-      await client.query(
-        `update governance.refresh_tokens
+      if (current.revoked_at !== null) {
+        await client.query(
+          `update governance.refresh_tokens
             set revoked_at = now()
           where family_id = $1
             and revoked_at is null`,
-        [current.family_id],
-      );
-      const actor = await client.query<{ role: string }>(
-        `select role from governance.users where id = $1 and tenant_id = $2`,
+          [current.family_id],
+        );
+        const actor = await client.query<{ role: string }>(
+          `select role from governance.users where id = $1 and tenant_id = $2`,
+          [current.user_id, current.tenant_id],
+        );
+        await appendAudit(
+          {
+            tenantId: current.tenant_id,
+            actorId: current.user_id,
+            actorRole: actor.rows[0]?.role ?? "SYSTEM",
+            domain: "GOVERNANCE",
+            entityType: "USER",
+            entityId: current.user_id,
+            action: "SECURITY_EVENT",
+            policyVersionId: null,
+            decisionContext: {
+              event: "REFRESH_TOKEN_REUSE_DETECTED",
+              family_id: current.family_id,
+            },
+            correlationId: request.correlationId,
+          },
+          client,
+        );
+        await client.query("COMMIT");
+        committed = true;
+        throw ApiError.unauthorized("Refresh token reuse terdeteksi");
+      }
+
+      if (current.expires_at.getTime() <= Date.now()) {
+        await client.query("ROLLBACK");
+        throw ApiError.unauthorized("Refresh token kedaluwarsa");
+      }
+
+      const users = await client.query<UserRow>(
+        `select id, tenant_id, branch_id, full_name, email, password_hash, role,
+              mfa_enabled, mfa_secret_encrypted, is_active
+         from governance.users
+        where id = $1
+          and tenant_id = $2
+          and is_active = true`,
         [current.user_id, current.tenant_id],
+      );
+
+      if (users.rows.length !== 1) {
+        await client.query("ROLLBACK");
+        throw ApiError.unauthorized("Pengguna tidak aktif");
+      }
+
+      const user = users.rows[0]!;
+      const roleResult = RoleSchema.safeParse(user.role);
+      if (!roleResult.success) {
+        await client.query("ROLLBACK");
+        throw ApiError.unauthorized("Peran pengguna tidak valid");
+      }
+      const role: Role = roleResult.data;
+
+      const nextToken = createRefreshToken();
+      const nextHash = hashRefreshToken(nextToken);
+      const nextId = randomUUID();
+
+      await client.query(
+        `update governance.refresh_tokens
+          set revoked_at = now(),
+              replaced_by = $2
+        where id = $1`,
+        [current.id, nextId],
+      );
+      await client.query(
+        `insert into governance.refresh_tokens
+        (id, tenant_id, user_id, token_hash, family_id, expires_at, user_agent, ip_hash)
+       values ($1,$2,$3,$4,$5,$6,$7,$8)`,
+        [
+          nextId,
+          current.tenant_id,
+          current.user_id,
+          nextHash,
+          current.family_id,
+          refreshExpiry(),
+          request.header("user-agent") ?? null,
+          hashIp(request.ip),
+        ],
       );
       await appendAudit(
         {
           tenantId: current.tenant_id,
           actorId: current.user_id,
-          actorRole: actor.rows[0]?.role ?? "SYSTEM",
+          actorRole: role,
           domain: "GOVERNANCE",
           entityType: "USER",
           entityId: current.user_id,
-          action: "SECURITY_EVENT",
+          action: "REFRESH_TOKEN_ROTATED",
           policyVersionId: null,
-          decisionContext: {
-            event: "REFRESH_TOKEN_REUSE_DETECTED",
-            family_id: current.family_id,
-          },
+          decisionContext: { family_id: current.family_id },
           correlationId: request.correlationId,
         },
         client,
       );
       await client.query("COMMIT");
       committed = true;
-      throw ApiError.unauthorized("Refresh token reuse terdeteksi");
+
+      const access = await signAccessToken(current.user_id, {
+        tid: current.tenant_id,
+        role,
+        branch_id: user.branch_id,
+      });
+
+      setRefreshCookie(response, nextToken);
+      sendData(response, {
+        access_token: access.token,
+        token_type: "Bearer",
+        expires_in: access.expiresIn,
+      });
+    } catch (error) {
+      if (!committed) {
+        await client.query("ROLLBACK").catch(() => undefined);
+      }
+      throw error;
+    } finally {
+      client.release();
     }
-
-    if (current.expires_at.getTime() <= Date.now()) {
-      await client.query("ROLLBACK");
-      throw ApiError.unauthorized("Refresh token kedaluwarsa");
-    }
-
-    const users = await client.query<UserRow>(
-      `select id, tenant_id, branch_id, full_name, email, password_hash, role,
-              mfa_enabled, mfa_secret_encrypted, is_active
-         from governance.users
-        where id = $1
-          and tenant_id = $2
-          and is_active = true`,
-      [current.user_id, current.tenant_id],
-    );
-
-    if (users.rows.length !== 1) {
-      await client.query("ROLLBACK");
-      throw ApiError.unauthorized("Pengguna tidak aktif");
-    }
-
-    const user = users.rows[0]!;
-    const roleResult = RoleSchema.safeParse(user.role);
-    if (!roleResult.success) {
-      await client.query("ROLLBACK");
-      throw ApiError.unauthorized("Peran pengguna tidak valid");
-    }
-    const role: Role = roleResult.data;
-
-    const nextToken = createRefreshToken();
-    const nextHash = hashRefreshToken(nextToken);
-    const nextId = randomUUID();
-
-    await client.query(
-      `update governance.refresh_tokens
-          set revoked_at = now(),
-              replaced_by = $2
-        where id = $1`,
-      [current.id, nextId],
-    );
-    await client.query(
-      `insert into governance.refresh_tokens
-        (id, tenant_id, user_id, token_hash, family_id, expires_at, user_agent, ip_hash)
-       values ($1,$2,$3,$4,$5,$6,$7,$8)`,
-      [
-        nextId,
-        current.tenant_id,
-        current.user_id,
-        nextHash,
-        current.family_id,
-        refreshExpiry(),
-        request.header("user-agent") ?? null,
-        hashIp(request.ip),
-      ],
-    );
-    await appendAudit(
-      {
-        tenantId: current.tenant_id,
-        actorId: current.user_id,
-        actorRole: role,
-        domain: "GOVERNANCE",
-        entityType: "USER",
-        entityId: current.user_id,
-        action: "REFRESH_TOKEN_ROTATED",
-        policyVersionId: null,
-        decisionContext: { family_id: current.family_id },
-        correlationId: request.correlationId,
-      },
-      client,
-    );
-    await client.query("COMMIT");
-    committed = true;
-
-    const access = await signAccessToken(current.user_id, {
-      tid: current.tenant_id,
-      role,
-      branch_id: user.branch_id,
-    });
-
-    setRefreshCookie(response, nextToken);
-    sendData(response, {
-      access_token: access.token,
-      token_type: "Bearer",
-      expires_in: access.expiresIn,
-    });
-  } catch (error) {
-    if (!committed) {
-      await client.query("ROLLBACK").catch(() => undefined);
-    }
-    throw error;
-  } finally {
-    client.release();
-  }
+  });
 });
 
 authRouter.post("/logout", requireAuthenticated, async (request, response) => {

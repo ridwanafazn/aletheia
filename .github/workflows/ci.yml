@@ -130,6 +130,8 @@ jobs:
           --health-retries 10
     env:
       DATABASE_URL: postgresql://aletheia:aletheia@localhost:5432/aletheia
+      DATABASE_URL_APP: postgresql://aletheia_app:ci-app-password@localhost:5432/aletheia
+      APP_DB_PASSWORD: ci-app-password
       PII_PEPPER: ci-demo-pepper
     steps:
       - name: Checkout
@@ -161,6 +163,9 @@ jobs:
           pnpm --filter @aletheia/database build
           pnpm --filter @aletheia/payments build
           pnpm --filter @aletheia/observability build
+
+      - name: Provision application role
+        run: node scripts/provision-app-role.mjs
 
       - name: Check schema, RLS, audit
         run: pnpm db:check

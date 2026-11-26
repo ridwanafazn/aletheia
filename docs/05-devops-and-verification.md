@@ -102,7 +102,7 @@ Workflow terpisah berjalan pada setiap PR, push ke `main`, dan `workflow_dispatc
 | `secrets-and-sast` | Gitleaks 8.30.1 dan Semgrep OWASP Top Ten | 0 secret, 0 temuan Semgrep severity ERROR |
 | `dependencies` | `pnpm audit --prod --audit-level high`, Trivy lockfile, `govulncheck` | 0 HIGH/CRITICAL, 0 vulnerability Go |
 | `image` | Build worker image dan Trivy image scan | 0 HIGH/CRITICAL |
-| `database` | Migrasi, seed sintetis, `security:db`, `security:audit`, `security:pii` | 35/35 RLS checks, audit chain valid, 0 PII literal |
+| `database` | Migrasi, seed sintetis, `security:db`, `security:audit`, `security:pii` | 36/36 RLS checks, audit chain valid, 0 PII literal |
 
 Perintah verifikasi lokal:
 
@@ -174,6 +174,8 @@ Skenario k6 wajib: `smoke`, `claims-read`, `claim-submit`, `approval-race`, `pay
 | Cloudinary | Cloudinary | folder per environment/tenant |
 
 **Urutan deploy:** migration → governance → claims/payroll → worker → edge → web. Setiap langkah punya smoke test; jika gagal, rollback ke image/tag sebelumnya.
+
+**Runtime DB role:** migrasi, seed, check, dan audit memakai `DATABASE_URL` (owner). Service dan worker memakai `DATABASE_URL_APP` dengan role `aletheia_app`; password diprovision melalui `APP_DB_PASSWORD` dan `scripts/provision-app-role.mjs`. Jangan pernah menjalankan service production dengan `DATABASE_URL` owner.
 
 **Backup/restore:** Neon PITR + `pg_dump` harian untuk tabel kritis; uji restore minimal sekali per fase. Audit log diarsipkan dengan checksum. Redis/QStash bukan source of truth; kehilangan cache tidak boleh kehilangan data finansial.
 

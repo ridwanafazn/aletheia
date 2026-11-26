@@ -70,7 +70,7 @@
 - Cloudinary → folder `preview/`.
 
 **Demo:** login 6 role → buat klaim → risk/conflict → approve/SoD → audit.
-**Status 26 November 2026:** M5.3 selesai. Cloudflare Pages preview aktif di `aletheia-web-preview.pages.dev` dan menyajikan CSP serta security header. Edge preview perlu deploy ulang di TASK-18. Server demo lokal sudah dihentikan; nyalakan dengan `bash scripts/dev-up.sh`. Neon, Koyeb, Render, Redis, dan QStash preview belum dikonfigurasi.
+**Status 26 November 2026:** M5.3 selesai. M5.4 prasyarat runtime selesai: service memakai `aletheia_app` dengan tenant binding, worker Go terverifikasi, security gate 36/36, dan integration test 27/36/34 lulus dengan RLS aktif. Cloudflare Pages preview aktif di `aletheia-web-preview.pages.dev` dan menyajikan CSP serta security header. Edge preview perlu deploy ulang. Server demo lokal sudah dihentikan; nyalakan dengan `bash scripts/dev-up.sh`. Neon, Koyeb, Render, Redis, Cloudinary, dan QStash production belum dikonfigurasi.
 **Catatan:** payroll BE (TASK-06/07) boleh berjalan paralel setelah kontrak stabil, tetapi tidak menghambat demo klaim.
 
 ---
@@ -109,7 +109,7 @@
 | M5.1 | TASK-15 | **Selesai 26 November 2026.** Audit RLS 26 tabel, cross-tenant read/write, security headers dan CSP, PII scan, Gitleaks, Semgrep, Trivy, pnpm audit, govulncheck, audit chain job. | I-06/I-11/I-15 lulus; 35/35 RLS checks; 0 secret, 0 SAST, 0 dependency/image CVE; security checklist lulus. Bukti: `docs/evidence/m5.1-verification.md` |
 | M5.2 | TASK-16 | **Selesai 26 November 2026.** OTel trace/metrics/logs, 3 dashboard Grafana, 8 alert Prometheus, 7 skenario k6, query optimization, dan evidence. | SLO terukur; seluruh threshold k6 lulus; daftar klaim 5,85 ms menjadi 1,18 ms; 0 error. Bukti: `docs/evidence/m5.2-verification.md` |
 | M5.3 | TASK-17 | **Selesai 26 November 2026.** 21 test Playwright, 10 alur peran, axe, keyboard, race, coverage domain, flaky policy. | 21/21 lulus dua run; 0 flaky; axe 0 serious; coverage 96,26% lines; Go race dan integration lulus. Bukti: `docs/evidence/m5.3-verification.md` |
-| M5.4 | TASK-18 | Pipeline deploy production, Cloudflare Pages/Workers, Koyeb/Render, Neon/Upstash/Cloudinary, smoke, rollback | `/readyz` 200; rollback diuji; tidak ada secret |
+| M5.4 | TASK-18 | **Sebagian, 26 November 2026.** Prasyarat runtime selesai: role non-owner `aletheia_app`, tenant binding per request/transaksi, worker Go, webhook, signed file token, gate 36/36, integration 27/36/34. Pipeline deploy production, Cloudflare Pages/Workers, Koyeb/Render, Neon/Upstash/Cloudinary, smoke, dan rollback menunggu kredensial. | `/readyz` 200; rollback diuji; tidak ada secret. Bukti prasyarat: `docs/evidence/m5.4-verification.md` |
 
 **Deploy:**
 - **Staging full** (Neon staging, Upstash staging, Cloudinary staging).

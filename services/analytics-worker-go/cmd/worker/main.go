@@ -13,10 +13,12 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 
 	"github.com/ridwanafazn/aletheia/services/analytics-worker-go/internal/httpapi"
 	"github.com/ridwanafazn/aletheia/services/analytics-worker-go/internal/telemetry"
+	"github.com/ridwanafazn/aletheia/services/analytics-worker-go/internal/tenantctx"
 	"github.com/ridwanafazn/aletheia/services/analytics-worker-go/internal/worker"
 )
 
@@ -62,6 +64,24 @@ func main() {
 	}
 	if poolConfig.MaxConns < 4 {
 		poolConfig.MaxConns = 4
+	}
+	poolConfig.BeforeAcquire = func(ctx context.Context, conn *pgx.Conn) bool {
+		tenantID := tenantctx.TenantID(ctx)
+		if tenantID == "" {
+			return true
+		}
+		if _, err := conn.Exec(ctx, "select set_config('app.tenant_id', $1, false)", tenantID); err != nil {
+			return false
+		}
+		return true
+	}
+	poolConfig.AfterRelease = func(conn *pgx.Conn) bool {
+		resetCtx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+		defer cancel()
+		if _, err := conn.Exec(resetCtx, "reset app.tenant_id"); err != nil {
+			return false
+		}
+		return true
 	}
 	pool, err := pgxpool.NewWithConfig(context.Background(), poolConfig)
 	if err != nil {

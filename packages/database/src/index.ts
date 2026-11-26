@@ -1,2 +1,9 @@
 export * from "./schema/index.js";
-export { closeDatabase, db, pool } from "./client.js";
+export {
+  closeDatabase,
+  getTenantId,
+  pool,
+  runWithTenant,
+  systemQuery,
+  TenantPool,
+} from "./client.js";

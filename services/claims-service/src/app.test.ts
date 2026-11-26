@@ -1,6 +1,7 @@
 import { createHash, createHmac, randomUUID } from "node:crypto";
 
-import { closeDatabase, pool } from "@aletheia/database";
+import { closeDatabase } from "@aletheia/database";
+import { adminPool as pool, closeAdminDatabase } from "@aletheia/database/admin";
 import request from "supertest";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
@@ -322,6 +323,7 @@ describe.skipIf(!integrationEnabled)("claims service integration", () => {
 
   afterAll(async () => {
     await closeDatabase();
+    await closeAdminDatabase();
   });
 
   it("menolak request tanpa atau dengan signature gateway salah", async () => {

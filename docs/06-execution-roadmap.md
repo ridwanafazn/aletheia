@@ -2,7 +2,7 @@
 
 * **Status Dokumen:** Peta Jalan Eksekusi (*Single Source of Truth* untuk Agen OpenCode)
 * **Strategi:** *Contract-First, Vertical Slice, Evidence-Driven, Zero Context Drift*
-* **Kondisi Saat Ini:** Fase 0, M1.1–M1.3, M2.1–M2.3, M3.1–M3.4, M4.1, M4.2, M5.1, M5.2, dan M5.3 selesai. Seluruh layanan dan antarmuka selesai serta terverifikasi. RLS diaudit, security header dan CSP aktif, OTel dan dashboard terverifikasi, 7 skenario load test lulus, 21 E2E lulus dua run, coverage domain 96,26%, PII scan bersih, dependency/image scan bersih, dan rantai audit valid. Server demo sudah dihentikan; nyalakan dengan `bash scripts/dev-up.sh` dan baca `HANDOVER.md`. Preview Cloudflare Pages aktif dengan header keamanan. Edge preview perlu deploy ulang di TASK-18. Jangan mulai TASK-18 tanpa persetujuan pengguna.
+* **Kondisi Saat Ini:** Fase 0, M1.1–M1.3, M2.1–M2.3, M3.1–M3.4, M4.1, M4.2, M5.1, M5.2, dan M5.3 selesai. M5.4 sedang berjalan: prasyarat runtime selesai (pool `aletheia_app`, tenant binding per request/transaksi, worker Go, webhook, dan signed file token), security gate 36/36, integration test 27/36/34 lulus dengan RLS aktif pada database baru. Deployment provider eksternal (Cloudflare, Neon, Upstash, Cloudinary, Koyeb/Render) menunggu kredensial. Server demo sudah dihentikan; nyalakan dengan `bash scripts/dev-up.sh` dan baca `HANDOVER.md`. Bukti prasyarat: `docs/evidence/m5.4-verification.md`.
 
 ## 1. Protokol Kerja Agen
 
@@ -59,7 +59,7 @@
 * **Gerbang:** migrasi bersih di PostgreSQL 16 lokal; I-04, I-06, I-15 lulus; `EXPLAIN` untuk query kunci. Neon branch masih pending.
 
 #### `TASK-03A` — CI Quality Gate & Security Baseline
-* **Status:** sebagian. Job typecheck, lint, test, format, Go, compose, Gitleaks, Semgrep, Trivy, pnpm audit, govulncheck, RLS audit, PII scan, dan audit chain aktif. Coverage gate aktif dengan threshold 90% dan lulus di M5.3. Workflow belum dijalankan pada PR nyata.
+* **Status:** sebagian. Job typecheck, lint, test, format, Go, compose, Gitleaks, Semgrep, Trivy, pnpm audit, govulncheck, RLS audit, PII scan, dan audit chain aktif. Coverage gate aktif dengan threshold 90% dan lulus di M5.3. Workflow sudah dijalankan pada push `main`; PR nyata dan E2E full-stack belum menjadi job CI.
 * **Konteks Wajib:** `docs/05`, `docs/10`.
 * **Cakupan:** typecheck, lint, unit, integration, gitleaks, trivy, semgrep, coverage; cache pnpm; artifact.
 * **Gerbang:** pipeline hijau di PR dummy; tidak ada secret/CRITICAL.
@@ -156,7 +156,7 @@
 * **Konteks Wajib:** `docs/08`, `docs/10`, ADR-003/004.
 * **Cakupan:** audit RLS semua tabel (policy sudah dibuat di TASK-03), cross-tenant read/write tests, rate limit, CSP/CORS, PII scan, dependency dan image scan, audit verification job.
 * **Gerbang:** I-06, I-11, I-15 lulus; RLS audit 35/35; Gitleaks, Semgrep, Trivy, pnpm audit, dan govulncheck bersih; security checklist lulus.
-* **Catatan:** service demo masih memakai role pemilik database. RLS diverifikasi dengan role `aletheia_app`. Pengikatan sesi tenant pada pool service wajib diselesaikan sebelum production di TASK-18.
+* **Catatan:** temuan role pemilik database ditutup pada M5.4. Service runtime memakai `aletheia_app` dengan tenant binding per request/transaksi; provisioning password role production dilakukan saat TASK-18. Bukti: `docs/evidence/m5.4-verification.md`.
 
 #### `TASK-16` — Observability, SLO & Load Test
 * **Status:** selesai 26 November 2026. Bukti: `docs/evidence/m5.2-verification.md`.
@@ -172,9 +172,11 @@
 * **Gerbang:** 21/21 lulus dua run berturut-turut; 0 flaky; axe 0 serious/critical; coverage domain 96,26% lines; integration 27/36/34 lulus; Go race lulus.
 
 #### `TASK-18` — CI/CD Production & Deployment
+* **Status:** sebagian. Prasyarat runtime selesai 26 November 2026: service memakai role non-owner `aletheia_app`, tenant binding per request/transaksi, worker Go dan webhook terverifikasi, security gate 36/36. Deployment provider eksternal belum dijalankan karena kredensial belum tersedia.
 * **Konteks Wajib:** `docs/05`, `docs/12`.
 * **Cakupan:** pipeline deploy, Cloudflare Pages/Workers, Koyeb/Render, Neon/Upstash/Cloudinary, smoke test, rollback.
 * **Gerbang:** `/readyz` 200; demo live; rollback diuji; tidak ada secret.
+* **Catatan:** bukti prasyarat ada di `docs/evidence/m5.4-verification.md`. CI database job sekarang mem-provision role dan menjalankan integration test dengan `DATABASE_URL_APP`.
 
 ---
 

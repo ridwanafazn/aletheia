@@ -60,5 +60,5 @@ docker compose --profile observability up -d otel-collector jaeger prometheus gr
 ## Catatan
 
 * Semua data adalah sintetis. Tidak ada uang nyata atau PII nyata.
-* Service demo memakai role pemilik database. RLS diverifikasi dengan role `aletheia_app`; pengikatan tenant per transaksi adalah prasyarat TASK-18.
+* Service runtime memakai role non-owner `aletheia_app` dengan tenant binding per request; migrasi/seed memakai role owner. Bukti: `docs/evidence/m5.4-verification.md`.
 * Edge preview live perlu deploy ulang di TASK-18. Web preview statis aktif di `https://aletheia-web-preview.pages.dev`.

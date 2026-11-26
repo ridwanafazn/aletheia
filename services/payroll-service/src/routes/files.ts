@@ -1,4 +1,4 @@
-import { pool } from "@aletheia/database";
+import { pool, runWithTenant } from "@aletheia/database";
 import { Router, type Router as RouterType } from "express";
 
 import { verifyFileToken } from "../lib/files.js";
@@ -30,12 +30,14 @@ fileRouter.get("/:token", async (request, response) => {
     });
     return;
   }
-  const result = await pool.query<FileRow>(
-    `select file_name, mime_type, file_size, content, checksum_sha256
+  const result = await runWithTenant(payload.tenant_id, () =>
+    pool.query<FileRow>(
+      `select file_name, mime_type, file_size, content, checksum_sha256
        from payroll.generated_files
       where tenant_id = $1 and kind = $2 and entity_id = $3
       limit 1`,
-    [payload.tenant_id, payload.kind, payload.entity_id],
+      [payload.tenant_id, payload.kind, payload.entity_id],
+    ),
   );
   const file = result.rows[0];
   if (file === undefined) {

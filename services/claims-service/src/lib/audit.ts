@@ -2,9 +2,14 @@ import { randomUUID } from "node:crypto";
 
 import { pool } from "@aletheia/database";
 import { withSpan } from "@aletheia/observability";
-import type { Pool, PoolClient } from "pg";
+import type { QueryResult, QueryResultRow } from "pg";
 
-export type Queryable = Pick<Pool | PoolClient, "query">;
+export interface Queryable {
+  query<R extends QueryResultRow = QueryResultRow>(
+    text: string,
+    values?: unknown[],
+  ): Promise<QueryResult<R>>;
+}
 
 export interface AuditInput {
   tenantId: string;

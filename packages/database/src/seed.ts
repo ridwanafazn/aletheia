@@ -3,7 +3,7 @@ import { createHash } from "node:crypto";
 import { hash as argonHash } from "@node-rs/argon2";
 import type { PoolClient } from "pg";
 
-import { closeDatabase, pool } from "./client.js";
+import { adminPool as pool, closeAdminDatabase } from "./admin.js";
 
 function uid(value: number): string {
   return `019361a2-7c00-7000-8000-${String(value).padStart(12, "0")}`;
@@ -1170,7 +1170,7 @@ async function main(): Promise<void> {
     throw error;
   } finally {
     client.release();
-    await closeDatabase();
+    await closeAdminDatabase();
   }
 }
 

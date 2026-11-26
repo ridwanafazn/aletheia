@@ -1,4 +1,5 @@
-import { closeDatabase, pool } from "@aletheia/database";
+import { closeDatabase } from "@aletheia/database";
+import { adminPool as pool, closeAdminDatabase } from "@aletheia/database/admin";
 import { hashPassword } from "./lib/password.js";
 import { generateTotpForTest } from "./lib/mfa.js";
 import request from "supertest";
@@ -124,6 +125,7 @@ describe.skipIf(!integrationEnabled)("governance service integration", () => {
 
   afterAll(async () => {
     await closeDatabase();
+    await closeAdminDatabase();
   });
 
   it("menolak request tanpa signature gateway", async () => {

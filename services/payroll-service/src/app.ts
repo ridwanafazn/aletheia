@@ -5,6 +5,7 @@ import { errorHandler, notFoundHandler } from "./middleware/error-handler.js";
 import { gatewayAuth } from "./middleware/gateway-auth.js";
 import { requestContext } from "./middleware/context.js";
 import { requestLogger } from "./middleware/request-logger.js";
+import { tenantContext } from "./middleware/tenant-context.js";
 import { batchRouter, paymentRouter, payrollReferenceRouter } from "./routes/batches.js";
 import {
   batchRetryRouter,
@@ -34,6 +35,7 @@ export function createApp(): express.Express {
   );
   app.use("/api/v1/payroll-files", fileRouter);
   app.use(gatewayAuth);
+  app.use(tenantContext);
 
   app.use(healthRouter);
   app.use("/api/v1/employees", employeeRouter);

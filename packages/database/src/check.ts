@@ -1,4 +1,4 @@
-import { closeDatabase, pool } from "./client.js";
+import { adminPool as pool, closeAdminDatabase } from "./admin.js";
 
 const expectedTables = [
   "governance.tenants",
@@ -161,5 +161,5 @@ main()
     process.exitCode = 1;
   })
   .finally(async () => {
-    await closeDatabase();
+    await closeAdminDatabase();
   });

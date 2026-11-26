@@ -21,6 +21,7 @@ Folder ini menyimpan bukti yang dapat diperiksa reviewer: verifikasi milestone, 
 | `m5.1-verification.md` | RLS, security hardening, scan | Selesai |
 | `m5.2-verification.md` | OTel, SLO, load test, query optimization | Selesai |
 | `m5.3-verification.md` | E2E, axe, coverage, final QA | Selesai |
+| `m5.4-verification.md` | Runtime RLS, role `aletheia_app`, tenant binding, worker Go | Prasyarat selesai; deployment eksternal pending |
 
 ## Load test
 
@@ -75,4 +76,4 @@ Setiap bukti baru wajib mencantumkan:
 * Analisis singkat bila ada kegagalan.
 * Tanpa PII, token, atau kredensial.
 
-Commit SHA belum dicantumkan karena seluruh perubahan pada handover ini belum di-commit. Setelah commit pertama, tambahkan SHA pada evidence baru.
+Baseline M1–M5.3 ada pada commit `a302555` dan tag `v0.5.3`. Perubahan M5.4 runtime dicatat pada riwayat Git setelah baseline tersebut.

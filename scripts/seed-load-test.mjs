@@ -1,6 +1,6 @@
 import { createHash } from "node:crypto";
 
-import { closeDatabase, pool } from "../packages/database/dist/index.js";
+import { adminPool as pool, closeAdminDatabase } from "../packages/database/dist/admin.js";
 
 const SAU_TENANT = "019361a2-7c00-7000-8000-000000000001";
 const SAU_BRANCH_BDG = "019361a2-7c00-7000-8000-000000000011";
@@ -159,11 +159,11 @@ async function main() {
   console.log(
     `PASS load-test seed tenant=SAU branch=BDG headcount=${counts.rows[0].total} load=${counts.rows[0].load_test}`,
   );
-  await closeDatabase();
+  await closeAdminDatabase();
 }
 
 main().catch(async (error) => {
   console.error("LOAD_SEED_FAILED", error);
-  await closeDatabase();
+  await closeAdminDatabase();
   process.exitCode = 1;
 });

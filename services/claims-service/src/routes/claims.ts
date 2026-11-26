@@ -1,6 +1,6 @@
 import { randomInt, randomUUID } from "node:crypto";
 
-import { pool } from "@aletheia/database";
+import { pool, runWithTenant, systemQuery } from "@aletheia/database";
 import { incrementCounter, withSpan } from "@aletheia/observability";
 import {
   ClaimListQuerySchema,
@@ -429,124 +429,129 @@ claimsRouter.post("/payments/webhook/:provider", async (request, response) => {
     throw ApiError.unauthorized("Signature webhook tidak valid");
   }
 
-  const client = await pool.connect();
-  try {
-    await client.query("BEGIN");
-    const disbursements = await client.query<DisbursementRow>(
-      `select id, claim_id, provider, provider_reference, amount, status, idempotency_key,
+  const resolved = await systemQuery<{ tenant_id: string }>(
+    `select claims.resolve_disbursement_tenant($1, $2) as tenant_id`,
+    [provider, event.provider_reference],
+  );
+  const tenantId = resolved.rows[0]?.tenant_id;
+  if (tenantId === undefined) {
+    throw ApiError.notFound("Payment untuk webhook tidak ditemukan");
+  }
+
+  await runWithTenant(tenantId, async () => {
+    const client = await pool.connect();
+    try {
+      await client.query("BEGIN");
+      const disbursements = await client.query<DisbursementRow>(
+        `select id, claim_id, provider, provider_reference, amount, status, idempotency_key,
               requested_by, approved_by, requested_at, paid_at, failure_reason
          from claims.disbursements
         where provider = $1
           and provider_reference = $2
         for update`,
-      [provider, event.provider_reference],
-    );
-    const disbursement = disbursements.rows[0];
-    if (disbursement === undefined) {
-      await client.query("ROLLBACK");
-      throw ApiError.notFound("Payment untuk webhook tidak ditemukan");
-    }
-    if (compareMoney(event.amount, disbursement.amount) !== 0) {
-      await client.query("ROLLBACK");
-      throw new ApiError(422, "ERR_PAYMENT_STATE_CONFLICT", "Nominal webhook tidak cocok");
-    }
+        [provider, event.provider_reference],
+      );
+      const disbursement = disbursements.rows[0];
+      if (disbursement === undefined) {
+        await client.query("ROLLBACK");
+        throw ApiError.notFound("Payment untuk webhook tidak ditemukan");
+      }
+      if (compareMoney(event.amount, disbursement.amount) !== 0) {
+        await client.query("ROLLBACK");
+        throw new ApiError(422, "ERR_PAYMENT_STATE_CONFLICT", "Nominal webhook tidak cocok");
+      }
 
-    const tenantRow = await client.query<{ tenant_id: string }>(
-      `select tenant_id from claims.disbursements where id = $1`,
-      [disbursement.id],
-    );
-    const tenantId = tenantRow.rows[0]!.tenant_id;
-
-    if (
-      event.status === "PAID" &&
-      (disbursement.status === "PENDING" ||
-        disbursement.status === "PROCESSING" ||
-        disbursement.status === "FAILED")
-    ) {
-      await client.query(
-        `update claims.disbursements
+      if (
+        event.status === "PAID" &&
+        (disbursement.status === "PENDING" ||
+          disbursement.status === "PROCESSING" ||
+          disbursement.status === "FAILED")
+      ) {
+        await client.query(
+          `update claims.disbursements
             set status = 'PAID',
                 paid_at = $2,
                 failure_reason = null
           where id = $1`,
-        [disbursement.id, event.occurred_at],
-      );
-      await client.query(
-        `update claims.submissions
+          [disbursement.id, event.occurred_at],
+        );
+        await client.query(
+          `update claims.submissions
             set status = 'DISBURSED',
                 finalized_at = coalesce(finalized_at, now()),
                 updated_at = now()
           where tenant_id = $1
             and id = $2
             and status = 'APPROVED'`,
-        [tenantId, disbursement.claim_id],
-      );
-      await appendAudit(
-        {
-          tenantId,
-          actorId: disbursement.requested_by,
-          actorRole: "FINANCE_MANAGER",
-          domain: "CLAIMS",
-          entityType: "CLAIM",
-          entityId: disbursement.claim_id,
-          action: "CLAIM_DISBURSED",
-          policyVersionId: null,
-          decisionContext: {
-            payment_id: disbursement.id,
-            provider: disbursement.provider,
-            provider_reference: disbursement.provider_reference,
-            amount: disbursement.amount,
-            source: "PROVIDER_WEBHOOK",
+          [tenantId, disbursement.claim_id],
+        );
+        await appendAudit(
+          {
+            tenantId,
+            actorId: disbursement.requested_by,
+            actorRole: "FINANCE_MANAGER",
+            domain: "CLAIMS",
+            entityType: "CLAIM",
+            entityId: disbursement.claim_id,
+            action: "CLAIM_DISBURSED",
+            policyVersionId: null,
+            decisionContext: {
+              payment_id: disbursement.id,
+              provider: disbursement.provider,
+              provider_reference: disbursement.provider_reference,
+              amount: disbursement.amount,
+              source: "PROVIDER_WEBHOOK",
+            },
+            correlationId: request.correlationId,
           },
-          correlationId: request.correlationId,
-        },
-        client,
-      );
-    } else if (
-      event.status === "FAILED" &&
-      (disbursement.status === "PENDING" || disbursement.status === "PROCESSING")
-    ) {
-      await client.query(
-        `update claims.disbursements
+          client,
+        );
+      } else if (
+        event.status === "FAILED" &&
+        (disbursement.status === "PENDING" || disbursement.status === "PROCESSING")
+      ) {
+        await client.query(
+          `update claims.disbursements
             set status = 'FAILED',
                 failure_reason = 'Provider melaporkan kegagalan'
           where id = $1`,
-        [disbursement.id],
-      );
-      await appendAudit(
-        {
-          tenantId,
-          actorId: disbursement.requested_by,
-          actorRole: "FINANCE_MANAGER",
-          domain: "CLAIMS",
-          entityType: "CLAIM",
-          entityId: disbursement.claim_id,
-          action: "CLAIM_DISBURSEMENT_FAILED",
-          policyVersionId: null,
-          decisionContext: {
-            payment_id: disbursement.id,
-            provider: disbursement.provider,
-            source: "PROVIDER_WEBHOOK",
+          [disbursement.id],
+        );
+        await appendAudit(
+          {
+            tenantId,
+            actorId: disbursement.requested_by,
+            actorRole: "FINANCE_MANAGER",
+            domain: "CLAIMS",
+            entityType: "CLAIM",
+            entityId: disbursement.claim_id,
+            action: "CLAIM_DISBURSEMENT_FAILED",
+            policyVersionId: null,
+            decisionContext: {
+              payment_id: disbursement.id,
+              provider: disbursement.provider,
+              source: "PROVIDER_WEBHOOK",
+            },
+            correlationId: request.correlationId,
           },
-          correlationId: request.correlationId,
-        },
-        client,
-      );
-    }
+          client,
+        );
+      }
 
-    await client.query("COMMIT");
-    if (event.status === "PAID") {
-      incrementCounter("payment_success_total", { provider });
-    } else if (event.status === "FAILED") {
-      incrementCounter("payment_failure_total", { provider });
+      await client.query("COMMIT");
+      if (event.status === "PAID") {
+        incrementCounter("payment_success_total", { provider });
+      } else if (event.status === "FAILED") {
+        incrementCounter("payment_failure_total", { provider });
+      }
+      sendData(response, { received: true });
+    } catch (error) {
+      await client.query("ROLLBACK").catch(() => undefined);
+      throw error;
+    } finally {
+      client.release();
     }
-    sendData(response, { received: true });
-  } catch (error) {
-    await client.query("ROLLBACK").catch(() => undefined);
-    throw error;
-  } finally {
-    client.release();
-  }
+  });
 });
 
 claimsRouter.get("/:id", requireRoles(...CLAIM_READ_ROLES), async (request, response) => {
@@ -554,11 +559,16 @@ claimsRouter.get("/:id", requireRoles(...CLAIM_READ_ROLES), async (request, resp
   const claimId = ClaimIdParamSchema.parse(request.params.id);
   const client = await pool.connect();
   try {
+    await client.query("BEGIN");
     const detail = await getClaimDetail(client, auth.tenantId, claimId, scopedBranchId(auth));
     if (detail === null) {
       throw ApiError.notFound("Klaim tidak ditemukan");
     }
+    await client.query("COMMIT");
     sendData(response, detail);
+  } catch (error) {
+    await client.query("ROLLBACK").catch(() => undefined);
+    throw error;
   } finally {
     client.release();
   }

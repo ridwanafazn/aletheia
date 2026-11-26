@@ -71,11 +71,12 @@
 3. RLS aktif di semua tabel tenant-scoped:
    ```sql
    CREATE POLICY tenant_isolation ON claims.submissions
-     USING (tenant_id = current_setting('app.tenant_id', true)::uuid)
-     WITH CHECK (tenant_id = current_setting('app.tenant_id', true)::uuid);
+     USING (tenant_id = nullif(current_setting('app.tenant_id', true), '')::uuid)
+     WITH CHECK (tenant_id = nullif(current_setting('app.tenant_id', true), '')::uuid);
    ```
-4. Service menetapkan `SET LOCAL app.tenant_id = $1` di awal transaksi; koneksi pool di-reset setelah transaksi.
-5. Role database: `aletheia_app` (DML terbatas), `aletheia_readonly` (analytics), `aletheia_migrator` (DDL). Tidak ada role superuser untuk aplikasi.
+4. Service menetapkan `app.tenant_id` pada koneksi pool dari `AsyncLocalStorage`; koneksi di-reset setelah request. Worker Go menetapkan tenant dari event melalui hook `pgxpool`.
+5. Login, refresh, dan webhook memakai fungsi `SECURITY DEFINER` yang hanya mengembalikan tenant/data minimum; setelah tenant diketahui, seluruh transaksi berjalan dengan RLS aktif.
+6. Role database: `aletheia_app` (DML terbatas, login), `aletheia_readonly` (analytics), `aletheia_migrator` (DDL). Tidak ada role superuser untuk aplikasi.
 6. Uji wajib: tenant A tidak bisa membaca/menulis data tenant B meski memiliki UUID yang valid; hasilnya 404/403 tanpa bocoran keberadaan data.
 7. GraphQL BFF dan worker wajib meneruskan tenant dari token/event, bukan dari input pengguna.
 
@@ -222,7 +223,7 @@
 - [x] Tidak ada stack trace/SQL di error produksi.
 - [x] Runbook insiden diperbarui.
 
-> **Status M5.1:** seluruh item checklist di atas lulus pada 26 November 2026. Bukti ada di `docs/evidence/m5.1-verification.md`. Pengecualian deployment: service demo masih memakai role pemilik database; pengikatan sesi tenant pada pool service wajib diselesaikan sebelum production.
+> **Status M5.1:** seluruh item checklist di atas lulus pada 26 November 2026. Bukti ada di `docs/evidence/m5.1-verification.md`. **Pembaruan M5.4:** pool service runtime kini memakai role non-owner `aletheia_app` dengan tenant binding; security gate 36/36 dan integration test 27/36/34 lulus dengan RLS aktif. Bukti: `docs/evidence/m5.4-verification.md`. Provisioning password role production tetap dilakukan saat deployment.
 
 ## 18. Batasan Keras Keamanan untuk Agen
 
