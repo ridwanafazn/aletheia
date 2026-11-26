@@ -1,4 +1,7 @@
+import { setDefaultResultOrder } from "node:dns";
 import { existsSync, readFileSync } from "node:fs";
+
+setDefaultResultOrder("ipv4first");
 
 const values = new Map();
 if (existsSync(".env.production.local")) {
@@ -37,7 +40,11 @@ async function warm(name, baseUrl) {
     return response.ok;
   } catch (error) {
     const duration = Date.now() - started;
-    console.log(`FAIL ${name} ${duration}ms ${error instanceof Error ? error.message : "unknown"}`);
+    const cause =
+      error instanceof Error && error.cause instanceof Error ? ` (${error.cause.message})` : "";
+    console.log(
+      `FAIL ${name} ${duration}ms ${error instanceof Error ? error.message : "unknown"}${cause}`,
+    );
     return false;
   }
 }

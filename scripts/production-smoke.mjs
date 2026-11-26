@@ -1,3 +1,7 @@
+import { setDefaultResultOrder } from "node:dns";
+
+setDefaultResultOrder("ipv4first");
+
 const edgeUrl = (process.env.EDGE_URL ?? process.argv[2] ?? "").replace(/\/$/, "");
 const webUrl = (process.env.WEB_URL ?? "").replace(/\/$/, "");
 const password = process.env.SMOKE_PASSWORD ?? "AletheiaDemo!2026";
