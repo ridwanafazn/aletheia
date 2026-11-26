@@ -89,7 +89,7 @@ export const users = governance.table(
     unique("users_tenant_email_unique").on(table.tenantId, table.email),
     check(
       "users_role_check",
-      sql`${table.role} in ('CLAIMS_OFFICER','HR_SPECIALIST','BRANCH_MANAGER','FINANCE_MANAGER','MIS_ANALYST','COMPLIANCE_ADMIN')`,
+      sql`${table.role} in ('CLAIMS_OFFICER','HR_SPECIALIST','BRANCH_MANAGER','FINANCE_MANAGER','MIS_ANALYST','COMPLIANCE_ADMIN','EMPLOYEE')`,
     ),
   ],
 );
@@ -616,6 +616,86 @@ export const leaveRequests = payroll.table(
   ],
 );
 
+export const leaveBalances = payroll.table(
+  "leave_balances",
+  {
+    id: uuid("id").primaryKey(),
+    tenantId: uuid("tenant_id").notNull(),
+    personnelId: uuid("personnel_id")
+      .notNull()
+      .references(() => personnel.id),
+    leaveType: varchar("leave_type", { length: 24 }).notNull(),
+    year: smallint("year").notNull(),
+    entitlementDays: numeric("entitlement_days", { precision: 6, scale: 2 })
+      .notNull()
+      .default("0"),
+    usedDays: numeric("used_days", { precision: 6, scale: 2 }).notNull().default("0"),
+    pendingDays: numeric("pending_days", { precision: 6, scale: 2 }).notNull().default("0"),
+    createdAt: createdAt(),
+    updatedAt: updatedAt(),
+  },
+  (table) => [
+    unique("leave_balances_tenant_personnel_type_year_unique").on(
+      table.tenantId,
+      table.personnelId,
+      table.leaveType,
+      table.year,
+    ),
+    check(
+      "leave_balances_type_check",
+      sql`${table.leaveType} in ('ANNUAL','SICK','MATERNITY','UNPAID','OTHER')`,
+    ),
+    check("leave_balances_year_check", sql`${table.year} between 2000 and 2100`),
+    check(
+      "leave_balances_days_check",
+      sql`${table.entitlementDays} >= 0 AND ${table.usedDays} >= 0 AND ${table.pendingDays} >= 0 AND ${table.usedDays} + ${table.pendingDays} <= ${table.entitlementDays}`,
+    ),
+    index("idx_leave_balances_tenant_personnel_year").on(
+      table.tenantId,
+      table.personnelId,
+      table.year,
+    ),
+  ],
+);
+
+export const overtimeRequests = payroll.table(
+  "overtime_requests",
+  {
+    id: uuid("id").primaryKey(),
+    tenantId: uuid("tenant_id").notNull(),
+    personnelId: uuid("personnel_id")
+      .notNull()
+      .references(() => personnel.id),
+    workDate: date("work_date").notNull(),
+    hours: numeric("hours", { precision: 5, scale: 2 }).notNull(),
+    reason: text("reason").notNull(),
+    status: varchar("status", { length: 16 }).notNull(),
+    decidedBy: uuid("decided_by"),
+    decidedAt: timestamp("decided_at", { withTimezone: true }),
+    decisionNotes: text("decision_notes"),
+    createdBy: uuid("created_by").notNull(),
+    createdAt: createdAt(),
+    updatedAt: updatedAt(),
+  },
+  (table) => [
+    unique("overtime_requests_tenant_personnel_date_unique").on(
+      table.tenantId,
+      table.personnelId,
+      table.workDate,
+    ),
+    check(
+      "overtime_status_check",
+      sql`${table.status} in ('PENDING','APPROVED','REJECTED','CANCELLED')`,
+    ),
+    check("overtime_hours_check", sql`${table.hours} > 0 AND ${table.hours} <= 24`),
+    index("idx_overtime_requests_tenant_status_date").on(
+      table.tenantId,
+      table.status,
+      table.workDate,
+    ),
+  ],
+);
+
 export const payslips = payroll.table(
   "payslips",
   {
@@ -916,6 +996,8 @@ export const allTables = [
   payrollItems,
   attendanceSummaries,
   leaveRequests,
+  leaveBalances,
+  overtimeRequests,
   payslips,
   taxReports,
   taxReconciliations,

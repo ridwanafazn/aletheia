@@ -7,6 +7,7 @@ export const RoleSchema = z.enum([
   "FINANCE_MANAGER",
   "MIS_ANALYST",
   "COMPLIANCE_ADMIN",
+  "EMPLOYEE",
 ]);
 export type Role = z.infer<typeof RoleSchema>;
 
@@ -102,6 +103,9 @@ export type LeaveType = z.infer<typeof LeaveTypeSchema>;
 
 export const LeaveStatusSchema = z.enum(["PENDING", "APPROVED", "REJECTED", "CANCELLED"]);
 export type LeaveStatus = z.infer<typeof LeaveStatusSchema>;
+
+export const OvertimeStatusSchema = z.enum(["PENDING", "APPROVED", "REJECTED", "CANCELLED"]);
+export type OvertimeStatus = z.infer<typeof OvertimeStatusSchema>;
 
 export const ReportTypeSchema = z.enum([
   "PPH21_MONTHLY",

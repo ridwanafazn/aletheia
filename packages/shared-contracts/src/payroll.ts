@@ -7,6 +7,7 @@ import {
   EmploymentStatusSchema,
   LeaveStatusSchema,
   LeaveTypeSchema,
+  OvertimeStatusSchema,
   PaymentProviderNameSchema,
   PaymentStatusSchema,
   PersonnelTypeSchema,
@@ -213,6 +214,105 @@ export const LeaveRequestSchema = z
   })
   .strict();
 export type LeaveRequest = z.infer<typeof LeaveRequestSchema>;
+
+export const LeaveBalanceSchema = z
+  .object({
+    id: UuidSchema,
+    personnel_id: UuidSchema,
+    leave_type: LeaveTypeSchema,
+    year: z.number().int().min(2000).max(2100),
+    entitlement_days: z.number().min(0),
+    used_days: z.number().min(0),
+    pending_days: z.number().min(0),
+    remaining_days: z.number().min(0),
+  })
+  .strict();
+export type LeaveBalance = z.infer<typeof LeaveBalanceSchema>;
+
+export const LeaveBalanceListResponseSchema = z
+  .object({ items: z.array(LeaveBalanceSchema) })
+  .strict();
+export type LeaveBalanceListResponse = z.infer<typeof LeaveBalanceListResponseSchema>;
+
+export const LeaveBalanceUpsertSchema = z
+  .object({
+    entitlement_days: z.number().min(0).max(366),
+  })
+  .strict();
+export type LeaveBalanceUpsert = z.infer<typeof LeaveBalanceUpsertSchema>;
+
+export const SelfLeaveRequestCreateSchema = z
+  .object({
+    leave_type: LeaveTypeSchema,
+    start_date: DateOnlySchema,
+    end_date: DateOnlySchema,
+    days: z.number().min(0.5).max(366),
+    reason: z.string().trim().min(3).max(500),
+  })
+  .strict()
+  .refine((value) => Date.parse(value.end_date) >= Date.parse(value.start_date), {
+    message: "end_date harus sama atau setelah start_date",
+    path: ["end_date"],
+  });
+export type SelfLeaveRequestCreate = z.infer<typeof SelfLeaveRequestCreateSchema>;
+
+export const OvertimeRequestCreateSchema = z
+  .object({
+    work_date: DateOnlySchema,
+    hours: z.number().min(0.5).max(24),
+    reason: z.string().trim().min(3).max(500),
+  })
+  .strict();
+export type OvertimeRequestCreate = z.infer<typeof OvertimeRequestCreateSchema>;
+
+export const OvertimeDecisionRequestSchema = z
+  .object({
+    decision: z.enum(["APPROVED", "REJECTED"]),
+    notes: z.string().trim().min(3).max(2000).optional(),
+  })
+  .strict()
+  .refine((value) => value.decision !== "REJECTED" || value.notes !== undefined, {
+    message: "notes wajib diisi untuk penolakan",
+    path: ["notes"],
+  });
+export type OvertimeDecisionRequest = z.infer<typeof OvertimeDecisionRequestSchema>;
+
+export const OvertimeRequestSchema = z
+  .object({
+    id: UuidSchema,
+    personnel_id: UuidSchema,
+    work_date: DateOnlySchema,
+    hours: z.number().positive(),
+    reason: z.string(),
+    status: OvertimeStatusSchema,
+    decided_by: UuidSchema.nullable(),
+    decided_at: IsoDateTimeSchema.nullable(),
+    decision_notes: z.string().nullable(),
+    created_at: IsoDateTimeSchema,
+  })
+  .strict();
+export type OvertimeRequest = z.infer<typeof OvertimeRequestSchema>;
+
+export const OvertimeRequestListResponseSchema = z
+  .object({ items: z.array(OvertimeRequestSchema) })
+  .strict();
+export type OvertimeRequestListResponse = z.infer<typeof OvertimeRequestListResponseSchema>;
+
+export const MeProfileSchema = z
+  .object({
+    personnel_id: UuidSchema,
+    personnel_code: z.string(),
+    full_name: z.string(),
+    branch_id: UuidSchema,
+    branch_name: z.string(),
+    personnel_type: PersonnelTypeSchema,
+    employment_status: EmploymentStatusSchema,
+    ptkp_status: PtkpStatusSchema,
+    join_date: DateOnlySchema,
+    is_active: z.boolean(),
+  })
+  .strict();
+export type MeProfile = z.infer<typeof MeProfileSchema>;
 
 export const PayrollBatchCreateSchema = z
   .object({
