@@ -27,6 +27,7 @@ import {
 import { useAuth } from "../auth/AuthProvider";
 import { hasFeature, useTenantProfile } from "../tenant/api";
 import { downloadReport, generateReport, listReports } from "./api";
+import { ReportsActivity } from "./ReportsActivity";
 import { REPORT_TYPE_OPTIONS, reportPeriod } from "./model";
 import type { ReportSearch } from "./search";
 
@@ -212,110 +213,114 @@ export default function ReportsPage() {
         </Banner>
       )}
 
-      <section className="panel">
-        <div className="panel__header">
-          <div>
-            <div className="panel__title">Buat laporan</div>
-            <div className="panel__description">
-              Laporan memakai policy payroll aktif pada saat permintaan dibuat.
-            </div>
-          </div>
-        </div>
-        {canCreate ? (
-          <div className="panel__body">
-            <div className="filter-bar" aria-label="Filter dan pembuatan laporan">
-              <div className="field">
-                <label className="field__label" htmlFor="report-type">
-                  Jenis laporan
-                </label>
-                <select
-                  id="report-type"
-                  className="select"
-                  value={reportType}
-                  onChange={(event) => updateFilter("type", event.target.value)}
-                >
-                  {allowedOptions.map((item) => (
-                    <option key={item.value} value={item.value}>
-                      {item.label}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              {option?.periodMode === "year" ? (
-                <div className="field">
-                  <label className="field__label" htmlFor="report-year">
-                    Tahun pajak
-                  </label>
-                  <input
-                    id="report-year"
-                    className="input"
-                    type="number"
-                    min={2000}
-                    max={2100}
-                    value={year}
-                    onChange={(event) => updateFilter("year", event.target.value)}
-                  />
-                </div>
-              ) : (
-                <div className="field">
-                  <label className="field__label" htmlFor="report-period">
-                    Periode
-                  </label>
-                  <input
-                    id="report-period"
-                    className="input"
-                    type="month"
-                    value={month}
-                    onChange={(event) => updateFilter("period", event.target.value)}
-                  />
-                </div>
-              )}
-              <div className="field">
-                <label className="field__label" htmlFor="report-branch">
-                  Cabang
-                </label>
-                <select
-                  id="report-branch"
-                  className="select"
-                  value={search.branch_id ?? ""}
-                  onChange={(event) => updateFilter("branch_id", event.target.value)}
-                >
-                  <option value="">Semua cabang</option>
-                  {branches.map((branch) => (
-                    <option key={branch.id} value={branch.id}>
-                      {branch.code} · {branch.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <div className="field field--action">
-                <span className="field__label" aria-hidden="true">
-                  &nbsp;
-                </span>
-                <Button
-                  variant="primary"
-                  icon={<FileSpreadsheet size={15} />}
-                  loading={generateMutation.isPending}
-                  onClick={() => generateMutation.mutate(crypto.randomUUID())}
-                >
-                  Buat laporan
-                </Button>
+      <div className="grid-sidebar reports-layout">
+        <section className="panel">
+          <div className="panel__header">
+            <div>
+              <div className="panel__title">Buat laporan</div>
+              <div className="panel__description">
+                Laporan memakai policy payroll aktif pada saat permintaan dibuat.
               </div>
             </div>
-            <p className="small muted" style={{ marginTop: 10 }}>
-              Rentang {period.period_start} sampai {period.period_end}. Laporan baru membuat versi
-              baru dan tidak menimpa laporan lama.
-            </p>
           </div>
-        ) : (
-          <div className="panel__body">
-            <Banner tone="info" title="Mode baca">
-              Peran kepatuhan dapat melihat dan mengunduh laporan. Pembuatan laporan dilakukan
-              Spesialis SDM atau Manajer Keuangan.
-            </Banner>
-          </div>
-        )}
-      </section>
+          {canCreate ? (
+            <div className="panel__body">
+              <div className="filter-bar" aria-label="Filter dan pembuatan laporan">
+                <div className="field">
+                  <label className="field__label" htmlFor="report-type">
+                    Jenis laporan
+                  </label>
+                  <select
+                    id="report-type"
+                    className="select"
+                    value={reportType}
+                    onChange={(event) => updateFilter("type", event.target.value)}
+                  >
+                    {allowedOptions.map((item) => (
+                      <option key={item.value} value={item.value}>
+                        {item.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                {option?.periodMode === "year" ? (
+                  <div className="field">
+                    <label className="field__label" htmlFor="report-year">
+                      Tahun pajak
+                    </label>
+                    <input
+                      id="report-year"
+                      className="input"
+                      type="number"
+                      min={2000}
+                      max={2100}
+                      value={year}
+                      onChange={(event) => updateFilter("year", event.target.value)}
+                    />
+                  </div>
+                ) : (
+                  <div className="field">
+                    <label className="field__label" htmlFor="report-period">
+                      Periode
+                    </label>
+                    <input
+                      id="report-period"
+                      className="input"
+                      type="month"
+                      value={month}
+                      onChange={(event) => updateFilter("period", event.target.value)}
+                    />
+                  </div>
+                )}
+                <div className="field">
+                  <label className="field__label" htmlFor="report-branch">
+                    Cabang
+                  </label>
+                  <select
+                    id="report-branch"
+                    className="select"
+                    value={search.branch_id ?? ""}
+                    onChange={(event) => updateFilter("branch_id", event.target.value)}
+                  >
+                    <option value="">Semua cabang</option>
+                    {branches.map((branch) => (
+                      <option key={branch.id} value={branch.id}>
+                        {branch.code} · {branch.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div className="field field--action">
+                  <span className="field__label" aria-hidden="true">
+                    &nbsp;
+                  </span>
+                  <Button
+                    variant="primary"
+                    icon={<FileSpreadsheet size={15} />}
+                    loading={generateMutation.isPending}
+                    onClick={() => generateMutation.mutate(crypto.randomUUID())}
+                  >
+                    Buat laporan
+                  </Button>
+                </div>
+              </div>
+              <p className="small muted" style={{ marginTop: 10 }}>
+                Rentang {period.period_start} sampai {period.period_end}. Laporan baru membuat versi
+                baru dan tidak menimpa laporan lama.
+              </p>
+            </div>
+          ) : (
+            <div className="panel__body">
+              <Banner tone="info" title="Mode baca">
+                Peran kepatuhan dapat melihat dan mengunduh laporan. Pembuatan laporan dilakukan
+                Spesialis SDM atau Manajer Keuangan.
+              </Banner>
+            </div>
+          )}
+        </section>
+
+        <ReportsActivity />
+      </div>
 
       <section className="panel">
         <div className="panel__header">

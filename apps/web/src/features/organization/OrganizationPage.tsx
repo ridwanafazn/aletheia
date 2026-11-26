@@ -1,14 +1,21 @@
 import { useQuery } from "@tanstack/react-query";
-import { Building2, RefreshCw, Users } from "lucide-react";
+import { Building2, RefreshCw, Search, Users } from "lucide-react";
+import { useMemo, useState } from "react";
 
 import { Button, EmptyState, ErrorState, PageHeader, SkeletonTable, Stat } from "../../shared/ui";
-import { employmentLabel, formatNumber, personnelTypeLabel } from "../../shared/lib/format";
+import {
+  employmentLabel,
+  formatNumber,
+  initials,
+  personnelTypeLabel,
+} from "../../shared/lib/format";
 import { useAuth } from "../auth/AuthProvider";
 import { hasFeature, useTenantProfile } from "../tenant/api";
 import { getOrganization } from "./api";
 
 export default function OrganizationPage() {
   const { hasRole } = useAuth();
+  const [search, setSearch] = useState("");
   const tenantQuery = useTenantProfile();
   const query = useQuery({
     queryKey: ["organization"],
@@ -21,6 +28,22 @@ export default function OrganizationPage() {
       "MIS_ANALYST",
     ),
   });
+
+  const tree = query.data?.data;
+  const personNames = useMemo(() => {
+    const map = new Map<string, string>();
+    for (const department of tree?.departments ?? []) {
+      for (const position of department.positions) {
+        for (const person of position.personnel) {
+          map.set(person.personnel_id, person.full_name);
+        }
+      }
+    }
+    for (const person of tree?.unassigned ?? []) {
+      map.set(person.personnel_id, person.full_name);
+    }
+    return map;
+  }, [tree]);
 
   if (
     !hasRole(
@@ -41,13 +64,12 @@ export default function OrganizationPage() {
     );
   }
 
-  if (tenantQuery.isPending) {
+  if (tenantQuery.isPending || query.isPending) {
     return <SkeletonTable rows={6} />;
   }
   if (tenantQuery.isError) {
     return <ErrorState error={tenantQuery.error} onRetry={() => void tenantQuery.refetch()} />;
   }
-
   if (!hasFeature(tenantQuery.data?.data, "ORGANIZATION")) {
     return (
       <div className="panel">
@@ -58,19 +80,44 @@ export default function OrganizationPage() {
       </div>
     );
   }
-
-  if (query.isPending) {
-    return <SkeletonTable rows={6} />;
-  }
   if (query.isError) {
     return <ErrorState error={query.error} onRetry={() => void query.refetch()} />;
   }
 
-  const tree = query.data.data;
-  const headcount = tree.departments.reduce((total, department) => total + department.headcount, 0);
-  const positionCount = tree.departments.reduce(
+  const organization = query.data.data;
+  const headcount = organization.departments.reduce(
+    (total, department) => total + department.headcount,
+    0,
+  );
+  const positionCount = organization.departments.reduce(
     (total, department) => total + department.positions.length,
     0,
+  );
+  const needle = search.trim().toLowerCase();
+  const matches = (values: string[]) =>
+    needle.length === 0 || values.some((value) => value.toLowerCase().includes(needle));
+
+  const filledDepartments = organization.departments.filter((department) => {
+    if (department.headcount === 0) {
+      return false;
+    }
+    if (needle.length === 0) {
+      return true;
+    }
+    return (
+      matches([department.name, department.code]) ||
+      department.positions.some(
+        (position) =>
+          matches([position.name]) ||
+          position.personnel.some((person) => matches([person.full_name, person.personnel_code])),
+      )
+    );
+  });
+  const emptyDepartments = organization.departments.filter(
+    (department) => department.headcount === 0,
+  );
+  const filteredUnassigned = organization.unassigned.filter((person) =>
+    matches([person.full_name, person.personnel_code]),
   );
 
   return (
@@ -91,73 +138,129 @@ export default function OrganizationPage() {
       />
 
       <div className="stat-grid">
-        <Stat label="Departemen" value={tree.departments.length} meta="Struktur aktif" />
+        <Stat label="Departemen" value={organization.departments.length} meta="Struktur aktif" />
         <Stat label="Posisi terisi" value={positionCount} meta="Lintas departemen" />
         <Stat label="Personel" value={headcount} meta="Aktif dan terhubung" />
-        <Stat label="Belum ditempatkan" value={tree.unassigned.length} meta="Perlu penugasan" />
+        <Stat
+          label="Belum ditempatkan"
+          value={organization.unassigned.length}
+          meta="Perlu penugasan"
+        />
       </div>
 
-      {tree.departments.length === 0 ? (
+      <div className="organization-toolbar panel">
+        <label className="organization-search">
+          <Search size={16} aria-hidden="true" />
+          <span className="sr-only">Cari personel atau departemen</span>
+          <input
+            className="input"
+            type="search"
+            placeholder="Cari nama, kode, atau departemen"
+            value={search}
+            onChange={(event) => setSearch(event.target.value)}
+          />
+        </label>
+        <span className="organization-toolbar__count">
+          {formatNumber(
+            filledDepartments.reduce((total, department) => total + department.headcount, 0),
+          )}{" "}
+          personel terlihat
+        </span>
+      </div>
+
+      {filledDepartments.length === 0 ? (
         <EmptyState
-          title="Belum ada departemen"
-          body="Departemen dan posisi akan muncul setelah data organisasi diisi."
+          title={needle.length === 0 ? "Belum ada departemen terisi" : "Tidak ada hasil"}
+          body={
+            needle.length === 0
+              ? "Departemen dan posisi akan muncul setelah data organisasi diisi."
+              : "Coba kata kunci lain atau kosongkan pencarian."
+          }
           icon={<Building2 size={18} />}
         />
       ) : (
-        <div className="grid-sidebar">
-          {tree.departments.map((department) => (
-            <section className="panel" key={department.id}>
+        <div className="org-grid">
+          {filledDepartments.map((department) => (
+            <section className="panel org-card" key={department.id}>
               <div className="panel__header">
                 <div>
                   <div className="panel__title">{department.name}</div>
                   <div className="panel__description mono">{department.code}</div>
                 </div>
-                <Users size={16} aria-hidden="true" />
+                <span className="org-headcount">
+                  <Users size={14} aria-hidden="true" />
+                  {formatNumber(department.headcount)}
+                </span>
               </div>
-              <div className="panel__body">
-                <div className="small muted" style={{ marginBottom: 10 }}>
-                  {formatNumber(department.headcount)} personel
-                </div>
-                {department.positions.length === 0 ? (
-                  <p className="small muted">Belum ada posisi terisi.</p>
-                ) : (
-                  <div className="stack stack--sm">
-                    {department.positions.map((position) => (
-                      <div key={position.id}>
-                        <div className="row row--between">
-                          <strong>{position.name}</strong>
-                          <span className="small muted">
-                            {position.job_level} · {position.headcount}
-                          </span>
-                        </div>
-                        <ul className="leave-list">
-                          {position.personnel.map((person) => (
-                            <li className="leave-item" key={person.personnel_id}>
-                              <div>
-                                <div className="leave-item__title">{person.full_name}</div>
-                                <div className="leave-item__meta">
-                                  {person.personnel_code} ·{" "}
-                                  {personnelTypeLabel(person.personnel_type)} ·{" "}
-                                  {employmentLabel(person.employment_status)}
-                                </div>
+              <div className="panel__body org-card__body">
+                {department.positions.map((position) => (
+                  <div className="org-position" key={position.id}>
+                    <div className="org-position__header">
+                      <strong>{position.name}</strong>
+                      <span>
+                        {position.job_level} · {position.headcount}
+                      </span>
+                    </div>
+                    <ul className="org-people">
+                      {position.personnel.map((person) => {
+                        const supervisor =
+                          person.supervisor_id === null
+                            ? null
+                            : personNames.get(person.supervisor_id);
+                        return (
+                          <li className="org-person" key={person.personnel_id}>
+                            <span className="org-person__avatar" aria-hidden="true">
+                              {initials(person.full_name)}
+                            </span>
+                            <div className="org-person__copy">
+                              <div className="org-person__name">{person.full_name}</div>
+                              <div className="org-person__meta">
+                                {person.personnel_code} ·{" "}
+                                {personnelTypeLabel(person.personnel_type)} ·{" "}
+                                {employmentLabel(person.employment_status)}
                               </div>
-                              {person.supervisor_id === null ? (
-                                <span className="small muted">Top level</span>
-                              ) : null}
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    ))}
+                              {supervisor === null ? null : (
+                                <div className="org-person__supervisor">
+                                  Supervisor: {supervisor}
+                                </div>
+                              )}
+                            </div>
+                          </li>
+                        );
+                      })}
+                    </ul>
                   </div>
-                )}
+                ))}
               </div>
             </section>
           ))}
         </div>
       )}
 
-      {tree.unassigned.length > 0 ? (
+      {emptyDepartments.length > 0 ? (
+        <section className="panel org-empty">
+          <div className="panel__header">
+            <div>
+              <div className="panel__title">Departemen tanpa personel</div>
+              <div className="panel__description">
+                Struktur sudah ada, tetapi belum ada penugasan aktif.
+              </div>
+            </div>
+          </div>
+          <div className="panel__body">
+            <div className="org-empty__chips">
+              {emptyDepartments.map((department) => (
+                <span className="org-empty__chip" key={department.id}>
+                  <strong>{department.name}</strong>
+                  <span>{department.code}</span>
+                </span>
+              ))}
+            </div>
+          </div>
+        </section>
+      ) : null}
+
+      {filteredUnassigned.length > 0 ? (
         <section className="panel">
           <div className="panel__header">
             <div>
@@ -166,12 +269,15 @@ export default function OrganizationPage() {
             </div>
           </div>
           <div className="panel__body">
-            <ul className="leave-list">
-              {tree.unassigned.map((person) => (
-                <li className="leave-item" key={person.personnel_id}>
-                  <div>
-                    <div className="leave-item__title">{person.full_name}</div>
-                    <div className="leave-item__meta">{person.personnel_code}</div>
+            <ul className="org-people org-people--unassigned">
+              {filteredUnassigned.map((person) => (
+                <li className="org-person" key={person.personnel_id}>
+                  <span className="org-person__avatar" aria-hidden="true">
+                    {initials(person.full_name)}
+                  </span>
+                  <div className="org-person__copy">
+                    <div className="org-person__name">{person.full_name}</div>
+                    <div className="org-person__meta">{person.personnel_code}</div>
                   </div>
                 </li>
               ))}

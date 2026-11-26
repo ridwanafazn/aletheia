@@ -50,6 +50,12 @@ const indexRoute = createRoute({
   component: () => <Navigate to="/claims" replace />,
 });
 
+const overviewRoute = createRoute({
+  getParentRoute: () => appRoute,
+  path: "/overview",
+  component: lazyRouteComponent(() => import("../features/overview/OverviewPage")),
+});
+
 const claimsRoute = createRoute({
   getParentRoute: () => appRoute,
   path: "/claims",
@@ -152,6 +158,7 @@ const routeTree = rootRoute.addChildren([
   loginRoute,
   appRoute.addChildren([
     indexRoute,
+    overviewRoute,
     claimsRoute,
     newClaimRoute,
     claimDetailRoute,

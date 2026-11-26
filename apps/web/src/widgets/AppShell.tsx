@@ -9,6 +9,7 @@ import {
   FileText,
   FlaskConical,
   Inbox,
+  LayoutDashboard,
   LayoutList,
   LogOut,
   Menu,
@@ -26,6 +27,7 @@ import { Button } from "../shared/ui";
 
 interface NavItem {
   to:
+    | "/overview"
     | "/claims"
     | "/approvals"
     | "/payroll"
@@ -50,6 +52,24 @@ interface NavGroup {
 }
 
 const NAV_GROUPS: NavGroup[] = [
+  {
+    label: "Ringkasan",
+    items: [
+      {
+        to: "/overview",
+        label: "Ikhtisar",
+        icon: LayoutDashboard,
+        roles: [
+          "HR_SPECIALIST",
+          "CLAIMS_OFFICER",
+          "BRANCH_MANAGER",
+          "FINANCE_MANAGER",
+          "COMPLIANCE_ADMIN",
+          "MIS_ANALYST",
+        ],
+      },
+    ],
+  },
   {
     label: "Saya",
     items: [
@@ -163,6 +183,7 @@ const NAV_GROUPS: NavGroup[] = [
 ];
 
 const PAGE_TITLES: Record<string, string> = {
+  "/overview": "Ikhtisar",
   "/claims": "Ruang Klaim",
   "/claims/new": "Klaim Baru",
   "/approvals": "Antrean Persetujuan",
@@ -179,6 +200,9 @@ const PAGE_TITLES: Record<string, string> = {
 };
 
 function sectionFor(pathname: string): string {
+  if (pathname.startsWith("/overview")) {
+    return "Ringkasan";
+  }
   if (pathname.startsWith("/me")) {
     return "Saya";
   }
