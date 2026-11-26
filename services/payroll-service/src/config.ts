@@ -38,8 +38,8 @@ if (parsed.NODE_ENV === "production") {
   if (parsed.INTERNAL_GATEWAY_SECRET === undefined) {
     throw new Error("INTERNAL_GATEWAY_SECRET wajib diisi di production");
   }
-  if ((process.env.DATABASE_URL ?? "") === "") {
-    throw new Error("DATABASE_URL wajib diisi di production");
+  if ((process.env.DATABASE_URL_APP ?? "") === "") {
+    throw new Error("DATABASE_URL_APP wajib diisi di production");
   }
   if (parsed.PII_PEPPER === undefined) {
     throw new Error("PII_PEPPER wajib diisi di production");

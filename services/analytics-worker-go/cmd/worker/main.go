@@ -51,15 +51,18 @@ func main() {
 		}
 	}()
 
-	databaseURL := strings.TrimSpace(os.Getenv("DATABASE_URL"))
+	databaseURL := strings.TrimSpace(os.Getenv("WORKER_DATABASE_URL"))
 	if databaseURL == "" {
-		logger.Error("DATABASE_URL wajib diisi")
+		databaseURL = strings.TrimSpace(os.Getenv("DATABASE_URL"))
+	}
+	if databaseURL == "" {
+		logger.Error("WORKER_DATABASE_URL atau DATABASE_URL wajib diisi")
 		os.Exit(1)
 	}
 
 	poolConfig, err := pgxpool.ParseConfig(databaseURL)
 	if err != nil {
-		logger.Error("DATABASE_URL tidak valid", "error", err)
+		logger.Error("URL database worker tidak valid", "error", err)
 		os.Exit(1)
 	}
 	if poolConfig.MaxConns < 4 {

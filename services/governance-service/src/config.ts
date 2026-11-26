@@ -56,8 +56,8 @@ if (parsed.NODE_ENV === "production" && parsed.INTERNAL_GATEWAY_SECRET === undef
   throw new Error("INTERNAL_GATEWAY_SECRET wajib diisi di production");
 }
 
-if (parsed.NODE_ENV === "production" && (process.env.DATABASE_URL ?? "") === "") {
-  throw new Error("DATABASE_URL wajib diisi di production");
+if (parsed.NODE_ENV === "production" && (process.env.DATABASE_URL_APP ?? "") === "") {
+  throw new Error("DATABASE_URL_APP wajib diisi di production");
 }
 
 if (parsed.NODE_ENV === "production" && parsed.REFRESH_TOKEN_PEPPER === undefined) {

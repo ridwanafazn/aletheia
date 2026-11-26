@@ -47,16 +47,19 @@ const optional = [
   "OTEL_EXPORTER_OTLP_ENDPOINT",
   "WORKER_URL",
   "WORKER_PUBLIC_URL",
+  "GOVERNANCE_URL",
+  "CLAIMS_URL",
+  "PAYROLL_URL",
   "EDGE_URL",
 ];
 
 const missing = required.filter((key) => (values.get(key) ?? "").length === 0);
 const hasHost =
   (values.get("KOYEB_API_TOKEN") ?? "").length > 0 ||
-  ((values.get("RENDER_API_KEY") ?? "").length > 0 &&
-    (values.get("RENDER_OWNER_ID") ?? "").length > 0);
+  (values.get("RENDER_API_KEY") ?? "").length > 0 ||
+  (values.get("RENDER_BLUEPRINT") ?? "") === "true";
 if (!hasHost) {
-  missing.push("KOYEB_API_TOKEN atau RENDER_API_KEY + RENDER_OWNER_ID");
+  missing.push("KOYEB_API_TOKEN, RENDER_API_KEY, atau RENDER_BLUEPRINT=true");
 }
 
 const invalid = [];

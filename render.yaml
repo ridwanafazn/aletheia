@@ -1,0 +1,192 @@
+# Render Blueprint for Aletheia production demo.
+#
+# Secrets are intentionally not stored here: env vars with `sync: false` are
+# prompted during the first Blueprint sync. Use the values from
+# .env.production.local (which is ignored by Git).
+#
+# Neon production is external; Render only hosts the four container services.
+# After the first deploy, update WORKER_URL if Render assigns a suffixed
+# onrender.com hostname.
+
+services:
+  - type: web
+    name: aletheia-governance
+    runtime: docker
+    plan: free
+    region: singapore
+    dockerfilePath: ./infra/docker/express-service.Dockerfile
+    dockerContext: .
+    healthCheckPath: /healthz
+    autoDeployTrigger: off
+    envVars:
+      - key: SERVICE_NAME
+        value: governance-service
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL_APP
+        sync: false
+      - key: JWT_ISSUER
+        value: aletheia
+      - key: JWT_AUDIENCE
+        value: aletheia-web
+      - key: JWT_PRIVATE_KEY
+        sync: false
+      - key: JWT_PUBLIC_KEY
+        sync: false
+      - key: ACCESS_TOKEN_TTL_SECONDS
+        value: "900"
+      - key: REFRESH_TOKEN_TTL_SECONDS
+        value: "604800"
+      - key: REFRESH_TOKEN_PEPPER
+        sync: false
+      - key: MFA_ENCRYPTION_KEY
+        sync: false
+      - key: MFA_ENFORCED
+        value: "false"
+      - key: COOKIE_SECURE
+        value: "true"
+      - key: INTERNAL_GATEWAY_SECRET
+        sync: false
+      - key: PII_PEPPER
+        sync: false
+      - key: QSTASH_URL
+        value: https://qstash.upstash.io
+      - key: QSTASH_TOKEN
+        sync: false
+      - key: QSTASH_CURRENT_SIGNING_KEY
+        sync: false
+      - key: QSTASH_NEXT_SIGNING_KEY
+        sync: false
+      - key: WORKER_URL
+        value: https://aletheia-worker.onrender.com
+      - key: LOG_LEVEL
+        value: info
+
+  - type: web
+    name: aletheia-claims
+    runtime: docker
+    plan: free
+    region: singapore
+    dockerfilePath: ./infra/docker/express-service.Dockerfile
+    dockerContext: .
+    healthCheckPath: /healthz
+    autoDeployTrigger: off
+    envVars:
+      - key: SERVICE_NAME
+        value: claims-service
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL_APP
+        sync: false
+      - key: INTERNAL_GATEWAY_SECRET
+        sync: false
+      - key: PII_PEPPER
+        sync: false
+      - key: PAYMENT_WEBHOOK_SECRET
+        sync: false
+      - key: FILE_SIGNING_SECRET
+        sync: false
+      - key: FILE_URL_TTL_SECONDS
+        value: "300"
+      - key: CLOUDINARY_CLOUD_NAME
+        sync: false
+      - key: CLOUDINARY_API_KEY
+        sync: false
+      - key: CLOUDINARY_API_SECRET
+        sync: false
+      - key: CLOUDINARY_FOLDER_PREFIX
+        value: aletheia/claims
+      - key: QSTASH_URL
+        value: https://qstash.upstash.io
+      - key: QSTASH_TOKEN
+        sync: false
+      - key: QSTASH_CURRENT_SIGNING_KEY
+        sync: false
+      - key: QSTASH_NEXT_SIGNING_KEY
+        sync: false
+      - key: WORKER_URL
+        value: https://aletheia-worker.onrender.com
+      - key: MOCK_PAYMENT_AUTO_COMPLETE
+        value: "true"
+      - key: LOG_LEVEL
+        value: info
+
+  - type: web
+    name: aletheia-payroll
+    runtime: docker
+    plan: free
+    region: singapore
+    dockerfilePath: ./infra/docker/express-service.Dockerfile
+    dockerContext: .
+    healthCheckPath: /healthz
+    autoDeployTrigger: off
+    envVars:
+      - key: SERVICE_NAME
+        value: payroll-service
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL_APP
+        sync: false
+      - key: INTERNAL_GATEWAY_SECRET
+        sync: false
+      - key: PII_PEPPER
+        sync: false
+      - key: PAYMENT_WEBHOOK_SECRET
+        sync: false
+      - key: FILE_SIGNING_SECRET
+        sync: false
+      - key: FILE_URL_TTL_SECONDS
+        value: "300"
+      - key: CLOUDINARY_CLOUD_NAME
+        sync: false
+      - key: CLOUDINARY_API_KEY
+        sync: false
+      - key: CLOUDINARY_API_SECRET
+        sync: false
+      - key: CLOUDINARY_FOLDER_PREFIX
+        value: aletheia/claims
+      - key: QSTASH_URL
+        value: https://qstash.upstash.io
+      - key: QSTASH_TOKEN
+        sync: false
+      - key: QSTASH_CURRENT_SIGNING_KEY
+        sync: false
+      - key: QSTASH_NEXT_SIGNING_KEY
+        sync: false
+      - key: WORKER_URL
+        value: https://aletheia-worker.onrender.com
+      - key: MOCK_PAYMENT_AUTO_COMPLETE
+        value: "true"
+      - key: LOG_LEVEL
+        value: info
+
+  - type: web
+    name: aletheia-worker
+    runtime: docker
+    plan: free
+    region: singapore
+    dockerfilePath: ./infra/docker/go-worker.Dockerfile
+    dockerContext: .
+    healthCheckPath: /healthz
+    autoDeployTrigger: off
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: WORKER_DATABASE_URL
+        sync: false
+      - key: WORKER_CONCURRENCY
+        value: "4"
+      - key: ALLOW_UNSIGNED_EVENTS
+        value: "false"
+      - key: QSTASH_URL
+        value: https://qstash.upstash.io
+      - key: QSTASH_TOKEN
+        sync: false
+      - key: QSTASH_CURRENT_SIGNING_KEY
+        sync: false
+      - key: QSTASH_NEXT_SIGNING_KEY
+        sync: false
+      - key: WORKER_PUBLIC_URL
+        value: https://aletheia-worker.onrender.com
+      - key: LOG_LEVEL
+        value: info
