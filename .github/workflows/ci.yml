@@ -155,6 +155,13 @@ jobs:
       - name: Seed
         run: pnpm db:seed
 
+      - name: Build workspace packages
+        run: |
+          pnpm --filter @aletheia/shared-contracts build
+          pnpm --filter @aletheia/database build
+          pnpm --filter @aletheia/payments build
+          pnpm --filter @aletheia/observability build
+
       - name: Check schema, RLS, audit
         run: pnpm db:check
 
