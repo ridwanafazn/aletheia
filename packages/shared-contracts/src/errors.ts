@@ -1,0 +1,62 @@
+import { z } from "zod";
+
+import { UuidSchema } from "./primitives.js";
+
+export const ErrorCodeSchema = z.enum([
+  "ERR_VALIDATION_FAILED",
+  "ERR_UNAUTHORIZED_ACCESS",
+  "ERR_RBAC_FORBIDDEN",
+  "ERR_SOD_VIOLATION",
+  "ERR_IDEMPOTENCY_CONFLICT",
+  "ERR_CONCURRENT_LOCK",
+  "ERR_RISK_PENDING",
+  "ERR_COMPLIANCE_REVIEW_PENDING",
+  "ERR_POLICY_RULE_VIOLATION",
+  "ERR_NOT_FOUND",
+  "ERR_PAYMENT_STATE_CONFLICT",
+  "ERR_PAYMENT_PROVIDER_FAILED",
+  "ERR_REPORT_NOT_READY",
+  "ERR_REPORT_GENERATION_FAILED",
+  "ERR_RATE_LIMIT_EXCEEDED",
+  "ERR_TENANT_MISMATCH",
+  "ERR_INTERNAL_ERROR",
+]);
+export type ErrorCode = z.infer<typeof ErrorCodeSchema>;
+
+export const ErrorStatusByCode: Record<ErrorCode, number> = {
+  ERR_VALIDATION_FAILED: 400,
+  ERR_UNAUTHORIZED_ACCESS: 401,
+  ERR_RBAC_FORBIDDEN: 403,
+  ERR_SOD_VIOLATION: 403,
+  ERR_IDEMPOTENCY_CONFLICT: 409,
+  ERR_CONCURRENT_LOCK: 409,
+  ERR_RISK_PENDING: 409,
+  ERR_COMPLIANCE_REVIEW_PENDING: 409,
+  ERR_POLICY_RULE_VIOLATION: 422,
+  ERR_NOT_FOUND: 404,
+  ERR_PAYMENT_STATE_CONFLICT: 409,
+  ERR_PAYMENT_PROVIDER_FAILED: 424,
+  ERR_REPORT_NOT_READY: 409,
+  ERR_REPORT_GENERATION_FAILED: 422,
+  ERR_RATE_LIMIT_EXCEEDED: 429,
+  ERR_TENANT_MISMATCH: 401,
+  ERR_INTERNAL_ERROR: 500,
+};
+
+export const FieldErrorSchema = z
+  .object({
+    path: z.string().min(1),
+    message: z.string().min(1),
+  })
+  .strict();
+
+export const ApiErrorSchema = z
+  .object({
+    code: ErrorCodeSchema,
+    message: z.string().min(1),
+    details: z.array(FieldErrorSchema).optional(),
+    correlation_id: UuidSchema,
+    retryable: z.boolean(),
+  })
+  .strict();
+export type ApiError = z.infer<typeof ApiErrorSchema>;

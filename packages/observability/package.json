@@ -1,0 +1,31 @@
+{
+  "name": "@aletheia/observability",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "typecheck": "tsc -b --pretty false",
+    "lint": "eslint src --max-warnings 0",
+    "test": "vitest run --passWithNoTests --exclude \"**/dist/**\"",
+    "build": "tsc -b --force --pretty false"
+  },
+  "dependencies": {
+    "@opentelemetry/api": "^1.10.0",
+    "@opentelemetry/exporter-metrics-otlp-http": "^0.301.2",
+    "@opentelemetry/exporter-trace-otlp-http": "^0.301.2",
+    "@opentelemetry/instrumentation-express": "^0.73.0",
+    "@opentelemetry/instrumentation-http": "^0.301.2",
+    "@opentelemetry/instrumentation-pg": "^0.78.0",
+    "@opentelemetry/instrumentation-pino": "^0.71.0",
+    "@opentelemetry/resources": "^3.1.1",
+    "@opentelemetry/sdk-metrics": "^3.1.1",
+    "@opentelemetry/sdk-node": "^0.301.2",
+    "@opentelemetry/semantic-conventions": "^1.45.0",
+    "@opentelemetry/sdk-trace": "^3.1.1"
+  }
+}

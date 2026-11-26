@@ -1,0 +1,16 @@
+# CODEOWNERS
+# Replace placeholders with GitHub usernames before enabling enforcement.
+
+*                   @ridwanafazn
+
+/docs/              @ridwanafazn
+/docs/14-architecture-decision-records.md @ridwanafazn
+/.github/           @ridwanafazn
+
+/services/governance-service/  @ridwanafazn
+/services/claims-service/      @ridwanafazn
+/services/payroll-service/     @ridwanafazn
+/services/analytics-worker-go/ @ridwanafazn
+
+/packages/shared-contracts/    @ridwanafazn
+/packages/payments/            @ridwanafazn

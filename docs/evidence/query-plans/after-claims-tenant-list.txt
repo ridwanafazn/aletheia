@@ -1,0 +1,13 @@
+                                                                    QUERY PLAN                                                                    
+--------------------------------------------------------------------------------------------------------------------------------------------------
+ Limit  (cost=0.29..5.10 rows=26 width=41) (actual time=0.053..0.220 rows=26 loops=1)
+   Buffers: shared hit=25 read=2
+   ->  Index Scan using idx_claims_tenant_date on submissions  (cost=0.29..1553.32 rows=8387 width=41) (actual time=0.052..0.217 rows=26 loops=1)
+         Index Cond: (tenant_id = '019361a2-7c00-7000-8000-000000000001'::uuid)
+         Buffers: shared hit=25 read=2
+ Planning:
+   Buffers: shared hit=260
+ Planning Time: 2.347 ms
+ Execution Time: 0.290 ms
+(9 rows)
+

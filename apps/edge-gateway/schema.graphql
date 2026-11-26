@@ -1,0 +1,106 @@
+scalar DateTime
+scalar Decimal
+scalar JSON
+
+type BranchKpiSummary {
+  branchId: ID!
+  branchCode: String!
+  branchName: String!
+  reportMonth: String!
+  totalClaimsSubmitted: Int!
+  totalClaimsApprovedAmount: Decimal!
+  claimApprovalRatePct: Float!
+  avgTurnaroundHours: Float!
+  totalPayrollDisbursed: Decimal!
+  totalPph21Collected: Decimal!
+  budgetUtilizationPct: Float!
+  momVariancePct: Float!
+}
+
+type AnomalyFlagView {
+  id: ID!
+  conflictType: String!
+  severity: String!
+  matchedPersonnelCode: String
+  matchedPersonnelName: String
+  matchedPersonnelType: String
+  matchedClaimNumber: String
+  evidenceSummary: JSON!
+  resolutionStatus: String!
+  detectedAt: DateTime!
+}
+
+type AuditTrailEntry {
+  id: ID!
+  actorName: String!
+  actorRole: String!
+  action: String!
+  policyVersionTag: String
+  decisionContext: JSON!
+  recordHash: String!
+  recordedAt: DateTime!
+}
+
+type ClaimDocumentView {
+  id: ID!
+  documentType: String!
+  secureUrl: String!
+  uploadedAt: DateTime!
+}
+
+type ClaimAuditDetail {
+  id: ID!
+  claimNumber: String!
+  claimantName: String!
+  claimantNikMasked: String!
+  bankAccountMasked: String!
+  claimCategory: String!
+  requestedAmount: Decimal!
+  approvedAmount: Decimal
+  riskScore: Int!
+  status: String!
+  boundPolicyVersionTag: String!
+  boundPolicyRules: JSON!
+  documents: [ClaimDocumentView!]!
+  anomalyFlags: [AnomalyFlagView!]!
+  auditHistory: [AuditTrailEntry!]!
+}
+
+type WhatIfSimulationResult {
+  id: ID!
+  simulationName: String!
+  basePolicyVersionTag: String!
+  actualTotalCost: Decimal!
+  simulatedTotalCost: Decimal!
+  varianceAmount: Decimal!
+  variancePercentage: Float!
+  impactBreakdown: JSON!
+  createdAt: DateTime!
+}
+
+input WhatIfSimulationInput {
+  simulationName: String!
+  basePolicyVersionId: ID!
+  simulatedRulesPayload: JSON!
+  targetPeriodStart: String!
+  targetPeriodEnd: String!
+  branchId: ID
+}
+
+type WhatIfRunResult {
+  eventId: ID!
+  status: String!
+  enqueued: Boolean!
+  requestedAt: DateTime!
+}
+
+type Query {
+  misExecutiveSummary(reportMonth: String!, branchId: ID): [BranchKpiSummary!]!
+  misTrend(reportMonth: String!, branchId: ID, months: Int = 6): [BranchKpiSummary!]!
+  claimAuditDetail(claimId: ID!): ClaimAuditDetail
+  whatIfSimulations(limit: Int = 10): [WhatIfSimulationResult!]!
+}
+
+type Mutation {
+  runWhatIfSimulation(input: WhatIfSimulationInput!): WhatIfRunResult!
+}

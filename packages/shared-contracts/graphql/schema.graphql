@@ -1,0 +1,95 @@
+scalar DateTime
+scalar Decimal
+scalar JSON
+
+enum PolicyDomain {
+  CLAIMS_POLICY
+  PAYROLL_TAX_POLICY
+}
+
+type BranchKpiSummary {
+  branchId: ID!
+  branchCode: String!
+  branchName: String!
+  reportMonth: String!
+  totalClaimsSubmitted: Int!
+  totalClaimsApprovedAmount: Decimal!
+  claimApprovalRatePct: Float!
+  avgTurnaroundHours: Float!
+  totalPayrollDisbursed: Decimal!
+  totalPph21Collected: Decimal!
+  budgetUtilizationPct: Float!
+  momVariancePct: Float!
+}
+
+type AnomalyFlagView {
+  id: ID!
+  conflictType: String!
+  severity: String!
+  matchedPersonnelCode: String
+  matchedPersonnelName: String
+  matchedPersonnelType: String
+  matchedClaimNumber: String
+  evidenceSummary: JSON!
+  resolutionStatus: String!
+  detectedAt: DateTime!
+}
+
+type AuditTrailEntry {
+  id: ID!
+  actorName: String!
+  actorRole: String!
+  action: String!
+  policyVersionTag: String
+  decisionContext: JSON!
+  recordHash: String!
+  recordedAt: DateTime!
+}
+
+type ClaimAuditDetail {
+  id: ID!
+  claimNumber: String!
+  claimantName: String!
+  claimantNikMasked: String!
+  bankAccountMasked: String!
+  claimCategory: String!
+  requestedAmount: Decimal!
+  approvedAmount: Decimal
+  riskScore: Int!
+  status: String!
+  boundPolicyVersionTag: String!
+  boundPolicyRules: JSON!
+  documents: [ClaimDocumentView!]!
+  anomalyFlags: [AnomalyFlagView!]!
+  auditHistory: [AuditTrailEntry!]!
+}
+
+type ClaimDocumentView {
+  id: ID!
+  documentType: String!
+  secureUrl: String!
+  uploadedAt: DateTime!
+}
+
+type WhatIfSimulationResult {
+  id: ID!
+  simulationName: String!
+  basePolicyVersionTag: String!
+  actualTotalCost: Decimal!
+  simulatedTotalCost: Decimal!
+  varianceAmount: Decimal!
+  variancePercentage: Float!
+  impactBreakdown: JSON!
+  createdAt: DateTime!
+}
+
+type Query {
+  # Dasbor MIS Analyst, membaca security barrier view dan cache Redis.
+  misExecutiveSummary(reportMonth: String!, branchId: ID): [BranchKpiSummary!]!
+
+  # Audit 360 derajat, menggabungkan Claims, Policy, Anomaly, dan Audit Trail.
+  claimAuditDetail(claimId: ID!): ClaimAuditDetail
+
+  # Riwayat simulasi kebijakan MIS Analyst.
+  whatIfSimulations(limit: Int = 10): [WhatIfSimulationResult!]!
+}

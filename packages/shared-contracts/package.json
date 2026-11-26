@@ -1,0 +1,29 @@
+{
+  "name": "@aletheia/shared-contracts",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist",
+    "graphql",
+    "openapi.json"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "typecheck": "tsc -b --pretty false",
+    "lint": "eslint src --max-warnings 0",
+    "test": "vitest run --passWithNoTests --exclude \"**/dist/**\"",
+    "build": "tsc -b --force --pretty false",
+    "build:openapi": "tsc -b --force --pretty false && node dist/generate-openapi.js"
+  },
+  "dependencies": {
+    "zod": "^4.6.7"
+  }
+}

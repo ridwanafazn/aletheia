@@ -1,0 +1,216 @@
+name: CI
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  changes:
+    name: Detect changed areas
+    runs-on: ubuntu-latest
+    outputs:
+      ts: ${{ steps.filter.outputs.ts }}
+      go: ${{ steps.filter.outputs.go }}
+      infra: ${{ steps.filter.outputs.infra }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Filter paths
+        id: filter
+        uses: dorny/paths-filter@v3
+        with:
+          filters: |
+            ts:
+              - "apps/**"
+              - "services/**/*.ts"
+              - "packages/**"
+              - "package.json"
+              - "pnpm-lock.yaml"
+              - "pnpm-workspace.yaml"
+              - "tsconfig.base.json"
+              - "eslint.config.js"
+              - ".prettierrc.json"
+              - ".prettierignore"
+              - ".github/workflows/ci.yml"
+            go:
+              - "services/analytics-worker-go/**"
+              - ".github/workflows/ci.yml"
+            infra:
+              - "infra/**"
+              - "docker-compose.yml"
+              - ".dockerignore"
+              - ".env.example"
+              - ".github/workflows/ci.yml"
+
+  quality:
+    name: Typecheck, lint, test
+    needs: changes
+    if: needs.changes.outputs.ts == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 12.14.0
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - name: Install
+        run: pnpm install --frozen-lockfile
+
+      - name: Typecheck
+        run: pnpm -r typecheck
+
+      - name: Lint
+        run: pnpm -r lint
+
+      - name: Test
+        run: pnpm -r test
+
+      - name: Domain coverage
+        run: pnpm test:coverage
+
+      - name: Upload coverage report
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: coverage
+          retention-days: 14
+
+      - name: Generate OpenAPI
+        run: pnpm --filter @aletheia/shared-contracts build:openapi
+
+      - name: Verify OpenAPI artifact is current
+        run: git diff --exit-code -- packages/shared-contracts/openapi.json
+
+      - name: Format check
+        run: pnpm format:check
+
+      - name: Build web and enforce bundle budget
+        run: pnpm --filter @aletheia/web build
+
+      - name: Bundle edge gateway
+        run: pnpm --filter @aletheia/edge-gateway build
+
+  database:
+    name: Migrate, seed, RLS check
+    needs: changes
+    if: needs.changes.outputs.ts == 'true' || needs.changes.outputs.infra == 'true'
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: aletheia
+          POSTGRES_PASSWORD: aletheia
+          POSTGRES_DB: aletheia
+        ports:
+          - "5432:5432"
+        options: >-
+          --health-cmd "pg_isready -U aletheia -d aletheia"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      DATABASE_URL: postgresql://aletheia:aletheia@localhost:5432/aletheia
+      PII_PEPPER: ci-demo-pepper
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 12.14.0
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - name: Install
+        run: pnpm install --frozen-lockfile
+
+      - name: Migrate
+        run: pnpm db:migrate
+
+      - name: Seed
+        run: pnpm db:seed
+
+      - name: Check schema, RLS, audit
+        run: pnpm db:check
+
+      - name: Governance integration tests
+        run: pnpm --filter @aletheia/governance-service test
+        env:
+          RUN_GOVERNANCE_INTEGRATION: "true"
+
+      - name: Claims integration tests
+        run: pnpm --filter @aletheia/claims-service test
+        env:
+          RUN_CLAIMS_INTEGRATION: "true"
+
+      - name: Payroll integration tests
+        run: pnpm --filter @aletheia/payroll-service test
+        env:
+          RUN_PAYROLL_INTEGRATION: "true"
+
+  go:
+    name: Go vet, race test, build
+    needs: changes
+    if: needs.changes.outputs.go == 'true'
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: services/analytics-worker-go
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: services/analytics-worker-go/go.mod
+          cache: false
+
+      - name: Vet
+        run: go vet ./...
+
+      - name: Test with race detector
+        run: go test -race ./...
+
+      - name: Build
+        run: go build ./...
+
+  docker:
+    name: Compose validation
+    needs: changes
+    if: needs.changes.outputs.infra == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Prepare local environment
+        run: cp .env.example .env
+
+      - name: Validate compose
+        run: docker compose config

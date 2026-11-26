@@ -1,0 +1,110 @@
+name: Security
+
+on:
+  pull_request:
+  push:
+    branches: ["main"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  secrets-and-sast:
+    name: Secret and SAST scan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Gitleaks
+        run: |
+          docker run --rm -v "$PWD:/repo" -w /repo \
+            ghcr.io/gitleaks/gitleaks:v8.30.1 dir . --config .gitleaks.toml --redact --no-banner
+      - name: Semgrep OWASP Top Ten
+        run: |
+          docker run --rm -v "$PWD:/src" -w /src semgrep/semgrep:1.186.0 \
+            semgrep scan --config p/owasp-top-ten --severity ERROR --error \
+            --exclude node_modules --exclude dist --exclude "*.test.ts" --exclude "*.spec.ts" \
+            apps services packages
+
+  dependencies:
+    name: Dependency and Go vulnerability scan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 12.14.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: pnpm audit
+        run: pnpm audit --prod --audit-level high
+      - name: Trivy lockfile scan
+        run: |
+          docker run --rm -v "$PWD:/src" aquasec/trivy:0.76.2 fs \
+            --scanners vuln --severity HIGH,CRITICAL --exit-code 1 --timeout 5m \
+            /src/pnpm-lock.yaml
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: services/analytics-worker-go/go.mod
+      - name: Govulncheck
+        working-directory: services/analytics-worker-go
+        run: |
+          go install golang.org/x/vuln/cmd/govulncheck@latest
+          "$(go env GOPATH)/bin/govulncheck" ./...
+
+  image:
+    name: Container image scan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build worker image
+        run: docker build -f infra/docker/go-worker.Dockerfile -t aletheia-worker:ci .
+      - name: Trivy image scan
+        run: |
+          docker run --rm -v /var/run/docker.sock:/var/run/docker.sock \
+            aquasec/trivy:0.76.2 image --severity HIGH,CRITICAL --exit-code 1 \
+            --timeout 5m aletheia-worker:ci
+
+  database:
+    name: RLS, PII and audit chain
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: aletheia
+          POSTGRES_PASSWORD: aletheia
+          POSTGRES_DB: aletheia
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U aletheia"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      DATABASE_URL: postgresql://aletheia:aletheia@localhost:5432/aletheia
+      DATABASE_URL_POOLED: postgresql://aletheia:aletheia@localhost:5432/aletheia
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 12.14.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm db:migrate
+      - run: pnpm db:seed
+      - name: Database RLS audit
+        run: pnpm security:db
+      - name: Audit chain verification
+        run: pnpm security:audit
+      - name: PII source scan
+        run: pnpm security:pii

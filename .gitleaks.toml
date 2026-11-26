@@ -1,0 +1,16 @@
+title = "Aletheia secret scanning"
+
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Local development env and generated artifacts"
+paths = [
+  '''(^|/)\.env$''',
+  '''(^|/)\.env\..*$''',
+  '''apps/edge-gateway/\.dev\.vars$''',
+  '''(^|/)node_modules/''',
+  '''(^|/)dist/''',
+  '''docs/evidence/''',
+  '''packages/database/src/seed\.ts$''',
+]

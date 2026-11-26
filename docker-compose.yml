@@ -1,0 +1,211 @@
+name: aletheia
+
+x-express-service: &express-service
+  build:
+    context: .
+    dockerfile: infra/docker/express-service.Dockerfile
+  env_file:
+    - path: .env
+      required: false
+  environment:
+    NODE_ENV: production
+    NODE_OPTIONS: --max-old-space-size=256
+  init: true
+  mem_limit: 512m
+  restart: unless-stopped
+  security_opt:
+    - no-new-privileges:true
+  networks:
+    - aletheia
+
+services:
+  nginx-lb:
+    image: nginx:1.27-alpine
+    ports:
+      - "8080:80"
+    volumes:
+      - ./infra/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      governance-service:
+        condition: service_healthy
+      claims-service:
+        condition: service_healthy
+      payroll-service:
+        condition: service_healthy
+      analytics-worker-go:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - aletheia
+
+  governance-service:
+    <<: *express-service
+    build:
+      context: .
+      dockerfile: infra/docker/express-service.Dockerfile
+      args:
+        SERVICE_NAME: governance-service
+    environment:
+      NODE_ENV: production
+      NODE_OPTIONS: --max-old-space-size=256
+      PORT: 4001
+    expose:
+      - "4001"
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:4001/healthz >/dev/null || exit 1"]
+      interval: 15s
+      timeout: 3s
+      start_period: 10s
+      retries: 3
+
+  claims-service:
+    <<: *express-service
+    build:
+      context: .
+      dockerfile: infra/docker/express-service.Dockerfile
+      args:
+        SERVICE_NAME: claims-service
+    environment:
+      NODE_ENV: production
+      NODE_OPTIONS: --max-old-space-size=256
+      PORT: 4002
+    expose:
+      - "4002"
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:4002/healthz >/dev/null || exit 1"]
+      interval: 15s
+      timeout: 3s
+      start_period: 10s
+      retries: 3
+
+  payroll-service:
+    <<: *express-service
+    build:
+      context: .
+      dockerfile: infra/docker/express-service.Dockerfile
+      args:
+        SERVICE_NAME: payroll-service
+    environment:
+      NODE_ENV: production
+      NODE_OPTIONS: --max-old-space-size=256
+      PORT: 4003
+    expose:
+      - "4003"
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:4003/healthz >/dev/null || exit 1"]
+      interval: 15s
+      timeout: 3s
+      start_period: 10s
+      retries: 3
+
+  analytics-worker-go:
+    build:
+      context: .
+      dockerfile: infra/docker/go-worker.Dockerfile
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      PORT: 4004
+      GOMEMLIMIT: 128MiB
+    init: true
+    mem_limit: 512m
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    expose:
+      - "4004"
+    healthcheck:
+      test: ["CMD", "/app/worker", "--healthcheck"]
+      interval: 15s
+      timeout: 3s
+      start_period: 5s
+      retries: 3
+    networks:
+      - aletheia
+
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:0.140.0
+    profiles: ["observability"]
+    command: ["--config=/etc/otelcol/config.yaml"]
+    volumes:
+      - ./infra/observability/otel-collector-config.yaml:/etc/otelcol/config.yaml:ro
+    ports:
+      - "4317:4317"
+      - "4318:4318"
+      - "8889:8889"
+    restart: unless-stopped
+    networks:
+      - aletheia
+
+  jaeger:
+    image: jaegertracing/all-in-one:1.76.0
+    profiles: ["observability"]
+    environment:
+      COLLECTOR_OTLP_ENABLED: "true"
+    ports:
+      - "16686:16686"
+    restart: unless-stopped
+    networks:
+      - aletheia
+
+  prometheus:
+    image: prom/prometheus:v3.16.0
+    profiles: ["observability"]
+    volumes:
+      - ./infra/observability/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./infra/observability/prometheus/alerts.yml:/etc/prometheus/alerts.yml:ro
+    ports:
+      - "9090:9090"
+    depends_on:
+      - otel-collector
+    restart: unless-stopped
+    networks:
+      - aletheia
+
+  grafana:
+    image: grafana/grafana:13.3.2
+    profiles: ["observability"]
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: aletheia
+      GF_AUTH_ANONYMOUS_ENABLED: "true"
+      GF_AUTH_ANONYMOUS_ORG_ROLE: Viewer
+      GF_USERS_ALLOW_SIGN_UP: "false"
+    volumes:
+      - ./infra/observability/grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./infra/observability/grafana/dashboards:/var/lib/grafana/dashboards:ro
+    ports:
+      - "3000:3000"
+    depends_on:
+      - prometheus
+    restart: unless-stopped
+    networks:
+      - aletheia
+
+  postgres:
+    image: postgres:16-alpine
+    profiles: ["local-db"]
+    environment:
+      POSTGRES_USER: aletheia
+      POSTGRES_PASSWORD: aletheia
+      POSTGRES_DB: aletheia
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U aletheia -d aletheia"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    restart: unless-stopped
+    networks:
+      - aletheia
+
+networks:
+  aletheia:
+    driver: bridge
+
+volumes:
+  postgres-data:

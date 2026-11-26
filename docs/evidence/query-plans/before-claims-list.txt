@@ -1,0 +1,18 @@
+                                                                    QUERY PLAN                                                                     
+---------------------------------------------------------------------------------------------------------------------------------------------------
+ Limit  (cost=856.91..856.97 rows=26 width=41) (actual time=5.778..5.781 rows=26 loops=1)
+   Buffers: shared hit=500
+   ->  Sort  (cost=856.91..877.74 rows=8334 width=41) (actual time=5.776..5.778 rows=26 loops=1)
+         Sort Key: created_at DESC, id DESC
+         Sort Method: top-N heapsort  Memory: 28kB
+         Buffers: shared hit=500
+         ->  Seq Scan on submissions  (cost=0.00..619.37 rows=8334 width=41) (actual time=0.007..4.706 rows=8387 loops=1)
+               Filter: ((tenant_id = '019361a2-7c00-7000-8000-000000000001'::uuid) AND (branch_id = '019361a2-7c00-7000-8000-000000000011'::uuid))
+               Rows Removed by Filter: 12
+               Buffers: shared hit=494
+ Planning:
+   Buffers: shared hit=217
+ Planning Time: 1.928 ms
+ Execution Time: 5.853 ms
+(14 rows)
+

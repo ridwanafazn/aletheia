@@ -1,0 +1,101 @@
+groups:
+  - name: aletheia-slo
+    rules:
+      - alert: ApiErrorRateHigh
+        expr: |
+          (
+            sum(rate(http_errors_total{error_type="server"}[5m]))
+            /
+            clamp_min(sum(rate(http_requests_total[5m])), 0.001)
+          ) > 0.02
+        for: 5m
+        labels:
+          severity: P1
+          owner: platform
+        annotations:
+          summary: "API error rate di atas 2 persen"
+          runbook_url: "docs/09-observability-and-performance.md#8-alert--runbook"
+
+      - alert: ApiP95LatencyHigh
+        expr: |
+          histogram_quantile(
+            0.95,
+            sum by (le, service_name) (rate(http_request_duration_seconds_bucket[5m]))
+          ) > 1.0
+        for: 10m
+        labels:
+          severity: P2
+          owner: platform
+        annotations:
+          summary: "p95 latency di atas 1 detik selama 10 menit"
+          runbook_url: "docs/09-observability-and-performance.md#8-alert--runbook"
+
+      - alert: DbPoolWaiting
+        expr: sum(db_pool_connections{state="waiting"}) > 5
+        for: 5m
+        labels:
+          severity: P1
+          owner: database
+        annotations:
+          summary: "Pool database menunggu lebih dari 5 koneksi"
+          runbook_url: "docs/09-observability-and-performance.md#15-runbook-singkat"
+
+      - alert: QueueConsumeErrors
+        expr: |
+          sum(rate(queue_consume_total{outcome="error"}[5m]))
+          /
+          clamp_min(sum(rate(queue_consume_total[5m])), 0.001) > 0.01
+        for: 5m
+        labels:
+          severity: P2
+          owner: worker
+        annotations:
+          summary: "Queue consumer gagal di atas 1 persen"
+          runbook_url: "docs/09-observability-and-performance.md#15-runbook-singkat"
+
+      - alert: PaymentFailuresHigh
+        expr: |
+          sum(rate(payment_failure_total[10m]))
+          /
+          clamp_min(sum(rate(payment_success_total[10m])) + sum(rate(payment_failure_total[10m])), 0.001) > 0.05
+        for: 10m
+        labels:
+          severity: P1
+          owner: finance
+        annotations:
+          summary: "Kegagalan payment di atas 5 persen"
+          runbook_url: "docs/09-observability-and-performance.md#15-runbook-singkat"
+
+      - alert: PayrollBatchSlow
+        expr: |
+          histogram_quantile(
+            0.95,
+            sum by (le) (rate(payroll_batch_duration_seconds_bucket[10m]))
+          ) > 60
+        for: 10m
+        labels:
+          severity: P2
+          owner: payroll
+        annotations:
+          summary: "Kalkulasi batch payroll p95 di atas 60 detik"
+          runbook_url: "docs/09-observability-and-performance.md#15-runbook-singkat"
+
+      - alert: AuditChainBroken
+        expr: increase(audit_chain_broken_total[5m]) > 0
+        for: 0m
+        labels:
+          severity: P0
+          owner: compliance
+        annotations:
+          summary: "Rantai audit terdeteksi rusak"
+          runbook_url: "docs/09-observability-and-performance.md#15-runbook-singkat"
+
+      - alert: CrossTenantProbeFailed
+        expr: increase(cross_tenant_access_total[5m]) > 0
+        for: 0m
+        labels:
+          severity: P0
+          owner: security
+        annotations:
+          summary: "Percobaan akses lintas tenant terdeteksi"
+          runbook_url: "docs/08-security-and-compliance.md"

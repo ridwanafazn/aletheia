@@ -1,0 +1,18 @@
+name = "aletheia-edge"
+main = "src/index.ts"
+compatibility_date = "2026-11-01"
+workers_dev = true
+
+[vars]
+ENVIRONMENT = "development"
+GOVERNANCE_URL = "http://127.0.0.1:4101"
+CLAIMS_URL = "http://127.0.0.1:4102"
+PAYROLL_URL = "http://127.0.0.1:4103"
+WEB_ORIGIN = "http://localhost:5173"
+COOKIE_CROSS_SITE = "false"
+RATE_LIMIT_AUTH_MAX = "10"
+RATE_LIMIT_MUTATION_MAX = "30"
+RATE_LIMIT_GRAPHQL_MAX = "20"
+RATE_LIMIT_READ_MAX = "120"
+RATE_LIMIT_WINDOW_SECONDS = "60"
+GATEWAY_MAX_SKEW_SECONDS = "30"

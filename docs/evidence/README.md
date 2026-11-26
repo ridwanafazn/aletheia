@@ -1,0 +1,78 @@
+# `docs/evidence` — Indeks Bukti Teknis
+
+Folder ini menyimpan bukti yang dapat diperiksa reviewer: verifikasi milestone, hasil load test, query plan, screenshot SLO, dan demo access.
+
+## Milestone
+
+| File | Isi | Status |
+| --- | --- | --- |
+| `m1.1-verification.md` | Fondasi workspace dan tooling | Selesai |
+| `m1.2-verification.md` | Kontrak, database, dan policy | Selesai |
+| `m1.3-verification.md` | Edge, auth, dan observability dasar | Selesai |
+| `m2.1-verification.md` | Governance service | Selesai |
+| `m2.2-verification.md` | Claims service | Selesai |
+| `m2.3-verification.md` | Edge BFF dan web workbench | Selesai |
+| `m3.1-verification.md` | Payroll service | Selesai |
+| `m3.2-verification.md` | Go worker dan kalkulasi | Selesai |
+| `m3.3-verification.md` | Payroll console dan employee directory | Selesai |
+| `m3.4-verification.md` | Payslip, laporan, payment lifecycle | Selesai |
+| `m4.1-verification.md` | MIS backend | Selesai |
+| `m4.2-verification.md` | MIS frontend | Selesai |
+| `m5.1-verification.md` | RLS, security hardening, scan | Selesai |
+| `m5.2-verification.md` | OTel, SLO, load test, query optimization | Selesai |
+| `m5.3-verification.md` | E2E, axe, coverage, final QA | Selesai |
+
+## Load test
+
+`load/` berisi:
+
+* `2026-11-26-summary.md`
+* `2026-11-26-smoke.md`
+* `2026-11-26-claims-read.md`
+* `2026-11-26-claim-submit.md`
+* `2026-11-26-approval-race.md`
+* `2026-11-26-payroll-batch.md`
+* `2026-11-26-mis-dashboard.md`
+* `2026-11-26-payment-retry.md`
+
+Semua threshold lulus. Tidak ada threshold yang diturunkan.
+
+## Query plan
+
+`query-plans/` berisi:
+
+* `README.md`
+* `before-claims-list.txt`
+* `after-claims-list.txt`
+* `after-claims-tenant-list.txt`
+* `before-audit-list.txt`
+* `after-audit-list.txt`
+
+Hasil utama: daftar klaim per cabang 5,853 ms menjadi 1,183 ms; daftar klaim per tenant 0,290 ms.
+
+## SLO dan observability
+
+`slo/` berisi:
+
+* `index.html` — galeri bukti.
+* `m5.2-overview.png`
+* `m5.2-domain.png`
+* `m5.2-data-layer.png`
+* `m5.2-jaeger-trace.png`
+
+## Demo
+
+* `demo-access.md` — akun, role, URL, cara menjalankan ulang.
+* `m5.3/coverage-summary.json` — ringkasan coverage domain.
+
+## Metadata
+
+Setiap bukti baru wajib mencantumkan:
+
+* Tanggal dan lingkungan.
+* Perintah reproduksi.
+* Hasil ringkas.
+* Analisis singkat bila ada kegagalan.
+* Tanpa PII, token, atau kredensial.
+
+Commit SHA belum dicantumkan karena seluruh perubahan pada handover ini belum di-commit. Setelah commit pertama, tambahkan SHA pada evidence baru.

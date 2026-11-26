@@ -1,0 +1,14 @@
+                                                                      QUERY PLAN                                                                      
+------------------------------------------------------------------------------------------------------------------------------------------------------
+ Limit  (cost=0.29..3.08 rows=26 width=41) (actual time=0.313..0.908 rows=26 loops=1)
+   Buffers: shared hit=26 read=2
+   ->  Index Only Scan using idx_claims_branch_date on submissions  (cost=0.29..900.45 rows=8375 width=41) (actual time=0.312..0.902 rows=26 loops=1)
+         Index Cond: ((tenant_id = '019361a2-7c00-7000-8000-000000000001'::uuid) AND (branch_id = '019361a2-7c00-7000-8000-000000000011'::uuid))
+         Heap Fetches: 26
+         Buffers: shared hit=26 read=2
+ Planning:
+   Buffers: shared hit=261 read=2
+ Planning Time: 5.197 ms
+ Execution Time: 1.183 ms
+(10 rows)
+

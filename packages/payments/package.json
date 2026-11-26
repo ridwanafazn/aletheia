@@ -1,0 +1,20 @@
+{
+  "name": "@aletheia/payments",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "typecheck": "tsc -b --pretty false",
+    "lint": "eslint src --max-warnings 0",
+    "test": "vitest run --passWithNoTests --exclude \"**/dist/**\"",
+    "build": "tsc -b --force --pretty false"
+  },
+  "dependencies": {
+    "@aletheia/shared-contracts": "workspace:*"
+  }
+}

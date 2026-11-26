@@ -1,0 +1,44 @@
+import cookieParser from "cookie-parser";
+import { httpMetricsMiddleware } from "@aletheia/observability";
+import express, { type Request } from "express";
+
+import { errorHandler, notFoundHandler } from "./middleware/error-handler.js";
+import { gatewayAuth } from "./middleware/gateway-auth.js";
+import { requestContext } from "./middleware/context.js";
+import { requestLogger } from "./middleware/request-logger.js";
+import { analyticsRouter } from "./routes/analytics.js";
+import { auditRouter } from "./routes/audit.js";
+import { authRouter } from "./routes/auth.js";
+import { healthRouter } from "./routes/health.js";
+import { policyRouter } from "./routes/policies.js";
+
+export function createApp(): express.Express {
+  const app = express();
+  app.disable("x-powered-by");
+
+  app.use(httpMetricsMiddleware);
+  app.use(requestContext);
+  app.use(requestLogger);
+  app.use(
+    express.json({
+      limit: "1mb",
+      verify: (request, _response, buffer) => {
+        (request as Request).rawBody = Buffer.from(buffer);
+      },
+    }),
+  );
+  app.use(cookieParser());
+  app.use(gatewayAuth);
+
+  app.use(healthRouter);
+  app.use("/api/v1/auth", authRouter);
+  app.use("/api/v1/policies", policyRouter);
+  app.use("/api/v1/audit-logs", auditRouter);
+  app.use("/internal/v1/analytics", analyticsRouter);
+  app.use("/api/v1/analytics", analyticsRouter);
+
+  app.use(notFoundHandler);
+  app.use(errorHandler);
+
+  return app;
+}

@@ -1,0 +1,52 @@
+{
+  "name": "aletheia",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@12.14.0",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "typecheck": "pnpm -r typecheck",
+    "lint": "pnpm -r lint",
+    "test": "pnpm -r test",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "db:migrate": "pnpm --filter @aletheia/database db:migrate",
+    "db:seed": "pnpm --filter @aletheia/database db:seed",
+    "db:check": "pnpm --filter @aletheia/database db:check",
+    "compose:config": "docker compose config",
+    "verify": "bash scripts/verify-all.sh",
+    "security:db": "pnpm --filter @aletheia/database build && node scripts/security-audit.mjs",
+    "security:audit": "pnpm --filter @aletheia/database build && node scripts/verify-audit-chain.mjs",
+    "security:pii": "node scripts/pii-scan.mjs",
+    "security:deps": "pnpm audit --prod --audit-level high",
+    "load:seed": "pnpm --filter @aletheia/database build && node scripts/seed-load-test.mjs",
+    "load:smoke": "node scripts/run-load-test.mjs smoke",
+    "load:claims-read": "node scripts/run-load-test.mjs claims-read",
+    "load:claim-submit": "node scripts/run-load-test.mjs claim-submit",
+    "load:approval-race": "node scripts/run-load-test.mjs approval-race",
+    "load:payroll-batch": "node scripts/run-load-test.mjs payroll-batch",
+    "load:mis-dashboard": "node scripts/run-load-test.mjs mis-dashboard",
+    "load:payment-retry": "node scripts/run-load-test.mjs payment-retry",
+    "obs:up": "docker compose --profile observability up -d otel-collector jaeger prometheus grafana",
+    "obs:down": "docker compose --profile observability stop otel-collector jaeger prometheus grafana",
+    "obs:capture": "pnpm --filter @aletheia/web exec node scripts/capture-dashboards.mjs",
+    "test:coverage": "vitest run --coverage",
+    "test:e2e": "node apps/web/node_modules/@playwright/test/cli.js test --config apps/web/playwright.config.ts",
+    "test:a11y": "node apps/web/node_modules/@playwright/test/cli.js test --config apps/web/playwright.config.ts e2e/a11y.spec.ts"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@types/node": "^22.20.5",
+    "@vitest/coverage-v8": "5.1.2",
+    "eslint": "^10.15.0",
+    "eslint-config-prettier": "^10.1.8",
+    "globals": "^17.14.0",
+    "prettier": "^3.10.1",
+    "typescript": "5.9.3",
+    "typescript-eslint": "^8.74.0",
+    "vitest": "5.1.2"
+  }
+}

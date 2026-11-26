@@ -1,0 +1,38 @@
+{
+  "name": "@aletheia/database",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "migrations"
+  ],
+  "scripts": {
+    "typecheck": "tsc -b --pretty false",
+    "lint": "eslint src --max-warnings 0",
+    "test": "vitest run --passWithNoTests --exclude \"**/dist/**\"",
+    "build": "tsc -b --force --pretty false",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "pnpm build && node dist/migrate.js",
+    "db:seed": "pnpm build && node dist/seed.js",
+    "db:check": "pnpm build && node dist/check.js"
+  },
+  "dependencies": {
+    "@node-rs/argon2": "^2.2.2",
+    "dotenv": "^18.0.10",
+    "drizzle-orm": "^0.45.4",
+    "pg": "^8.23.1"
+  },
+  "devDependencies": {
+    "@types/pg": "^8.23.1",
+    "drizzle-kit": "^0.31.11"
+  }
+}

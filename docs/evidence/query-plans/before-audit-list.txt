@@ -1,0 +1,13 @@
+                                                                          QUERY PLAN                                                                          
+--------------------------------------------------------------------------------------------------------------------------------------------------------------
+ Limit  (cost=0.41..5.99 rows=26 width=34) (actual time=0.058..0.167 rows=26 loops=1)
+   Buffers: shared hit=15
+   ->  Index Scan Backward using idx_audit_tenant_recorded on audit_logs  (cost=0.41..5462.14 rows=25461 width=34) (actual time=0.057..0.164 rows=26 loops=1)
+         Index Cond: (tenant_id = '019361a2-7c00-7000-8000-000000000001'::uuid)
+         Buffers: shared hit=15
+ Planning:
+   Buffers: shared hit=137
+ Planning Time: 1.352 ms
+ Execution Time: 0.302 ms
+(9 rows)
+
