@@ -1,6 +1,6 @@
 # Aletheia — Handover
 
-* **Status:** M1 sampai M5.4 live. Web, edge, empat service Render, Neon, Upstash, dan Cloudinary aktif; smoke production 15/15 lulus; login enam peran, UI web, dan rollback edge terverifikasi. M6.2 sedang menyelesaikan sinkronisasi `WORKER_URL`, uji async QStash, dan monitoring 24 jam.
+* **Status:** M1 sampai M5.4 live. Web, edge, empat service Render, Neon, Upstash QStash, dan Cloudinary aktif; smoke production 15/15 lulus; async QStash/worker terverifikasi; login enam peran, UI web, dan rollback edge terverifikasi. M6.2 live dengan monitoring 24 jam berjalan via workflow Production Monitor.
 * **Tanggal handover:** 26 November 2026
 * **Data:** seluruhnya sintetis. Tidak ada uang nyata atau PII nyata.
 * **Server demo:** dihentikan. Nyalakan ulang dengan `bash scripts/dev-up.sh`.
@@ -23,7 +23,7 @@ Aletheia adalah platform governance pencairan klaim dan payroll dengan:
 
 **Yang belum selesai:**
 
-* M6.2 finalisasi: sinkronisasi `WORKER_URL`/`WORKER_PUBLIC_URL` ke `https://aletheia-worker-zjnt.onrender.com`, uji async QStash, rollback Render/Pages drill, dan monitoring 24 jam.
+* M6.2 finalisasi: monitoring 24 jam (Production Monitor tiap 6 jam), rollback Render/Pages drill, dan sign-off akhir.
 * Cold start Render free tier; mitigasi `pnpm warm:production`. Jalankan `pnpm deploy:check`, lalu ikuti `docs/runbooks/m6.2-launch.md`.
 * UI payslip dan laporan. API-nya sudah ada dan diverifikasi di M3.4.
 * Edge preview live perlu deploy ulang.
@@ -278,7 +278,7 @@ Indeks lengkap ada di `docs/evidence/README.md`. Mulai dari:
 | --- | --- | --- |
 | Service memakai role pemilik DB | Selesai | Semua service production memakai `aletheia_app` + tenant binding |
 | Edge preview tidak resolve | Selesai | Edge live di `aletheia-edge.ridwanafazn.workers.dev` |
-| QStash belum aktif | Selesai | Upstash QStash aktif; sinkronisasi `WORKER_URL` final ke `-zjnt` sedang diselesaikan |
+| QStash belum aktif | Selesai | Upstash QStash aktif; `WORKER_URL` ke `-zjnt`; async What-If diproses worker ~5 detik |
 | Cold start Render free tier | Terbuka | Jalankan `pnpm warm:production`; pertimbangkan plan berbayar untuk demo tanpa jeda |
 | UI payslip dan laporan belum ada | Terbuka | API sudah diverifikasi M3.4; UI dapat menjadi task lanjutan |
 | RUM LCP/INP belum ada | Terbuka | Tambah web-vitals atau RUM di task lanjutan |
@@ -318,12 +318,11 @@ Jalankan `bash scripts/dev-up.sh`; skrip memilih container 55432 atau Compose 54
 
 M6.1 selesai: lihat `README.md`, `docs/evidence/m6.1-verification.md`, dan `docs/evidence/m6.1/aletheia-demo.webm`.
 
-M5.4 live dan smoke 15/15 lulus. Sisa M6.2:
+M5.4 live, smoke 15/15, dan async QStash lulus. Sisa M6.2:
 
-1. Update `WORKER_URL` di governance/claims/payroll dan `WORKER_PUBLIC_URL` di worker ke `https://aletheia-worker-zjnt.onrender.com`; `render.yaml` sudah diperbarui, jalankan Manual sync atau update dashboard.
-2. Uji async QStash (What-If atau payroll calculate).
-3. Rollback Render/Pages drill.
-4. Monitoring 24 jam dan freeze deploy.
-5. Tandai M6.2 selesai hanya setelah seluruh bukti terisi di `docs/evidence/m6.2-verification.md`.
+1. Monitoring 24 jam: `.github/workflows/production-monitor.yml` berjalan setiap 6 jam; butuh minimal 4 run sukses.
+2. Rollback Render/Pages drill (edge rollback sudah diuji).
+3. Freeze deploy dan sign-off akhir.
+4. Tandai M6.2 selesai hanya setelah seluruh bukti terisi di `docs/evidence/m6.2-verification.md`.
 
 Untuk demo, jalankan `pnpm warm:production` lebih dulu.

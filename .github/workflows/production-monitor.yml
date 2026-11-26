@@ -1,0 +1,51 @@
+name: Production Monitor
+
+on:
+  schedule:
+    - cron: "0 */6 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: production-monitor
+  cancel-in-progress: false
+
+jobs:
+  smoke:
+    name: Warm and smoke production
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 12.14.0
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - name: Install
+        run: pnpm install --frozen-lockfile
+
+      - name: Warm production services
+        run: pnpm warm:production
+        env:
+          GOVERNANCE_URL: ${{ vars.PROD_GOVERNANCE_URL }}
+          CLAIMS_URL: ${{ vars.PROD_CLAIMS_URL }}
+          PAYROLL_URL: ${{ vars.PROD_PAYROLL_URL }}
+          WORKER_URL: ${{ vars.PROD_WORKER_URL }}
+          EDGE_URL: ${{ vars.PROD_EDGE_URL }}
+
+      - name: Smoke production
+        run: pnpm smoke:production
+        env:
+          EDGE_URL: ${{ vars.PROD_EDGE_URL }}
+          WEB_URL: ${{ vars.PROD_WEB_URL }}

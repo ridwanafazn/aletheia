@@ -70,7 +70,7 @@
 - Cloudinary → folder `preview/`.
 
 **Demo:** login 6 role → buat klaim → risk/conflict → approve/SoD → audit.
-**Status 26 November 2026:** M5.3 selesai. M5.4 live: service Render, Neon, Upstash QStash, Cloudinary, edge Workers, dan web Pages aktif; smoke production 15/15 lulus; login enam peran, UI web, dan rollback edge terverifikasi. M6.2 sedang menyelesaikan sinkronisasi `WORKER_URL` final, uji async QStash, rollback Render/Pages, dan monitoring 24 jam. Render free tier memiliki cold start; jalankan `pnpm warm:production` sebelum demo.
+**Status 26 November 2026:** M5.3 selesai. M5.4 live: service Render, Neon, Upstash QStash, Cloudinary, edge Workers, dan web Pages aktif; smoke production 15/15 lulus; async QStash/worker lulus (~5 detik); login enam peran, UI web, dan rollback edge terverifikasi. M6.2 live dengan monitoring 24 jam via workflow Production Monitor; sisa rollback Render/Pages dan sign-off. Render free tier memiliki cold start; jalankan `pnpm warm:production` sebelum demo.
 **Catatan:** payroll BE (TASK-06/07) boleh berjalan paralel setelah kontrak stabil, tetapi tidak menghambat demo klaim.
 
 ---
@@ -123,7 +123,7 @@
 | Fase | Task | Yang dituntaskan | Gate |
 | --- | --- | --- | --- |
 | M6.1 | TASK-19 | **Aset selesai 26 November 2026.** README final, 8 screenshot inti + 3 mobile, video 2:16, akun demo, CHANGELOG, job matrix aktual. | Reviewer dapat menjalankan demo < 3 menit via `dev-up.sh`; evidence lengkap; live URL pending M5.4. Bukti: `docs/evidence/m6.1-verification.md` |
-| M6.2 | Launch (bagian dari TASK-19/18) | **Live, monitoring berjalan.** Smoke production 15/15, web UI 3 peran, rollback edge, dan CSP lulus. Sisa: sinkronisasi `WORKER_URL` final, uji async QStash, rollback Render/Pages, monitoring 24 jam, freeze deploy. Runbook: `docs/runbooks/m6.2-launch.md`; bukti: `docs/evidence/m6.2-verification.md`. | Semua endpoint sehat; tidak ada P0; matrix ≥ 100% |
+| M6.2 | Launch (bagian dari TASK-19/18) | **Live, monitoring berjalan.** Smoke production 15/15, web UI 3 peran, async QStash/worker (~5 detik), rollback edge, dan CSP lulus. Sisa: rollback Render/Pages, 4 run Production Monitor (24 jam), freeze deploy, sign-off. Runbook: `docs/runbooks/m6.2-launch.md`; bukti: `docs/evidence/m6.2-verification.md`. | Semua endpoint sehat; tidak ada P0; matrix ≥ 100% |
 
 **Deploy final:** production demo di free-tier, dengan akun demo dan data sintetis.
 **Demo:** 6 role → claims → payroll → payslip/report → MIS → policy/audit.
