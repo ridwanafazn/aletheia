@@ -165,6 +165,14 @@ const PERSONNEL_TYPE_LABELS: Record<string, string> = {
   SALES_AGENT: "Agen penjualan",
 };
 
+const REPORT_TYPE_LABELS: Record<string, string> = {
+  PPH21_MONTHLY: "PPh 21 bulanan",
+  PPH21_ANNUAL: "PPh 21 tahunan",
+  BPJS_MONTHLY: "BPJS bulanan",
+  BANK_FILE: "Berkas transfer bank",
+  PAYROLL_VARIANCE: "Varians payroll",
+};
+
 const EMPLOYMENT_LABELS: Record<string, string> = {
   PERMANENT: "Tetap",
   CONTRACT: "Kontrak",
@@ -227,6 +235,10 @@ export function personnelTypeLabel(value: string): string {
 
 export function employmentLabel(value: string): string {
   return EMPLOYMENT_LABELS[value] ?? value;
+}
+
+export function reportTypeLabel(value: string): string {
+  return REPORT_TYPE_LABELS[value] ?? value;
 }
 
 export function batchTypeLabel(value: string): string {
