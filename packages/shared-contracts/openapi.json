@@ -102,6 +102,12 @@
                   "ERR_RISK_PENDING",
                   "ERR_COMPLIANCE_REVIEW_PENDING",
                   "ERR_POLICY_RULE_VIOLATION",
+                  "ERR_LEAVE_BALANCE_INSUFFICIENT",
+                  "ERR_LEAVE_BALANCE_NOT_CONFIGURED",
+                  "ERR_OVERTIME_DUPLICATE",
+                  "ERR_ATTENDANCE_MISSING",
+                  "ERR_EMPLOYEE_LINK_CONFLICT",
+                  "ERR_PLAN_FEATURE_UNAVAILABLE",
                   "ERR_NOT_FOUND",
                   "ERR_PAYMENT_STATE_CONFLICT",
                   "ERR_PAYMENT_PROVIDER_FAILED",
@@ -1484,6 +1490,117 @@
               "rules_payload"
             ],
             "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "format": "uuid",
+                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+              },
+              "tenant_id": {
+                "type": "string",
+                "format": "uuid",
+                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+              },
+              "version_tag": {
+                "type": "string",
+                "minLength": 3,
+                "maxLength": 32
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "DRAFT",
+                  "ACTIVE",
+                  "ARCHIVED"
+                ]
+              },
+              "checksum_sha256": {
+                "type": "string",
+                "pattern": "^[a-f0-9]{64}$"
+              },
+              "effective_from": {
+                "type": "string",
+                "format": "date-time",
+                "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$"
+              },
+              "published_by": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "format": "uuid",
+                    "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "approved_by": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "format": "uuid",
+                    "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "created_at": {
+                "type": "string",
+                "format": "date-time",
+                "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$"
+              },
+              "domain": {
+                "type": "string",
+                "const": "PAYROLL_COST_POLICY"
+              },
+              "rules_payload": {
+                "type": "object",
+                "properties": {
+                  "bjo_rate": {
+                    "type": "string",
+                    "pattern": "^\\d+(\\.\\d{1,4})?$"
+                  },
+                  "management_fee_rate": {
+                    "type": "string",
+                    "pattern": "^\\d+(\\.\\d{1,4})?$"
+                  },
+                  "invoice_rounding": {
+                    "type": "string",
+                    "enum": [
+                      "NONE",
+                      "UP_1000",
+                      "NEAREST_1000"
+                    ]
+                  }
+                },
+                "required": [
+                  "bjo_rate",
+                  "management_fee_rate",
+                  "invoice_rounding"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "required": [
+              "id",
+              "tenant_id",
+              "version_tag",
+              "status",
+              "checksum_sha256",
+              "effective_from",
+              "published_by",
+              "approved_by",
+              "created_at",
+              "domain",
+              "rules_payload"
+            ],
+            "additionalProperties": false
           }
         ]
       },
@@ -1567,7 +1684,8 @@
                           "BRANCH_MANAGER",
                           "FINANCE_MANAGER",
                           "MIS_ANALYST",
-                          "COMPLIANCE_ADMIN"
+                          "COMPLIANCE_ADMIN",
+                          "EMPLOYEE"
                         ]
                       },
                       "full_name": {
@@ -1699,6 +1817,12 @@
                       "ERR_RISK_PENDING",
                       "ERR_COMPLIANCE_REVIEW_PENDING",
                       "ERR_POLICY_RULE_VIOLATION",
+                      "ERR_LEAVE_BALANCE_INSUFFICIENT",
+                      "ERR_LEAVE_BALANCE_NOT_CONFIGURED",
+                      "ERR_OVERTIME_DUPLICATE",
+                      "ERR_ATTENDANCE_MISSING",
+                      "ERR_EMPLOYEE_LINK_CONFLICT",
+                      "ERR_PLAN_FEATURE_UNAVAILABLE",
                       "ERR_NOT_FOUND",
                       "ERR_PAYMENT_STATE_CONFLICT",
                       "ERR_PAYMENT_PROVIDER_FAILED",
@@ -2258,6 +2382,12 @@
                       "ERR_RISK_PENDING",
                       "ERR_COMPLIANCE_REVIEW_PENDING",
                       "ERR_POLICY_RULE_VIOLATION",
+                      "ERR_LEAVE_BALANCE_INSUFFICIENT",
+                      "ERR_LEAVE_BALANCE_NOT_CONFIGURED",
+                      "ERR_OVERTIME_DUPLICATE",
+                      "ERR_ATTENDANCE_MISSING",
+                      "ERR_EMPLOYEE_LINK_CONFLICT",
+                      "ERR_PLAN_FEATURE_UNAVAILABLE",
                       "ERR_NOT_FOUND",
                       "ERR_PAYMENT_STATE_CONFLICT",
                       "ERR_PAYMENT_PROVIDER_FAILED",
@@ -2461,6 +2591,12 @@
                       "ERR_RISK_PENDING",
                       "ERR_COMPLIANCE_REVIEW_PENDING",
                       "ERR_POLICY_RULE_VIOLATION",
+                      "ERR_LEAVE_BALANCE_INSUFFICIENT",
+                      "ERR_LEAVE_BALANCE_NOT_CONFIGURED",
+                      "ERR_OVERTIME_DUPLICATE",
+                      "ERR_ATTENDANCE_MISSING",
+                      "ERR_EMPLOYEE_LINK_CONFLICT",
+                      "ERR_PLAN_FEATURE_UNAVAILABLE",
                       "ERR_NOT_FOUND",
                       "ERR_PAYMENT_STATE_CONFLICT",
                       "ERR_PAYMENT_PROVIDER_FAILED",
@@ -2834,6 +2970,12 @@
                       "ERR_RISK_PENDING",
                       "ERR_COMPLIANCE_REVIEW_PENDING",
                       "ERR_POLICY_RULE_VIOLATION",
+                      "ERR_LEAVE_BALANCE_INSUFFICIENT",
+                      "ERR_LEAVE_BALANCE_NOT_CONFIGURED",
+                      "ERR_OVERTIME_DUPLICATE",
+                      "ERR_ATTENDANCE_MISSING",
+                      "ERR_EMPLOYEE_LINK_CONFLICT",
+                      "ERR_PLAN_FEATURE_UNAVAILABLE",
                       "ERR_NOT_FOUND",
                       "ERR_PAYMENT_STATE_CONFLICT",
                       "ERR_PAYMENT_PROVIDER_FAILED",
@@ -3201,7 +3343,8 @@
                             "BRANCH_MANAGER",
                             "FINANCE_MANAGER",
                             "MIS_ANALYST",
-                            "COMPLIANCE_ADMIN"
+                            "COMPLIANCE_ADMIN",
+                            "EMPLOYEE"
                           ]
                         },
                         "action": {
@@ -3410,6 +3553,12 @@
                       "ERR_RISK_PENDING",
                       "ERR_COMPLIANCE_REVIEW_PENDING",
                       "ERR_POLICY_RULE_VIOLATION",
+                      "ERR_LEAVE_BALANCE_INSUFFICIENT",
+                      "ERR_LEAVE_BALANCE_NOT_CONFIGURED",
+                      "ERR_OVERTIME_DUPLICATE",
+                      "ERR_ATTENDANCE_MISSING",
+                      "ERR_EMPLOYEE_LINK_CONFLICT",
+                      "ERR_PLAN_FEATURE_UNAVAILABLE",
                       "ERR_NOT_FOUND",
                       "ERR_PAYMENT_STATE_CONFLICT",
                       "ERR_PAYMENT_PROVIDER_FAILED",
@@ -3718,6 +3867,12 @@
                       "ERR_RISK_PENDING",
                       "ERR_COMPLIANCE_REVIEW_PENDING",
                       "ERR_POLICY_RULE_VIOLATION",
+                      "ERR_LEAVE_BALANCE_INSUFFICIENT",
+                      "ERR_LEAVE_BALANCE_NOT_CONFIGURED",
+                      "ERR_OVERTIME_DUPLICATE",
+                      "ERR_ATTENDANCE_MISSING",
+                      "ERR_EMPLOYEE_LINK_CONFLICT",
+                      "ERR_PLAN_FEATURE_UNAVAILABLE",
                       "ERR_NOT_FOUND",
                       "ERR_PAYMENT_STATE_CONFLICT",
                       "ERR_PAYMENT_PROVIDER_FAILED",
@@ -4115,6 +4270,12 @@
                       "ERR_RISK_PENDING",
                       "ERR_COMPLIANCE_REVIEW_PENDING",
                       "ERR_POLICY_RULE_VIOLATION",
+                      "ERR_LEAVE_BALANCE_INSUFFICIENT",
+                      "ERR_LEAVE_BALANCE_NOT_CONFIGURED",
+                      "ERR_OVERTIME_DUPLICATE",
+                      "ERR_ATTENDANCE_MISSING",
+                      "ERR_EMPLOYEE_LINK_CONFLICT",
+                      "ERR_PLAN_FEATURE_UNAVAILABLE",
                       "ERR_NOT_FOUND",
                       "ERR_PAYMENT_STATE_CONFLICT",
                       "ERR_PAYMENT_PROVIDER_FAILED",
@@ -4496,6 +4657,12 @@
                       "ERR_RISK_PENDING",
                       "ERR_COMPLIANCE_REVIEW_PENDING",
                       "ERR_POLICY_RULE_VIOLATION",
+                      "ERR_LEAVE_BALANCE_INSUFFICIENT",
+                      "ERR_LEAVE_BALANCE_NOT_CONFIGURED",
+                      "ERR_OVERTIME_DUPLICATE",
+                      "ERR_ATTENDANCE_MISSING",
+                      "ERR_EMPLOYEE_LINK_CONFLICT",
+                      "ERR_PLAN_FEATURE_UNAVAILABLE",
                       "ERR_NOT_FOUND",
                       "ERR_PAYMENT_STATE_CONFLICT",
                       "ERR_PAYMENT_PROVIDER_FAILED",
@@ -4721,6 +4888,12 @@
                       "ERR_RISK_PENDING",
                       "ERR_COMPLIANCE_REVIEW_PENDING",
                       "ERR_POLICY_RULE_VIOLATION",
+                      "ERR_LEAVE_BALANCE_INSUFFICIENT",
+                      "ERR_LEAVE_BALANCE_NOT_CONFIGURED",
+                      "ERR_OVERTIME_DUPLICATE",
+                      "ERR_ATTENDANCE_MISSING",
+                      "ERR_EMPLOYEE_LINK_CONFLICT",
+                      "ERR_PLAN_FEATURE_UNAVAILABLE",
                       "ERR_NOT_FOUND",
                       "ERR_PAYMENT_STATE_CONFLICT",
                       "ERR_PAYMENT_PROVIDER_FAILED",
@@ -4822,7 +4995,8 @@
               "PPH21_ANNUAL",
               "BPJS_MONTHLY",
               "BANK_FILE",
-              "PAYROLL_VARIANCE"
+              "PAYROLL_VARIANCE",
+              "PAYROLL_COST_INVOICE"
             ]
           },
           "period_start": {
@@ -4882,7 +5056,8 @@
                       "PPH21_ANNUAL",
                       "BPJS_MONTHLY",
                       "BANK_FILE",
-                      "PAYROLL_VARIANCE"
+                      "PAYROLL_VARIANCE",
+                      "PAYROLL_COST_INVOICE"
                     ]
                   },
                   "branch_id": {
@@ -5163,6 +5338,12 @@
                       "ERR_RISK_PENDING",
                       "ERR_COMPLIANCE_REVIEW_PENDING",
                       "ERR_POLICY_RULE_VIOLATION",
+                      "ERR_LEAVE_BALANCE_INSUFFICIENT",
+                      "ERR_LEAVE_BALANCE_NOT_CONFIGURED",
+                      "ERR_OVERTIME_DUPLICATE",
+                      "ERR_ATTENDANCE_MISSING",
+                      "ERR_EMPLOYEE_LINK_CONFLICT",
+                      "ERR_PLAN_FEATURE_UNAVAILABLE",
                       "ERR_NOT_FOUND",
                       "ERR_PAYMENT_STATE_CONFLICT",
                       "ERR_PAYMENT_PROVIDER_FAILED",
@@ -5260,7 +5441,8 @@
                             "PPH21_ANNUAL",
                             "BPJS_MONTHLY",
                             "BANK_FILE",
-                            "PAYROLL_VARIANCE"
+                            "PAYROLL_VARIANCE",
+                            "PAYROLL_COST_INVOICE"
                           ]
                         },
                         "branch_id": {
@@ -5574,6 +5756,12 @@
                       "ERR_RISK_PENDING",
                       "ERR_COMPLIANCE_REVIEW_PENDING",
                       "ERR_POLICY_RULE_VIOLATION",
+                      "ERR_LEAVE_BALANCE_INSUFFICIENT",
+                      "ERR_LEAVE_BALANCE_NOT_CONFIGURED",
+                      "ERR_OVERTIME_DUPLICATE",
+                      "ERR_ATTENDANCE_MISSING",
+                      "ERR_EMPLOYEE_LINK_CONFLICT",
+                      "ERR_PLAN_FEATURE_UNAVAILABLE",
                       "ERR_NOT_FOUND",
                       "ERR_PAYMENT_STATE_CONFLICT",
                       "ERR_PAYMENT_PROVIDER_FAILED",
@@ -5775,6 +5963,12 @@
                       "ERR_RISK_PENDING",
                       "ERR_COMPLIANCE_REVIEW_PENDING",
                       "ERR_POLICY_RULE_VIOLATION",
+                      "ERR_LEAVE_BALANCE_INSUFFICIENT",
+                      "ERR_LEAVE_BALANCE_NOT_CONFIGURED",
+                      "ERR_OVERTIME_DUPLICATE",
+                      "ERR_ATTENDANCE_MISSING",
+                      "ERR_EMPLOYEE_LINK_CONFLICT",
+                      "ERR_PLAN_FEATURE_UNAVAILABLE",
                       "ERR_NOT_FOUND",
                       "ERR_PAYMENT_STATE_CONFLICT",
                       "ERR_PAYMENT_PROVIDER_FAILED",
@@ -6262,6 +6456,12 @@
                       "ERR_RISK_PENDING",
                       "ERR_COMPLIANCE_REVIEW_PENDING",
                       "ERR_POLICY_RULE_VIOLATION",
+                      "ERR_LEAVE_BALANCE_INSUFFICIENT",
+                      "ERR_LEAVE_BALANCE_NOT_CONFIGURED",
+                      "ERR_OVERTIME_DUPLICATE",
+                      "ERR_ATTENDANCE_MISSING",
+                      "ERR_EMPLOYEE_LINK_CONFLICT",
+                      "ERR_PLAN_FEATURE_UNAVAILABLE",
                       "ERR_NOT_FOUND",
                       "ERR_PAYMENT_STATE_CONFLICT",
                       "ERR_PAYMENT_PROVIDER_FAILED",
@@ -6590,6 +6790,12 @@
                       "ERR_RISK_PENDING",
                       "ERR_COMPLIANCE_REVIEW_PENDING",
                       "ERR_POLICY_RULE_VIOLATION",
+                      "ERR_LEAVE_BALANCE_INSUFFICIENT",
+                      "ERR_LEAVE_BALANCE_NOT_CONFIGURED",
+                      "ERR_OVERTIME_DUPLICATE",
+                      "ERR_ATTENDANCE_MISSING",
+                      "ERR_EMPLOYEE_LINK_CONFLICT",
+                      "ERR_PLAN_FEATURE_UNAVAILABLE",
                       "ERR_NOT_FOUND",
                       "ERR_PAYMENT_STATE_CONFLICT",
                       "ERR_PAYMENT_PROVIDER_FAILED",
@@ -7285,6 +7491,59 @@
                   "tax_remittance_rounding",
                   "prorate_fixed_allowance",
                   "attendance"
+                ],
+                "additionalProperties": false
+              },
+              "effective_from": {
+                "type": "string",
+                "format": "date-time",
+                "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$"
+              }
+            },
+            "required": [
+              "domain",
+              "version_tag",
+              "rules_payload",
+              "effective_from"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "domain": {
+                "type": "string",
+                "const": "PAYROLL_COST_POLICY"
+              },
+              "version_tag": {
+                "type": "string",
+                "minLength": 3,
+                "maxLength": 32
+              },
+              "rules_payload": {
+                "type": "object",
+                "properties": {
+                  "bjo_rate": {
+                    "type": "string",
+                    "pattern": "^\\d+(\\.\\d{1,4})?$"
+                  },
+                  "management_fee_rate": {
+                    "type": "string",
+                    "pattern": "^\\d+(\\.\\d{1,4})?$"
+                  },
+                  "invoice_rounding": {
+                    "type": "string",
+                    "enum": [
+                      "NONE",
+                      "UP_1000",
+                      "NEAREST_1000"
+                    ]
+                  }
+                },
+                "required": [
+                  "bjo_rate",
+                  "management_fee_rate",
+                  "invoice_rounding"
                 ],
                 "additionalProperties": false
               },
@@ -8063,6 +8322,117 @@
                       "rules_payload"
                     ],
                     "additionalProperties": false
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "format": "uuid",
+                        "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                      },
+                      "tenant_id": {
+                        "type": "string",
+                        "format": "uuid",
+                        "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                      },
+                      "version_tag": {
+                        "type": "string",
+                        "minLength": 3,
+                        "maxLength": 32
+                      },
+                      "status": {
+                        "type": "string",
+                        "enum": [
+                          "DRAFT",
+                          "ACTIVE",
+                          "ARCHIVED"
+                        ]
+                      },
+                      "checksum_sha256": {
+                        "type": "string",
+                        "pattern": "^[a-f0-9]{64}$"
+                      },
+                      "effective_from": {
+                        "type": "string",
+                        "format": "date-time",
+                        "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$"
+                      },
+                      "published_by": {
+                        "anyOf": [
+                          {
+                            "type": "string",
+                            "format": "uuid",
+                            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
+                      "approved_by": {
+                        "anyOf": [
+                          {
+                            "type": "string",
+                            "format": "uuid",
+                            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
+                      "created_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$"
+                      },
+                      "domain": {
+                        "type": "string",
+                        "const": "PAYROLL_COST_POLICY"
+                      },
+                      "rules_payload": {
+                        "type": "object",
+                        "properties": {
+                          "bjo_rate": {
+                            "type": "string",
+                            "pattern": "^\\d+(\\.\\d{1,4})?$"
+                          },
+                          "management_fee_rate": {
+                            "type": "string",
+                            "pattern": "^\\d+(\\.\\d{1,4})?$"
+                          },
+                          "invoice_rounding": {
+                            "type": "string",
+                            "enum": [
+                              "NONE",
+                              "UP_1000",
+                              "NEAREST_1000"
+                            ]
+                          }
+                        },
+                        "required": [
+                          "bjo_rate",
+                          "management_fee_rate",
+                          "invoice_rounding"
+                        ],
+                        "additionalProperties": false
+                      }
+                    },
+                    "required": [
+                      "id",
+                      "tenant_id",
+                      "version_tag",
+                      "status",
+                      "checksum_sha256",
+                      "effective_from",
+                      "published_by",
+                      "approved_by",
+                      "created_at",
+                      "domain",
+                      "rules_payload"
+                    ],
+                    "additionalProperties": false
                   }
                 ]
               },
@@ -8165,6 +8535,12 @@
                       "ERR_RISK_PENDING",
                       "ERR_COMPLIANCE_REVIEW_PENDING",
                       "ERR_POLICY_RULE_VIOLATION",
+                      "ERR_LEAVE_BALANCE_INSUFFICIENT",
+                      "ERR_LEAVE_BALANCE_NOT_CONFIGURED",
+                      "ERR_OVERTIME_DUPLICATE",
+                      "ERR_ATTENDANCE_MISSING",
+                      "ERR_EMPLOYEE_LINK_CONFLICT",
+                      "ERR_PLAN_FEATURE_UNAVAILABLE",
                       "ERR_NOT_FOUND",
                       "ERR_PAYMENT_STATE_CONFLICT",
                       "ERR_PAYMENT_PROVIDER_FAILED",
@@ -8768,6 +9144,12 @@
                       "ERR_RISK_PENDING",
                       "ERR_COMPLIANCE_REVIEW_PENDING",
                       "ERR_POLICY_RULE_VIOLATION",
+                      "ERR_LEAVE_BALANCE_INSUFFICIENT",
+                      "ERR_LEAVE_BALANCE_NOT_CONFIGURED",
+                      "ERR_OVERTIME_DUPLICATE",
+                      "ERR_ATTENDANCE_MISSING",
+                      "ERR_EMPLOYEE_LINK_CONFLICT",
+                      "ERR_PLAN_FEATURE_UNAVAILABLE",
                       "ERR_NOT_FOUND",
                       "ERR_PAYMENT_STATE_CONFLICT",
                       "ERR_PAYMENT_PROVIDER_FAILED",
@@ -9130,6 +9512,12 @@
                       "ERR_RISK_PENDING",
                       "ERR_COMPLIANCE_REVIEW_PENDING",
                       "ERR_POLICY_RULE_VIOLATION",
+                      "ERR_LEAVE_BALANCE_INSUFFICIENT",
+                      "ERR_LEAVE_BALANCE_NOT_CONFIGURED",
+                      "ERR_OVERTIME_DUPLICATE",
+                      "ERR_ATTENDANCE_MISSING",
+                      "ERR_EMPLOYEE_LINK_CONFLICT",
+                      "ERR_PLAN_FEATURE_UNAVAILABLE",
                       "ERR_NOT_FOUND",
                       "ERR_PAYMENT_STATE_CONFLICT",
                       "ERR_PAYMENT_PROVIDER_FAILED",
@@ -9558,6 +9946,12 @@
                       "ERR_RISK_PENDING",
                       "ERR_COMPLIANCE_REVIEW_PENDING",
                       "ERR_POLICY_RULE_VIOLATION",
+                      "ERR_LEAVE_BALANCE_INSUFFICIENT",
+                      "ERR_LEAVE_BALANCE_NOT_CONFIGURED",
+                      "ERR_OVERTIME_DUPLICATE",
+                      "ERR_ATTENDANCE_MISSING",
+                      "ERR_EMPLOYEE_LINK_CONFLICT",
+                      "ERR_PLAN_FEATURE_UNAVAILABLE",
                       "ERR_NOT_FOUND",
                       "ERR_PAYMENT_STATE_CONFLICT",
                       "ERR_PAYMENT_PROVIDER_FAILED",
@@ -9830,6 +10224,12 @@
                       "ERR_RISK_PENDING",
                       "ERR_COMPLIANCE_REVIEW_PENDING",
                       "ERR_POLICY_RULE_VIOLATION",
+                      "ERR_LEAVE_BALANCE_INSUFFICIENT",
+                      "ERR_LEAVE_BALANCE_NOT_CONFIGURED",
+                      "ERR_OVERTIME_DUPLICATE",
+                      "ERR_ATTENDANCE_MISSING",
+                      "ERR_EMPLOYEE_LINK_CONFLICT",
+                      "ERR_PLAN_FEATURE_UNAVAILABLE",
                       "ERR_NOT_FOUND",
                       "ERR_PAYMENT_STATE_CONFLICT",
                       "ERR_PAYMENT_PROVIDER_FAILED",
@@ -10134,6 +10534,12 @@
                       "ERR_RISK_PENDING",
                       "ERR_COMPLIANCE_REVIEW_PENDING",
                       "ERR_POLICY_RULE_VIOLATION",
+                      "ERR_LEAVE_BALANCE_INSUFFICIENT",
+                      "ERR_LEAVE_BALANCE_NOT_CONFIGURED",
+                      "ERR_OVERTIME_DUPLICATE",
+                      "ERR_ATTENDANCE_MISSING",
+                      "ERR_EMPLOYEE_LINK_CONFLICT",
+                      "ERR_PLAN_FEATURE_UNAVAILABLE",
                       "ERR_NOT_FOUND",
                       "ERR_PAYMENT_STATE_CONFLICT",
                       "ERR_PAYMENT_PROVIDER_FAILED",
@@ -10390,6 +10796,12 @@
                       "ERR_RISK_PENDING",
                       "ERR_COMPLIANCE_REVIEW_PENDING",
                       "ERR_POLICY_RULE_VIOLATION",
+                      "ERR_LEAVE_BALANCE_INSUFFICIENT",
+                      "ERR_LEAVE_BALANCE_NOT_CONFIGURED",
+                      "ERR_OVERTIME_DUPLICATE",
+                      "ERR_ATTENDANCE_MISSING",
+                      "ERR_EMPLOYEE_LINK_CONFLICT",
+                      "ERR_PLAN_FEATURE_UNAVAILABLE",
                       "ERR_NOT_FOUND",
                       "ERR_PAYMENT_STATE_CONFLICT",
                       "ERR_PAYMENT_PROVIDER_FAILED",
@@ -10745,6 +11157,12 @@
                       "ERR_RISK_PENDING",
                       "ERR_COMPLIANCE_REVIEW_PENDING",
                       "ERR_POLICY_RULE_VIOLATION",
+                      "ERR_LEAVE_BALANCE_INSUFFICIENT",
+                      "ERR_LEAVE_BALANCE_NOT_CONFIGURED",
+                      "ERR_OVERTIME_DUPLICATE",
+                      "ERR_ATTENDANCE_MISSING",
+                      "ERR_EMPLOYEE_LINK_CONFLICT",
+                      "ERR_PLAN_FEATURE_UNAVAILABLE",
                       "ERR_NOT_FOUND",
                       "ERR_PAYMENT_STATE_CONFLICT",
                       "ERR_PAYMENT_PROVIDER_FAILED",
@@ -11020,6 +11438,12 @@
                       "ERR_RISK_PENDING",
                       "ERR_COMPLIANCE_REVIEW_PENDING",
                       "ERR_POLICY_RULE_VIOLATION",
+                      "ERR_LEAVE_BALANCE_INSUFFICIENT",
+                      "ERR_LEAVE_BALANCE_NOT_CONFIGURED",
+                      "ERR_OVERTIME_DUPLICATE",
+                      "ERR_ATTENDANCE_MISSING",
+                      "ERR_EMPLOYEE_LINK_CONFLICT",
+                      "ERR_PLAN_FEATURE_UNAVAILABLE",
                       "ERR_NOT_FOUND",
                       "ERR_PAYMENT_STATE_CONFLICT",
                       "ERR_PAYMENT_PROVIDER_FAILED",
@@ -11238,6 +11662,12 @@
                       "ERR_RISK_PENDING",
                       "ERR_COMPLIANCE_REVIEW_PENDING",
                       "ERR_POLICY_RULE_VIOLATION",
+                      "ERR_LEAVE_BALANCE_INSUFFICIENT",
+                      "ERR_LEAVE_BALANCE_NOT_CONFIGURED",
+                      "ERR_OVERTIME_DUPLICATE",
+                      "ERR_ATTENDANCE_MISSING",
+                      "ERR_EMPLOYEE_LINK_CONFLICT",
+                      "ERR_PLAN_FEATURE_UNAVAILABLE",
                       "ERR_NOT_FOUND",
                       "ERR_PAYMENT_STATE_CONFLICT",
                       "ERR_PAYMENT_PROVIDER_FAILED",
@@ -11630,6 +12060,12 @@
                       "ERR_RISK_PENDING",
                       "ERR_COMPLIANCE_REVIEW_PENDING",
                       "ERR_POLICY_RULE_VIOLATION",
+                      "ERR_LEAVE_BALANCE_INSUFFICIENT",
+                      "ERR_LEAVE_BALANCE_NOT_CONFIGURED",
+                      "ERR_OVERTIME_DUPLICATE",
+                      "ERR_ATTENDANCE_MISSING",
+                      "ERR_EMPLOYEE_LINK_CONFLICT",
+                      "ERR_PLAN_FEATURE_UNAVAILABLE",
                       "ERR_NOT_FOUND",
                       "ERR_PAYMENT_STATE_CONFLICT",
                       "ERR_PAYMENT_PROVIDER_FAILED",
@@ -11920,6 +12356,12 @@
                       "ERR_RISK_PENDING",
                       "ERR_COMPLIANCE_REVIEW_PENDING",
                       "ERR_POLICY_RULE_VIOLATION",
+                      "ERR_LEAVE_BALANCE_INSUFFICIENT",
+                      "ERR_LEAVE_BALANCE_NOT_CONFIGURED",
+                      "ERR_OVERTIME_DUPLICATE",
+                      "ERR_ATTENDANCE_MISSING",
+                      "ERR_EMPLOYEE_LINK_CONFLICT",
+                      "ERR_PLAN_FEATURE_UNAVAILABLE",
                       "ERR_NOT_FOUND",
                       "ERR_PAYMENT_STATE_CONFLICT",
                       "ERR_PAYMENT_PROVIDER_FAILED",
@@ -12242,6 +12684,12 @@
                       "ERR_RISK_PENDING",
                       "ERR_COMPLIANCE_REVIEW_PENDING",
                       "ERR_POLICY_RULE_VIOLATION",
+                      "ERR_LEAVE_BALANCE_INSUFFICIENT",
+                      "ERR_LEAVE_BALANCE_NOT_CONFIGURED",
+                      "ERR_OVERTIME_DUPLICATE",
+                      "ERR_ATTENDANCE_MISSING",
+                      "ERR_EMPLOYEE_LINK_CONFLICT",
+                      "ERR_PLAN_FEATURE_UNAVAILABLE",
                       "ERR_NOT_FOUND",
                       "ERR_PAYMENT_STATE_CONFLICT",
                       "ERR_PAYMENT_PROVIDER_FAILED",

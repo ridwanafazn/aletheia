@@ -52,6 +52,7 @@ Semua perubahan penting pada Aletheia. Format mengikuti [Keep a Changelog](https
 
 ### Fixed
 
+- Artefak `packages/shared-contracts/openapi.json` disegarkan agar CI `Verify OpenAPI artifact is current` lulus setelah penambahan kontrak M6.4–M6.6.
 - QStash mengembalikan `enqueued=false` karena token berada di `us-east-1` tetapi endpoint default mengarah ke `eu-central-1`.
 - Production Monitor gagal resolve edge karena variabel memakai subdomain `ridwanafazn`, bukan `ridwanafzn`.
 - CI integration test gagal karena `@aletheia/observability` belum dibangun pada checkout bersih.
