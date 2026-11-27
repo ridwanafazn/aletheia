@@ -308,7 +308,7 @@ async function main(): Promise<void> {
     await upsert(client, "governance.tenants", {
       id: T_SAU,
       code: "SAU",
-      name: "Siaga Abdi Utama Demo",
+      name: "SEIHITSU",
       status: "ACTIVE",
       plan: "HRIS_PRO",
     });

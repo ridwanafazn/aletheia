@@ -18,8 +18,8 @@ Mengganti lapisan visual Quiet Ledger dengan **Daylight workspace**: HRIS yang t
 | Tipe | Plus Jakarta Sans dan IBM Plex Mono, numerik tabular |
 | Shell | Sidebar terang 252px, dapat diciutkan ke 78px, workspace card, user block |
 | Topbar | Breadcrumb, role chip, avatar profil; badge `HRIS Pro` dihapus |
-| Profil | `/profile`, dapat dibuka dari avatar topbar dan blok pengguna sidebar |
-| Login | Panel cobalt diagonal, watermark logo, ilustrasi garis, kartu form mengambang |
+| Profil | `/profile`, dapat dibuka dari avatar topbar dan blok pengguna sidebar; tenant tampil sebagai `SEIHITSU`; kartu dua kolom sama tinggi |
+| Login | Panel cobalt diagonal, watermark logo, ilustrasi garis, kartu form mengambang; tanpa input MFA; opsi akun seragam tanpa bento |
 | Overview | Header ringan, KPI berwarna, chart baru, antrean keputusan |
 | Tabel | Header terang, baris airy, status pill, aksi jelas |
 | Mobile | Sidebar drawer; payslip self-service menjadi kartu |

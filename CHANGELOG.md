@@ -46,6 +46,8 @@ Semua perubahan penting pada Aletheia. Format mengikuti [Keep a Changelog](https
 - Brand mark baru, app icon, dan favicon; halaman profil `/profile` yang dapat dibuka dari avatar topbar dan blok pengguna sidebar.
 - Sidebar dapat dibuka/tutup di desktop dan tersimpan sebagai preferensi; badge `HRIS Pro` dihapus dari topbar, konteks tenant pindah ke workspace card dan profil.
 - Mobile self-service payslip memakai kartu, bukan tabel horizontal.
+- Login demo menyembunyikan input MFA; opsi akun memakai grid dua kolom bertinggi sama tanpa kartu full-width.
+- Profil memakai aturan dua kartu sama tinggi; tenant demo tampil sebagai `SEIHITSU`.
 - Bukti UI Phase 0: `docs/evidence/design-phase5-verification.md` dan galeri screenshot baru.
 
 ### Changed

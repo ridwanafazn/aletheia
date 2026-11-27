@@ -152,13 +152,13 @@ Kata sandi semua akun: **`AletheiaDemo!2026`**. MFA nonaktif pada demo.
 
 | Email | Role | Tenant | Cabang |
 | --- | --- | --- | --- |
-| `officer.bdg@aletheia.id` | CLAIMS_OFFICER | SAU | BDG-01 |
-| `manager.bdg@aletheia.id` | BRANCH_MANAGER | SAU | BDG-01 |
-| `finance.vp@aletheia.id` | FINANCE_MANAGER | SAU | JKT-HQ |
-| `hr.ops@aletheia.id` | HR_SPECIALIST | SAU | JKT-HQ |
-| `employee.siti@aletheia.id` | EMPLOYEE | SAU | BDG-01 |
-| `compliance@aletheia.id` | COMPLIANCE_ADMIN | SAU | JKT-HQ |
-| `mis.analyst@aletheia.id` | MIS_ANALYST | SAU | JKT-HQ |
+| `officer.bdg@aletheia.id` | CLAIMS_OFFICER | SEIHITSU | BDG-01 |
+| `manager.bdg@aletheia.id` | BRANCH_MANAGER | SEIHITSU | BDG-01 |
+| `finance.vp@aletheia.id` | FINANCE_MANAGER | SEIHITSU | JKT-HQ |
+| `hr.ops@aletheia.id` | HR_SPECIALIST | SEIHITSU | JKT-HQ |
+| `employee.siti@aletheia.id` | EMPLOYEE | SEIHITSU | BDG-01 |
+| `compliance@aletheia.id` | COMPLIANCE_ADMIN | SEIHITSU | JKT-HQ |
+| `mis.analyst@aletheia.id` | MIS_ANALYST | SEIHITSU | JKT-HQ |
 | `compliance@bpui.id` | COMPLIANCE_ADMIN | BPUI | JKT-HQ |
 
 Halaman login menyediakan tombol peran demo yang mengisi email dan kata sandi otomatis. Untuk alur < 3 menit: jalankan `bash scripts/dev-up.sh`, buka `http://localhost:5173`, pilih **Spesialis SDM** untuk payroll, **Petugas Klaim** untuk klaim, atau **Karyawan** untuk Ruang Saya, lalu jelajahi menu sesuai peran.

@@ -115,7 +115,7 @@ export default function ProfilePage() {
             <dl className="profile-list">
               <div>
                 <dt>Tenant</dt>
-                <dd>{tenant === undefined ? "Memuat..." : `${tenant.name} (${tenant.code})`}</dd>
+                <dd>{tenant === undefined ? "Memuat..." : tenant.name}</dd>
               </div>
               <div>
                 <dt>Fitur aktif</dt>

@@ -77,14 +77,14 @@ Kata sandi semua akun: **`AletheiaDemo!2026`**. MFA nonaktif.
 
 | Email | Role | Tenant | Cabang |
 | --- | --- | --- | --- |
-| `officer.bdg@aletheia.id` | CLAIMS_OFFICER | SAU | BDG-01 |
-| `officer.sby@aletheia.id` | CLAIMS_OFFICER | SAU | SBY-01 |
-| `manager.bdg@aletheia.id` | BRANCH_MANAGER | SAU | BDG-01 |
-| `finance.vp@aletheia.id` | FINANCE_MANAGER | SAU | JKT-HQ |
-| `hr.ops@aletheia.id` | HR_SPECIALIST | SAU | JKT-HQ |
-| `employee.siti@aletheia.id` | EMPLOYEE | SAU | BDG-01 |
-| `compliance@aletheia.id` | COMPLIANCE_ADMIN | SAU | JKT-HQ |
-| `mis.analyst@aletheia.id` | MIS_ANALYST | SAU | JKT-HQ |
+| `officer.bdg@aletheia.id` | CLAIMS_OFFICER | SEIHITSU | BDG-01 |
+| `officer.sby@aletheia.id` | CLAIMS_OFFICER | SEIHITSU | SBY-01 |
+| `manager.bdg@aletheia.id` | BRANCH_MANAGER | SEIHITSU | BDG-01 |
+| `finance.vp@aletheia.id` | FINANCE_MANAGER | SEIHITSU | JKT-HQ |
+| `hr.ops@aletheia.id` | HR_SPECIALIST | SEIHITSU | JKT-HQ |
+| `employee.siti@aletheia.id` | EMPLOYEE | SEIHITSU | BDG-01 |
+| `compliance@aletheia.id` | COMPLIANCE_ADMIN | SEIHITSU | JKT-HQ |
+| `mis.analyst@aletheia.id` | MIS_ANALYST | SEIHITSU | JKT-HQ |
 | `compliance@bpui.id` | COMPLIANCE_ADMIN | BPUI | JKT-HQ |
 
 ## 4. URL production
@@ -146,7 +146,7 @@ pnpm db:check
 Evidence database terakhir:
 
 * 26 tabel, 26 policy RLS.
-* Audit chain valid; SAU 29.682 baris saat verifikasi M5.4.
+* Audit chain valid; SEIHITSU 29.682 baris saat verifikasi M5.4.
 * `pnpm security:db`: 41/41 checks lulus, termasuk tabel HRIS baru.
 * `pnpm security:audit`: semua tenant valid.
 

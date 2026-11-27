@@ -119,6 +119,10 @@
 - Page header: title, one-sentence description, primary action on the right.
 - Panels use a full border and no shadow. Shadows are reserved for floating layers.
 
+### Two-card rule
+
+When two cards sit side by side, both stretch to the row height. The shorter card keeps the same outer size and may contain empty space; never let the right card dictate a taller row while the left card shrinks to its content. Use `align-items: stretch` and `height: 100%` on the card children.
+
 ---
 
 ## 5. Shape and elevation
@@ -211,7 +215,7 @@ Declare elevation once. Do not combine a wide soft shadow with a 1px border on t
 - Brand mark, headline, body, and feature labels in white over cobalt.
 - Right panel: white with a crisp line illustration of a calm office scene, 42% opacity.
 - Login card: white, 20px radius, soft floating shadow, 420px max width.
-- Demo role buttons are light neutral cards. They are not primary actions.
+- Demo role buttons are light neutral cards in a two-column grid with equal row heights; no full-width last card, no bento asymmetry. MFA input is hidden in the demo login; the backend still supports MFA.
 - Mobile: stacked layout; cobalt header with watermark, form card below, illustration hidden.
 
 ### Dialogs and drawers

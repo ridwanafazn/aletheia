@@ -876,11 +876,20 @@ h3 {
 }
 
 .demo-role {
+  height: 100%;
   padding: 9px 11px;
   border-color: var(--border-200);
   border-radius: 10px;
   background: var(--surface-50);
   font-size: 11px;
+}
+
+.demo-roles {
+  grid-auto-rows: 1fr;
+}
+
+.demo-role:last-child:nth-child(odd) {
+  grid-column: auto;
 }
 
 .demo-role:hover {
@@ -896,7 +905,11 @@ h3 {
 /* Profile ---------------------------------------------------------------- */
 
 .profile-grid {
-  align-items: start;
+  align-items: stretch;
+}
+
+.profile-grid > .panel {
+  height: 100%;
 }
 
 .profile-hero {

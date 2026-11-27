@@ -64,7 +64,6 @@ export default function LoginPage() {
   const navigate = useNavigate();
   const [email, setEmail] = useState("officer.bdg@aletheia.id");
   const [password, setPassword] = useState("AletheiaDemo!2026");
-  const [mfaCode, setMfaCode] = useState("");
   const [error, setError] = useState<unknown>(null);
   const [submitting, setSubmitting] = useState(false);
 
@@ -85,7 +84,7 @@ export default function LoginPage() {
     setError(null);
     setSubmitting(true);
     try {
-      const nextUser = await login({ email, password, mfaCode });
+      const nextUser = await login({ email, password });
       await navigate({ to: landingFor(nextUser.role), replace: true });
     } catch (caught) {
       setError(caught);
@@ -165,24 +164,6 @@ export default function LoginPage() {
                 required
               />
             </div>
-            <div className="field">
-              <label className="field__label" htmlFor="mfa">
-                Kode MFA
-              </label>
-              <input
-                id="mfa"
-                className="input"
-                inputMode="numeric"
-                autoComplete="one-time-code"
-                placeholder="Opsional untuk akun demo"
-                value={mfaCode}
-                onChange={(event) => setMfaCode(event.target.value)}
-                maxLength={6}
-              />
-              <span className="field__hint">
-                Isi bila akun sudah mengaktifkan autentikasi dua faktor.
-              </span>
-            </div>
 
             <Button
               type="submit"
@@ -204,7 +185,6 @@ export default function LoginPage() {
                 onClick={() => {
                   setEmail(user.email);
                   setPassword("AletheiaDemo!2026");
-                  setMfaCode("");
                 }}
               >
                 <strong>{user.label}</strong>

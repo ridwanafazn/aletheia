@@ -358,7 +358,7 @@ export function AppShell() {
             </span>
             <span className="workspace-switcher__copy">
               <strong>{tenant.name}</strong>
-              <small>{tenant.code} · Ruang kerja</small>
+              <small>Ruang kerja</small>
             </span>
           </button>
         )}
