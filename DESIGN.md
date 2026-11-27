@@ -361,8 +361,21 @@ The sidebar collapse control is desktop-only. The mobile menu is a drawer with a
 - Chart bars render without entrance animation so evidence and reduced-motion users see the final state immediately.
 - Employee role keeps Ruang Saya as its home.
 
-**Phase 3 — Core workflow clarity: next.**
+**Phase 3 — Core workflow clarity: deferred.**
 
-- Form hierarchy, inline validation, sticky actions, and SoD explanations.
-- Mobile table-to-card conversion for payslips, reports, and workforce remains Phase 4.
-- Data search across employees, claims, and payroll remains a future Phase 1 extension.
+- Form hierarchy, inline validation, sticky actions, and SoD explanations are not part of the final portfolio cut.
+- The existing forms and approval explanations remain usable; the deeper workflow pass is logged as backlog.
+
+**Phase 4 — Mobile table conversion: deferred.**
+
+- Mobile table-to-card conversion for payslips, reports, and workforce remains backlog.
+- The current mobile tables stay horizontally scrollable and axe-clean.
+
+**Phase 5 — Final polish and production cutover: complete.**
+
+- Sidebar navigation scrolls independently for long role menus; the account footer stays pinned and visible.
+- Menu labels fade softly at the scroll edge, with a spacer so the last item is never hidden under the fade.
+- Cloudflare Pages CSP allows the bundled `data:` font subsets, so Plus Jakarta Sans loads in production with zero console errors.
+- Production runs commit `04962c3`: four Render services, Cloudflare Workers edge, and Cloudflare Pages web.
+- Post-deploy smoke **15/15**, async QStash/worker ~5 seconds, six-role login, and role-home browser checks pass.
+- Phase 3–4 remain documented backlog; no P0/P1 issues are open.

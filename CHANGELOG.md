@@ -54,6 +54,10 @@ Semua perubahan penting pada Aletheia. Format mengikuti [Keep a Changelog](https
 - UI Phase 2: home per peran untuk Claims Officer, Branch Manager, Finance Manager, HR Specialist, Compliance Admin, dan MIS Analyst.
 - UI Phase 2: urutan action-first — “Perlu tindakan” atau “Sinyal analisis”, fokus utama, tiga metrik sekunder, chart dengan “Apa artinya”, lalu tabel detail per peran.
 - UI Phase 2: chart tanpa animasi masuk dan empty state untuk data nol; kontras teks sekunder dinaikkan agar axe stabil saat transisi halaman.
+- UI Phase 5: navigasi sidebar bisa di-scroll untuk peran dengan menu panjang; footer akun tetap terlihat, label terakhir diberi spacer, dan tepi bawah memakai fade halus.
+- UI Phase 5: CSP Cloudflare Pages mengizinkan font `data:` dari bundel Plus Jakarta Sans, sehingga production bebas error console.
+- UI Phase 5: production cutover commit `04962c3` — empat service Render, edge Worker, dan Pages; smoke 15/15, async QStash/worker ~5 detik.
+- Bukti UI Phase 5: `docs/evidence/ui-phase5-verification.md` dan screenshot sidebar Finance/Compliance.
 
 ### Changed
 

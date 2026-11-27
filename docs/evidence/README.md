@@ -2,7 +2,7 @@
 
 Folder ini menyimpan bukti yang dapat diperiksa reviewer: verifikasi milestone, hasil load test, query plan, screenshot SLO, dan demo access.
 
-**Status pengembangan:** aktif; UI Phase 0 selesai 27 November 2026. Snapshot lengkap ada di [`../FINAL-STATUS.md`](../FINAL-STATUS.md) dan sistem visual di [`../../DESIGN.md`](../../DESIGN.md).
+**Status pengembangan:** UI Phase 0–2 dan Phase 5 selesai 27 November 2026; Phase 3–4 ditunda. Production live di commit `04962c3`. Snapshot lengkap ada di [`../FINAL-STATUS.md`](../FINAL-STATUS.md) dan sistem visual di [`../../DESIGN.md`](../../DESIGN.md).
 
 ## Milestone
 
@@ -34,6 +34,7 @@ Folder ini menyimpan bukti yang dapat diperiksa reviewer: verifikasi milestone, 
 | `design-phase5-verification.md` | UI Phase 0 Daylight workspace, logo, shell, login, profil, axe | Selesai 27 November 2026 |
 | `ui-phase1-verification.md` | UI Phase 1 command palette, aksi cepat, keyboard, search topbar | Selesai 27 November 2026 |
 | `ui-phase2-verification.md` | UI Phase 2 home per peran, hierarki insight, axe | Selesai 27 November 2026 |
+| `ui-phase5-verification.md` | UI Phase 5 sidebar scroll, CSP font, production cutover | Selesai 27 November 2026 |
 | `design-phase1-verification.md` | Quiet Ledger foundation, tokens, shell, komponen, E2E, axe | Selesai 27 November 2026 |
 | `design-phase2-verification.md` | Overview, reports v2, organization v2, charts, E2E, axe | Selesai 27 November 2026 |
 | `design-phase3-verification.md` | Payroll, employees, workforce, ruang saya, claims, E2E, axe | Selesai 27 November 2026 |

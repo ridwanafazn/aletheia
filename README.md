@@ -4,9 +4,9 @@
 
 Aletheia (Greek: *unconcealment*) is a reference implementation for governed money movement: customer claims, payroll, agent commissions, tax withholding, and cross-domain risk intelligence — built around **versioned policy references**, **zero double-disbursement**, and an **immutable audit trail**.
 
-> **Status:** M1–M5.4 live di production. Web, edge, empat service Render, Neon, Upstash QStash, dan Cloudinary aktif; smoke production **15/15 lulus**, async QStash/worker terverifikasi, login tujuh peran dan UI web terverifikasi, serta rollback edge, Pages, dan Render diuji. M6.1 portofolio siap (README, 8 screenshot, video 2:16, CHANGELOG). M6.2 live dengan monitoring 24 jam berjalan via `.github/workflows/production-monitor.yml`; run terjadwal pertama lulus dan sign-off menunggu 3 run berikutnya. M6.3 menambahkan pusat slip gaji dan layar laporan PPh 21/BPJS. M6.4 menambahkan employee self-service, e-cuti, dan e-lembur. M6.5 menambahkan reimburse dan struktur organisasi. M6.6 menambahkan paket tenant dan invoice biaya payroll. Stage 3A menautkan approval cuti ke attendance summary payroll. **Freeze deploy dicabut 27 November 2026; M6.3–M6.6 dan desain fase 1–4 live di commit `5d231c1` dengan smoke production 15/15.** Render free tier memiliki cold start; jalankan `pnpm warm:production` sebelum demo. Baca [`HANDOVER.md`](HANDOVER.md) sebelum melanjutkan.
+> **Status:** M1–M5.4 dan M6.1–M6.6 live di production. Web, edge, empat service Render, Neon, Upstash QStash, dan Cloudinary aktif; smoke production **15/15 lulus**, async QStash/worker terverifikasi, login enam peran operasional dan UI web terverifikasi, serta rollback edge, Pages, dan Render diuji. M6.2 live dengan monitoring 24 jam berjalan via `.github/workflows/production-monitor.yml`; run terjadwal pertama lulus dan sign-off menunggu 3 run berikutnya. M6.3 menambahkan pusat slip gaji dan layar laporan PPh 21/BPJS. M6.4 menambahkan employee self-service, e-cuti, dan e-lembur. M6.5 menambahkan reimburse dan struktur organisasi. M6.6 menambahkan paket tenant dan invoice biaya payroll. Stage 3A menautkan approval cuti ke attendance summary payroll. **Production live di commit `04962c3`; smoke production 15/15 dan UI Phase 5 selesai 27 November 2026.** Render free tier memiliki cold start; jalankan `pnpm warm:production` sebelum demo. Baca [`HANDOVER.md`](HANDOVER.md) sebelum melanjutkan.
 >
-> **UI Phase 0–2 selesai 27 November 2026.** Arah *Daylight workspace*, command palette, dan home per peran sudah live di localhost: token baru, sidebar collapsible, logo dan favicon, halaman profil, login baru, seluruh halaman desktop, pencarian halaman/aksi via `Ctrl/Cmd+K`, serta hierarki insight yang berbeda untuk setiap peran. Production tetap live di commit `5d231c1`; Stage 3A sudah di `main` dan CI hijau, tetapi belum di-deploy ke Render. Snapshot ada di [`docs/FINAL-STATUS.md`](docs/FINAL-STATUS.md).
+> **UI Phase 0–2 dan Phase 5 selesai 27 November 2026.** Arah *Daylight workspace*, command palette, home per peran, dan final polish sudah live di production: token baru, sidebar collapsible dengan navigasi yang bisa di-scroll, logo dan favicon, halaman profil, login baru, seluruh halaman desktop, pencarian halaman/aksi via `Ctrl/Cmd+K`, hierarki insight per peran, serta perbaikan CSP font. UI Phase 3 (form clarity) dan Phase 4 (mobile table conversion) sengaja ditunda dan tetap tercatat sebagai backlog. Snapshot ada di [`docs/FINAL-STATUS.md`](docs/FINAL-STATUS.md).
 
 ## Why this exists
 
@@ -28,7 +28,7 @@ Aletheia separates:
 
 ## Screenshots
 
-**UI Phase 0–2 — Daylight workspace.** Screenshot di bawah adalah tampilan terbaru. Bukti milestone lama tetap tersimpan di [`docs/evidence`](docs/evidence/README.md).
+**UI Phase 0–5 — Daylight workspace.** Screenshot di bawah adalah tampilan terbaru di production. Bukti milestone lama tetap tersimpan di [`docs/evidence`](docs/evidence/README.md).
 
 | Login dan akun demo | Ikhtisar per peran |
 | --- | --- |
@@ -46,7 +46,7 @@ Aletheia separates:
 | **Sidebar ringkas** | **Mobile** |
 | <img src="docs/evidence/design-phase5/overview-collapsed.png" alt="Sidebar ringkas dengan icon rail" width="100%"> | <img src="docs/evidence/design-phase5/overview-mobile.png" alt="Ikhtisar pada mobile" width="100%"> |
 
-Mobile: [`Ruang Saya`](docs/evidence/design-phase5/me-mobile.png) · [`Karyawan`](docs/evidence/design-phase5/employees-mobile.png) · [`Klaim`](docs/evidence/design-phase5/claims-mobile.png). Bukti Phase 0 ada di [`docs/evidence/design-phase5-verification.md`](docs/evidence/design-phase5-verification.md). Phase 1: [`command palette`](docs/evidence/ui-phase1/command-palette.png). Phase 2 role homes: [`Claims`](docs/evidence/ui-phase2/claims-officer.png) · [`Branch`](docs/evidence/ui-phase2/branch-manager.png) · [`Finance`](docs/evidence/ui-phase2/finance-manager.png) · [`HR`](docs/evidence/ui-phase2/hr-specialist.png) · [`Compliance`](docs/evidence/ui-phase2/compliance.png) · [`MIS`](docs/evidence/ui-phase2/mis-analyst.png). Semua data sintetis.
+Mobile: [`Ruang Saya`](docs/evidence/design-phase5/me-mobile.png) · [`Karyawan`](docs/evidence/design-phase5/employees-mobile.png) · [`Klaim`](docs/evidence/design-phase5/claims-mobile.png). Bukti Phase 0 ada di [`docs/evidence/design-phase5-verification.md`](docs/evidence/design-phase5-verification.md). Phase 1: [`command palette`](docs/evidence/ui-phase1/command-palette.png). Phase 2 role homes: [`Claims`](docs/evidence/ui-phase2/claims-officer.png) · [`Branch`](docs/evidence/ui-phase2/branch-manager.png) · [`Finance`](docs/evidence/ui-phase2/finance-manager.png) · [`HR`](docs/evidence/ui-phase2/hr-specialist.png) · [`Compliance`](docs/evidence/ui-phase2/compliance.png) · [`MIS`](docs/evidence/ui-phase2/mis-analyst.png). Phase 5: [`Finance sidebar`](docs/evidence/ui-phase5/finance-manager-sidebar.png) · [`Compliance sidebar`](docs/evidence/ui-phase5/compliance-sidebar-scrolled.png). Semua data sintetis.
 
 ## Demo video
 
@@ -115,6 +115,7 @@ flowchart TB
 | [`docs/evidence/design-phase5-verification.md`](docs/evidence/design-phase5-verification.md) | Bukti UI Phase 0: logo, shell, login, profil, dan axe |
 | [`docs/evidence/ui-phase1-verification.md`](docs/evidence/ui-phase1-verification.md) | Bukti UI Phase 1: command palette, aksi cepat, dan keyboard |
 | [`docs/evidence/ui-phase2-verification.md`](docs/evidence/ui-phase2-verification.md) | Bukti UI Phase 2: home per peran, hierarki insight, dan axe |
+| [`docs/evidence/ui-phase5-verification.md`](docs/evidence/ui-phase5-verification.md) | Bukti UI Phase 5: sidebar scroll, CSP font, dan production cutover |
 | [`docs/evidence/m6.1-verification.md`](docs/evidence/m6.1-verification.md) | Verifikasi portofolio M6.1 |
 | [`docs/runbooks/m6.2-launch.md`](docs/runbooks/m6.2-launch.md) | Runbook launch, smoke, rollback, monitoring M6.2 |
 | [`docs/evidence/m6.2-verification.md`](docs/evidence/m6.2-verification.md) | Bukti smoke production, web UI, rollback edge/Pages/Render, cold start, monitoring |
@@ -173,7 +174,7 @@ Halaman login menyediakan tombol peran demo yang mengisi email dan kata sandi ot
 - Claims: [aletheia-claims.onrender.com](https://aletheia-claims.onrender.com)
 - Payroll: [aletheia-payroll.onrender.com](https://aletheia-payroll.onrender.com)
 - Worker: [aletheia-worker-zjnt.onrender.com](https://aletheia-worker-zjnt.onrender.com)
-- Neon production: project `aletheia` (PG16, Singapore), migrasi 0000–0011, RLS 36/36.
+- Neon production: project `aletheia` (PG16, Singapore), migrasi 0000–0017, RLS aktif.
 - Upstash QStash dan Cloudinary aktif.
 
 Web production menyajikan CSP, HSTS, COOP, dan Permissions-Policy. Render free tier tidur saat idle; cold start bisa lebih dari 2 menit. Sebelum demo:
@@ -182,7 +183,7 @@ Web production menyajikan CSP, HSTS, COOP, dan Permissions-Policy. Render free t
 pnpm warm:production
 ```
 
-Lalu buka web production dan masuk dengan akun demo di atas. Uji async QStash/worker dengan `pnpm async:production`. Monitoring production berjalan setiap 6 jam lewat workflow **Production Monitor**; baseline `45816325368`, run pasca-drill `45821314200`, dan run terjadwal `45894766221` lulus dengan smoke 15/15; sign-off menunggu 3 run terjadwal berikutnya. Deploy 27 November 2026 untuk M6.3–M6.6 dan desain fase 1–4 live di commit `5d231c1`; bukti lengkap ada di [`docs/evidence/design-phases-production-deploy.md`](docs/evidence/design-phases-production-deploy.md). Untuk stack lokal, gunakan `bash scripts/dev-up.sh` dan `http://localhost:5173`.
+Lalu buka web production dan masuk dengan akun demo di atas. Uji async QStash/worker dengan `pnpm async:production`. Monitoring production berjalan setiap 6 jam lewat workflow **Production Monitor**; baseline `45816325368`, run pasca-drill `45821314200`, dan run terjadwal `45894766221` lulus dengan smoke 15/15; sign-off menunggu 3 run terjadwal berikutnya. Deploy UI Phase 5 live di commit `04962c3`; bukti ada di [`docs/evidence/ui-phase5-verification.md`](docs/evidence/ui-phase5-verification.md) dan [`docs/evidence/design-phases-production-deploy.md`](docs/evidence/design-phases-production-deploy.md). Untuk stack lokal, gunakan `bash scripts/dev-up.sh` dan `http://localhost:5173`.
 
 Semua endpoint selain health, login, refresh, dan webhook payment memerlukan header bertanda tangan gateway. Produksi wajib mengisi `INTERNAL_GATEWAY_SECRET`, `JWT_PRIVATE_KEY`, `JWT_PUBLIC_KEY`, `REFRESH_TOKEN_PEPPER`, `MFA_ENCRYPTION_KEY`, `PII_PEPPER`, kredensial Cloudinary, `PAYMENT_WEBHOOK_SECRET`, dan `FILE_SIGNING_SECRET`.
 
@@ -244,7 +245,7 @@ Dashboard dan alert disimpan di `infra/observability/`. Bukti M5.2 ada di `docs/
 | 3 | Payroll + HRIS-lite | done: M3.1–M3.4 |
 | 4 | MIS + GraphQL BFF | done: M4.1 dan M4.2 |
 | 5 | Hardening: RLS audit, observability, load, security, E2E | done: M5.1–M5.4 live di Render, Neon, Cloudflare, Upstash, Cloudinary |
-| 6 | Portfolio: deploy, README, video, evidence | in progress: UI Phase 0–2 selesai; Phase 3 alur inti berikutnya; M6.2 live, rollback edge/Pages/Render lulus, monitoring 24 jam berjalan (1/4 run terjadwal), sign-off ditunda; Stage 3A selesai di `main` |
+| 6 | Portfolio: deploy, README, video, evidence | done: UI Phase 0–2 dan Phase 5 live di production commit `04962c3`; Phase 3–4 ditunda; M6.2 live, rollback edge/Pages/Render lulus, monitoring 24 jam berjalan (1/4 run terjadwal), sign-off ditunda; Stage 3A live |
 
 See [`docs/06-execution-roadmap.md`](docs/06-execution-roadmap.md) for task-level detail.
 
