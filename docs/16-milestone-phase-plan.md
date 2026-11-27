@@ -128,6 +128,7 @@
 | M6.4 | Employee self-service | **Selesai 26 November 2026.** Role `EMPLOYEE`, `/me`, `/workforce`, saldo cuti, e-cuti, e-lembur, SoD, RLS, E2E, dan axe. Bukti: `docs/evidence/m6.4-verification.md`. | Karyawan dapat melihat data sendiri dan mengajukan cuti/lembur; HR dapat memutuskan |
 | M6.5 | Reimburse dan organisasi | **Selesai 27 November 2026.** Reimburse dengan Cloudinary, approval, pembayaran mock; departemen/posisi/personel read-only; E2E dan axe. Bukti: `docs/evidence/m6.5-verification.md`. | Karyawan dapat mengajukan reimburse; HR/Finance memutuskan; struktur organisasi terlihat |
 | M6.6 | Paket tenant dan invoice biaya | **Selesai 27 November 2026.** Plan BASIC/HRIS+/HRIS Pro/Enterprise, feature gating, badge topbar, policy biaya, report invoice per cabang; E2E dan axe. Bukti: `docs/evidence/m6.6-verification.md`. | Paket tenant terlihat dan fitur ter-gate; Finance dapat mengunduh invoice biaya payroll |
+| M6.7 | HRIS gap — cuti ke attendance (Stage 3A) | **Selesai 27 November 2026.** Approval cuti menambah `paid_leave_days`/`unpaid_leave_days` per periode, termasuk cuti lintas bulan; guard `ERR_ATTENDANCE_MISSING`/`ERR_ATTENDANCE_CAPACITY`; audit `attendance_sync`. Bukti: `docs/evidence/stage-3a-leave-attendance.md`. | Approval cuti memperbarui ringkasan absensi atau rollback dengan error yang jelas |
 
 **Deploy final:** production demo di free-tier, dengan akun demo dan data sintetis.
 **Demo:** 6 role → claims → payroll → payslip/report → MIS → policy/audit.

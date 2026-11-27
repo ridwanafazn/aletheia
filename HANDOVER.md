@@ -1,6 +1,6 @@
 # Aletheia — Handover
 
-* **Status:** M1–M5.4 live di production. Web, edge, empat service Render, Neon, Upstash QStash, dan Cloudinary aktif; smoke production 15/15 lulus; async QStash/worker terverifikasi; login tujuh peran, UI web, serta rollback edge, Pages, dan Render terverifikasi. M6.2 live dengan monitoring 24 jam berjalan via workflow Production Monitor. M6.3 menambahkan pusat slip gaji dan laporan di web. M6.4 menambahkan employee self-service, e-cuti, dan e-lembur. M6.5 menambahkan reimburse dan struktur organisasi. M6.6 menambahkan paket tenant dan invoice biaya payroll. **Freeze deploy dicabut 27 November 2026; M6.3–M6.6 dan desain fase 1–4 live di commit `5d231c1` dengan smoke production 15/15.**
+* **Status:** M1–M5.4 live di production. Web, edge, empat service Render, Neon, Upstash QStash, dan Cloudinary aktif; smoke production 15/15 lulus; async QStash/worker terverifikasi; login tujuh peran, UI web, serta rollback edge, Pages, dan Render terverifikasi. M6.2 live dengan monitoring 24 jam berjalan via workflow Production Monitor. M6.3 menambahkan pusat slip gaji dan laporan di web. M6.4 menambahkan employee self-service, e-cuti, dan e-lembur. M6.5 menambahkan reimburse dan struktur organisasi. M6.6 menambahkan paket tenant dan invoice biaya payroll. Stage 3A menautkan approval cuti ke attendance summary payroll. **Freeze deploy dicabut 27 November 2026; M6.3–M6.6 dan desain fase 1–4 live di commit `5d231c1` dengan smoke production 15/15.**
 * **Tanggal handover:** 26 November 2026
 * **Data:** seluruhnya sintetis. Tidak ada uang nyata atau PII nyata.
 * **Server demo:** dihentikan. Nyalakan ulang dengan `bash scripts/dev-up.sh`.
@@ -19,13 +19,13 @@ Aletheia adalah platform governance pencairan klaim dan payroll dengan:
 * OpenTelemetry, Prometheus, Grafana, dan Jaeger untuk observability.
 * k6 untuk load test dan Playwright untuk E2E.
 
-**Yang sudah selesai:** M1 fondasi, M2 governance dan claims, M3 payroll dan disbursement, M4 MIS, M5.1 security hardening, M5.2 observability dan load test, M5.3 E2E/accessibility/final QA, M5.4 production live di Render/Neon/Cloudflare/Upstash/Cloudinary, M6.1 README/screenshot/video/CHANGELOG/job matrix, M6.3 pusat slip gaji dan laporan di web, M6.4 employee self-service, e-cuti, serta e-lembur, M6.5 reimburse serta struktur organisasi, dan M6.6 paket tenant serta invoice biaya payroll.
+**Yang sudah selesai:** M1 fondasi, M2 governance dan claims, M3 payroll dan disbursement, M4 MIS, M5.1 security hardening, M5.2 observability dan load test, M5.3 E2E/accessibility/final QA, M5.4 production live di Render/Neon/Cloudflare/Upstash/Cloudinary, M6.1 README/screenshot/video/CHANGELOG/job matrix, M6.3 pusat slip gaji dan laporan di web, M6.4 employee self-service, e-cuti, serta e-lembur, M6.5 reimburse serta struktur organisasi, M6.6 paket tenant serta invoice biaya payroll, dan Stage 3A sinkronisasi cuti ke attendance summary.
 
 **Yang belum selesai:**
 
 * Monitoring production berkelanjutan; Production Monitor berjalan tiap 6 jam.
 * Cold start Render free tier; mitigasi `pnpm warm:production`. `pnpm deploy:check` sudah lulus; runbook ada di `docs/runbooks/m6.2-launch.md`.
-* Performance review, CRUD organisasi dan org chart visual, kebijakan reimburse, serta integrasi cuti ke attendance summary payroll. Ini modul HRIS berikutnya.
+* Performance review, CRUD organisasi dan org chart visual, serta kebijakan reimburse. Ini modul HRIS berikutnya.
 * RUM LCP/INP, exporter span edge, dan label Prometheus kardinalitas tinggi.
 * CI E2E full-stack belum menjadi job CI.
 
@@ -264,6 +264,7 @@ pnpm load:seed
 
 Indeks lengkap ada di `docs/evidence/README.md`. Mulai dari:
 
+* `docs/evidence/stage-3a-leave-attendance.md` — sinkronisasi approval cuti ke attendance summary, batas, dan test.
 * `docs/evidence/m6.4-verification.md` — employee self-service, e-cuti, e-lembur, E2E, axe.
 * `docs/evidence/m6.5-verification.md` — reimburse, struktur organisasi, E2E, axe.
 * `docs/evidence/m6.6-verification.md` — paket tenant, feature gating, invoice biaya payroll, E2E, axe.
@@ -290,7 +291,7 @@ Indeks lengkap ada di `docs/evidence/README.md`. Mulai dari:
 | Reimburse dan struktur organisasi | Selesai M6.5 | `/me` tab Reimburse, `/workforce` tab Reimburse, dan `/organization`; bukti `docs/evidence/m6.5-verification.md` |
 | Paket tenant dan invoice biaya payroll | Selesai M6.6 | Plan BASIC/HRIS+/HRIS Pro/Enterprise, badge topbar, feature gating API, report `PAYROLL_COST_INVOICE`; bukti `docs/evidence/m6.6-verification.md` |
 | Performance review dan org chart visual | Terbuka | Modul HRIS berikutnya; jangan diklaim sebagai fitur yang sudah ada |
-| Integrasi cuti ke attendance summary | Terbuka | Persetujuan cuti belum otomatis mengubah ringkasan absensi payroll |
+| Integrasi cuti ke attendance summary | Selesai Stage 3A | Approval cuti memperbarui `paid_leave_days`/`unpaid_leave_days`, termasuk cuti lintas bulan; bukti `docs/evidence/stage-3a-leave-attendance.md` |
 | RUM LCP/INP belum ada | Terbuka | Tambah web-vitals atau RUM di task lanjutan |
 | Label Prometheus kardinalitas tinggi | Terbuka | Gunakan `resource_constant_labels` atau transform collector |
 | Perubahan M5.4–M6.2 | Selesai | Commit `e81fca0`, `b829b94`, `fb10579`, `3209231`, `08ad6d7`; lihat riwayat Git |
@@ -335,6 +336,6 @@ Status deploy terbaru:
 1. M6.3–M6.6 dan desain fase 1–4 live di commit `5d231c1`.
 2. Production Monitor tetap berjalan setiap 6 jam.
 3. Bukti deploy: `docs/evidence/design-phases-production-deploy.md`.
-4. Langkah berikutnya: performance review, CRUD organisasi, pengaturan paket, dan integrasi cuti ke payroll.
+4. Langkah berikutnya: performance review, CRUD organisasi, dan pengaturan paket.
 
 Untuk demo, jalankan `pnpm warm:production` lebih dulu.

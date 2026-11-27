@@ -399,7 +399,7 @@ Semua mutasi finansial memakai `Idempotency-Key`; semua endpoint memakai tenant/
 - [x] Employee self-service untuk slip, absensi, saldo cuti, e-cuti, dan e-lembur (M6.4).
 - [x] Reimburse dan struktur organisasi read-only (M6.5).
 - [x] Paket tenant dan invoice biaya payroll (M6.6).
-- [ ] Persetujuan cuti otomatis memperbarui attendance summary payroll.
+- [x] Persetujuan cuti otomatis memperbarui attendance summary payroll (Stage 3A).
 - [x] Tidak ada PII mentah di UI/log/ekspor.
 - [ ] Test U-01..U-20 + I-08..I-10 lulus.
 

@@ -417,6 +417,7 @@ Aturan:
 4. **Leave approval**: `decided_by !== personnel.user_id` (bandingkan user, bukan `personnel_id`); alasan wajib untuk reject; audit.
 5. **Absensi** hanya ringkasan; clock-in/out dan shift scheduling adalah future development.
 6. Jika data absensi hilang, jangan default 0; tandai `MISSING_ATTENDANCE` dan minta konfirmasi HR.
+7. **Sinkronisasi cuti → absensi**: saat cuti `APPROVED`, tambahkan hari cuti ke `attendance_summaries` periode terkait. `UNPAID` menambah `unpaid_leave_days`; jenis lain menambah `paid_leave_days`. Cuti lintas bulan dibagi per bulan berdasarkan hari kerja Senin–Jumat; pecahan hari dibulatkan ke bawah. Jika ringkasan periode belum ada, tolak dengan `ERR_ATTENDANCE_MISSING`. Jika `present_days + paid_leave_days + unpaid_leave_days + absent_days` akan melebihi `working_days`, tolak dengan `ERR_ATTENDANCE_CAPACITY`. Keduanya menggulung seluruh transaksi approval.
 
 ## 5G. Matriks Uji Wajib
 
