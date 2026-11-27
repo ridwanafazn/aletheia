@@ -1,4 +1,4 @@
-import { mkdirSync, readFileSync } from "node:fs";
+import { copyFileSync, mkdirSync, readFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -7,7 +7,9 @@ import { chromium } from "@playwright/test";
 const HERE = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(HERE, "../../..");
 const OUTPUT = resolve(ROOT, "docs/guides");
+const PUBLIC_OUTPUT = resolve(ROOT, "apps/web/public/guides");
 mkdirSync(OUTPUT, { recursive: true });
+mkdirSync(PUBLIC_OUTPUT, { recursive: true });
 
 const LOGO = readFileSync(resolve(ROOT, "apps/web/public/brand/aletheia-mark.svg"), "utf8");
 const LOGIN_URL = "https://aletheia-web-preview.pages.dev";
@@ -692,6 +694,7 @@ for (const guide of guides) {
       '</span><span><span class="pageNumber"></span> / <span class="totalPages"></span></span></div>',
     margin: { top: "18mm", right: "16mm", bottom: "20mm", left: "16mm" },
   });
-  console.log(`created docs/guides/${guide.file}`);
+  copyFileSync(resolve(OUTPUT, guide.file), resolve(PUBLIC_OUTPUT, guide.file));
+  console.log(`created docs/guides/${guide.file} + public copy`);
 }
 await browser.close();
