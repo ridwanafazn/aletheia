@@ -262,7 +262,7 @@ const page = await browser.newPage({ viewport: { width: 2400, height: 1350 }, de
 
 await page.setContent(bannerHtml(), { waitUntil: "load" });
 
-await page.screenshot({ path: resolve(OUT, "banner-2400x1350.png") });
+await page.screenshot({ path: resolve(OUT, "banner-aletheia-2400x1350.png") });
 
 
 

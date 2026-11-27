@@ -153,7 +153,6 @@ Caption pendek untuk lightbox:
 | `05-organization.png` | Struktur Organisasi: delapan divisi dan 32 personel. | Halaman Struktur Organisasi dengan kartu departemen. |
 | `06-claims.png` | Ruang Klaim: status, risiko, dan konflik dalam satu daftar. | Tabel klaim dengan status dan flag konflik. |
 | `07-mis-intelligence.png` | MIS Intelligence: KPI cabang, approval rate, dan tren payroll/klaim. | Dashboard MIS Intelligence dengan KPI dan tabel cabang. |
-| `08-ruang-saya-mobile.png` | Ruang Saya di mobile: slip, absensi, cuti, lembur, dan reimburse. | Halaman Ruang Saya pada layar mobile. |
 
 ---
 

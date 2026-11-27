@@ -6,7 +6,7 @@ Paket aset untuk halaman `https://ridwanafazn.my.id/projects/aletheia`.
 
 | File | Ukuran | Kegunaan |
 | --- | --- | --- |
-| `banner-2400x1350.png` | 2400×1350 (16:9) | Banner utama resolusi tinggi |
+| `banner-aletheia-2400x1350.png` | 2400×1350 (16:9) | Banner utama resolusi tinggi |
 | `banner-1600x900.png` | 1600×900 (16:9) | Banner untuk web (ukuran tampil maksimum) |
 | `banner-og-1200x630.png` | 1200×630 | Open Graph / Twitter card |
 | `gallery/01-login.png` | 3200×2000 | Login dan akun demo |
@@ -17,7 +17,6 @@ Paket aset untuk halaman `https://ridwanafazn.my.id/projects/aletheia`.
 | `gallery/05-organization.png` | 3200×2000 | Struktur Organisasi |
 | `gallery/06-claims.png` | 3200×2000 | Ruang Klaim |
 | `gallery/07-mis-intelligence.png` | 3200×2000 | MIS Intelligence |
-| `gallery/08-ruang-saya-mobile.png` | 1170×2532 | Ruang Saya mobile |
 | `gallery.json` | — | Manifest caption/alt untuk lightbox |
 | `copywriting.md` | — | Copy lengkap dengan framing eksplorasi |
 | `render-banner.mjs` | — | Script reproduksi banner |
@@ -86,7 +85,7 @@ Script membutuhkan screenshot `gallery/07-mis-intelligence.png` dan font di `sou
 
 | Sekarang | Ganti dengan |
 | --- | --- |
-| Cover `Screenshot_2026-11-27_121751` | `banner-2400x1350.png` |
+| Cover `Screenshot_2026-11-27_121751` | `banner-aletheia-2400x1350.png` |
 | Peran “Fullstack Developer” | “Eksplorasi fullstack / solo build” |
 | Stack “React” | “React 19 · TypeScript · PostgreSQL · Go · Cloudflare” |
 | Subtitle “Enterprise Disbursement Governance & MIS Intelligence Platform” | “Ruang eksplorasi fullstack untuk klaim, payroll, dan MIS.” |
@@ -99,9 +98,9 @@ Script membutuhkan screenshot `gallery/07-mis-intelligence.png` dan font di `sou
 
 Halaman proyek di `portofx` membaca `longDescription` dan memecahnya menjadi section berdasarkan heading `##`. Jadi:
 
-1. Upload `banner-2400x1350.png` ke Cloudinary, pakai sebagai `coverImage` dan `ogImage`.
+1. Upload `banner-aletheia-2400x1350.png` ke Cloudinary, pakai sebagai `coverImage` dan `ogImage`.
 2. Salin bagian dari `page-copy.md` mulai “Kenapa saya membangun ini” sampai “Yang saya pelajari” ke `longDescription`. Heading `##` akan menjadi section.
-3. Upload sembilan gambar galeri, lalu isi `gallery` dengan `alt` dan `caption` dari `gallery.json`.
+3. Upload delapan gambar galeri live (mobile opsional), lalu isi `gallery` dengan `alt` dan `caption` dari `gallery.json`.
 4. Ubah `role` menjadi “Eksplorasi fullstack / solo build” dan `techStack` menjadi daftar stack lengkap.
 5. Ganti meta description dengan versi di `page-copy.md`.
 
