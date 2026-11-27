@@ -97,7 +97,7 @@ Kata sandi semua akun: **`AletheiaDemo!2026`**. MFA nonaktif.
 | Payroll | `https://aletheia-payroll.onrender.com` |
 | Worker | `https://aletheia-worker-zjnt.onrender.com` |
 
-Jalankan `pnpm warm:production` sebelum demo karena Render free tier tidur saat idle. Production Monitor berjalan tiap 6 jam; baseline `45816325368` dan run pasca-drill `45821314200` lulus. Sign-off M6.2 setelah minimal 4 run sukses (perkiraan 27 November 2026, 19:05 WIB).
+Jalankan `pnpm warm:production` sebelum demo karena Render free tier tidur saat idle. Production Monitor berjalan tiap 6 jam; baseline `45816325368`, run pasca-drill `45821314200`, dan run terjadwal `45894766221` lulus. Sign-off M6.2 setelah minimal 4 run sukses; 1/4 run terjadwal sudah lulus dan 3 run berikutnya dijadwalkan 27 November 2026 (perkiraan malam WIB, tergantung delay GitHub Actions).
 
 ## 4A. URL lokal
 
@@ -283,7 +283,7 @@ Indeks lengkap ada di `docs/evidence/README.md`. Mulai dari:
 | Service memakai role pemilik DB | Selesai | Semua service production memakai `aletheia_app` + tenant binding |
 | Edge production | Selesai | Live di `aletheia-edge.ridwanafzn.workers.dev`; rollback drill lulus |
 | QStash belum aktif | Selesai | Upstash QStash aktif; `WORKER_URL` ke `-zjnt`; async What-If diproses worker ~5 detik |
-| Monitoring 24 jam M6.2 | Berjalan | Baseline `45816325368` dan pasca-drill `45821314200` hijau; sign-off setelah 4 run terjadwal |
+| Monitoring 24 jam M6.2 | Berjalan | Baseline `45816325368`, pasca-drill `45821314200`, dan run terjadwal `45894766221` hijau; 1/4 run terjadwal lulus, sign-off setelah 3 run berikutnya |
 | Cold start Render free tier | Terbuka | Jalankan `pnpm warm:production`; pertimbangkan plan berbayar untuk demo tanpa jeda |
 | UI payslip dan laporan | Selesai M6.3 | `/payslips`, `/reports`, dan tombol buat slip di detail batch; bukti `docs/evidence/m6.3-verification.md` |
 | Employee self-service, e-cuti, e-lembur | Selesai M6.4 | `/me` dan `/workforce`; bukti `docs/evidence/m6.4-verification.md` |
@@ -328,7 +328,7 @@ Jalankan `bash scripts/dev-up.sh`; skrip memilih container 55432 atau Compose 54
 
 M6.1 selesai: lihat `README.md`, `docs/evidence/m6.1-verification.md`, dan `docs/evidence/m6.1/aletheia-demo.webm`. M6.3 selesai: lihat `docs/evidence/m6.3-verification.md`. M6.4 selesai: lihat `docs/evidence/m6.4-verification.md`. M6.5 selesai: lihat `docs/evidence/m6.5-verification.md`. M6.6 selesai: lihat `docs/evidence/m6.6-verification.md`.
 
-M5.4 live, smoke 15/15, async QStash lulus, dan rollback edge/Pages/Render sudah diuji. M6.2 selesai dan freeze deploy sudah dicabut pada 27 November 2026.
+M5.4 live, smoke 15/15, async QStash lulus, dan rollback edge/Pages/Render sudah diuji. Freeze deploy sudah dicabut pada 27 November 2026; M6.2 live dan sign-off monitoring menunggu 3 run terjadwal berikutnya (1/4 sudah lulus).
 
 Status deploy terbaru:
 

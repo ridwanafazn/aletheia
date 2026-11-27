@@ -70,7 +70,7 @@
 - Cloudinary → folder `preview/`.
 
 **Demo:** login 6 role → buat klaim → risk/conflict → approve/SoD → audit.
-**Status 26 November 2026:** M5.3 selesai. M5.4 live: service Render, Neon, Upstash QStash, Cloudinary, edge Workers, dan web Pages aktif; smoke production 15/15 lulus; async QStash/worker lulus (~5 detik); login enam peran, UI web, serta rollback edge, Pages, dan Render terverifikasi. M6.2 live; Production Monitor baseline `45816325368` dan pasca-drill `45821314200` lulus. Sisa 4 run terjadwal (24 jam), freeze deploy, dan sign-off. Render free tier memiliki cold start; jalankan `pnpm warm:production` sebelum demo.
+**Status 26 November 2026:** M5.3 selesai. M5.4 live: service Render, Neon, Upstash QStash, Cloudinary, edge Workers, dan web Pages aktif; smoke production 15/15 lulus; async QStash/worker lulus (~5 detik); login enam peran, UI web, serta rollback edge, Pages, dan Render terverifikasi. M6.2 live; Production Monitor baseline `45816325368` dan pasca-drill `45821314200` lulus, serta run terjadwal `45894766221` lulus (1/4). Sisa 3 run terjadwal; freeze deploy sudah dicabut; sign-off menunggu. Render free tier memiliki cold start; jalankan `pnpm warm:production` sebelum demo.
 **Catatan:** payroll BE (TASK-06/07) boleh berjalan paralel setelah kontrak stabil, tetapi tidak menghambat demo klaim.
 
 ---
@@ -123,7 +123,7 @@
 | Fase | Task | Yang dituntaskan | Gate |
 | --- | --- | --- | --- |
 | M6.1 | TASK-19 | **Aset selesai 26 November 2026.** README final, 8 screenshot inti + 3 mobile, video 2:16, akun demo, CHANGELOG, job matrix aktual. | Reviewer dapat menjalankan demo < 3 menit via `dev-up.sh` atau live URL; evidence lengkap. Bukti: `docs/evidence/m6.1-verification.md` |
-| M6.2 | Launch (bagian dari TASK-19/18) | **Live, monitoring berjalan.** Smoke production 15/15, web UI 3 peran, async QStash/worker (~5 detik), rollback edge/Pages/Render, dan CSP lulus. Sisa: 4 run Production Monitor (24 jam), freeze deploy, sign-off. Runbook: `docs/runbooks/m6.2-launch.md`; bukti: `docs/evidence/m6.2-verification.md`. | Semua endpoint sehat; tidak ada P0; matrix ≥ 100% |
+| M6.2 | Launch (bagian dari TASK-19/18) | **Live, monitoring berjalan.** Smoke production 15/15, web UI 3 peran, async QStash/worker (~5 detik), rollback edge/Pages/Render, dan CSP lulus. Run terjadwal `45894766221` lulus (1/4); sisa 3 run Production Monitor dan sign-off. Freeze deploy sudah dicabut. Runbook: `docs/runbooks/m6.2-launch.md`; bukti: `docs/evidence/m6.2-verification.md`. | Semua endpoint sehat; tidak ada P0; matrix ≥ 100% |
 | M6.3 | Follow-up HRIS surface | **Selesai 26 November 2026.** Pusat slip gaji `/payslips`, laporan `/reports`, tombol buat slip di detail batch, seed berkas demo, E2E, axe, dan bundle 143,7 KB. Bukti: `docs/evidence/m6.3-verification.md`. | Slip dan laporan dapat dibuat serta diunduh; E2E lulus |
 | M6.4 | Employee self-service | **Selesai 26 November 2026.** Role `EMPLOYEE`, `/me`, `/workforce`, saldo cuti, e-cuti, e-lembur, SoD, RLS, E2E, dan axe. Bukti: `docs/evidence/m6.4-verification.md`. | Karyawan dapat melihat data sendiri dan mengajukan cuti/lembur; HR dapat memutuskan |
 | M6.5 | Reimburse dan organisasi | **Selesai 27 November 2026.** Reimburse dengan Cloudinary, approval, pembayaran mock; departemen/posisi/personel read-only; E2E dan axe. Bukti: `docs/evidence/m6.5-verification.md`. | Karyawan dapat mengajukan reimburse; HR/Finance memutuskan; struktur organisasi terlihat |
