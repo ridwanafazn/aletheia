@@ -2,7 +2,7 @@
 
 Folder ini menyimpan bukti yang dapat diperiksa reviewer: verifikasi milestone, hasil load test, query plan, screenshot SLO, dan demo access.
 
-**Status pengembangan:** UI Phase 0–2 dan Phase 5 selesai 27 November 2026; Phase 3–4 ditunda. Web production live di commit `544e54e`; demo dataset 15 bulan sudah aktif. Snapshot lengkap ada di [`../FINAL-STATUS.md`](../FINAL-STATUS.md) dan sistem visual di [`../../DESIGN.md`](../../DESIGN.md).
+**Status pengembangan:** UI Phase 0–2 dan Phase 5 selesai 27 November 2026; Phase 3–4 ditunda. Web production live di commit `21c0a9a`; demo dataset 15 bulan sudah aktif. Snapshot lengkap ada di [`../FINAL-STATUS.md`](../FINAL-STATUS.md) dan sistem visual di [`../../DESIGN.md`](../../DESIGN.md).
 
 ## Milestone
 

@@ -45,6 +45,6 @@
 ## Catatan
 
 - Perubahan dilakukan langsung ke Neon melalui MCP.
-- Template `portofx` diubah untuk menyembunyikan heading “Hasil” tanpa menghapus daftar hasil; deploy Worker `17670b84-f6ba-42e9-8997-48445c2d9c10`.
+- Template `portofx` diubah untuk menyembunyikan heading “Hasil” tanpa menghapus daftar hasil (`41e24b5`); deploy Worker `17670b84-f6ba-42e9-8997-48445c2d9c10`.
 - `seo` disimpan di row, tetapi halaman saat ini memakai `title` dan `description` proyek untuk metadata utama.
 - Copy mengikuti framing eksplorasi: tidak ada klaim “expert”, “enterprise-grade”, atau “production-ready untuk perusahaan”.

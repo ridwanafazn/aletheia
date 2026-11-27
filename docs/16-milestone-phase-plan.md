@@ -132,7 +132,7 @@
 
 **Deploy final:** production demo di free-tier, dengan akun demo dan data sintetis.
 **Demo:** 6 role operasional + employee self-service → claims → payroll → payslip/report → MIS → policy/audit.
-**Status:** UI Phase 0–2 dan Phase 5 selesai 27 November 2026; Phase 3–4 ditunda. Web production live di commit `544e54e` dengan demo dataset 15 bulan. Snapshot di `docs/FINAL-STATUS.md`.
+**Status:** UI Phase 0–2 dan Phase 5 selesai 27 November 2026; Phase 3–4 ditunda. Web production live di commit `21c0a9a` dengan demo dataset 15 bulan. Snapshot di `docs/FINAL-STATUS.md`.
 
 ## 4. Deployment Matrix
 

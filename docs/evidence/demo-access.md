@@ -2,7 +2,7 @@
 
 * **Tanggal:** 27 November 2026
 * **Lingkungan:** lokal dan production, data sintetis
-* **Status server:** production live di commit `04962c3`; stack lokal dapat dinyalakan dengan `bash scripts/dev-up.sh` dan dijelaskan di `HANDOVER.md`.
+* **Status server:** production live di web commit `21c0a9a`; stack lokal dapat dinyalakan dengan `bash scripts/dev-up.sh` dan dijelaskan di `HANDOVER.md`.
 * **Kata sandi semua akun demo:** `AletheiaDemo!2026`
 * **MFA:** nonaktif
 
@@ -64,4 +64,4 @@ docker compose --profile observability up -d otel-collector jaeger prometheus gr
 
 * Semua data adalah sintetis. Tidak ada uang nyata atau PII nyata.
 * Service runtime memakai role non-owner `aletheia_app` dengan tenant binding per request; migrasi/seed memakai role owner. Bukti: `docs/evidence/m5.4-verification.md`.
-* Edge dan web production live di `https://aletheia-edge.ridwanafzn.workers.dev` dan `https://aletheia-web-preview.pages.dev` (commit `04962c3`). Jalankan `pnpm warm:production` sebelum demo karena Render free tier tidur saat idle.
+* Edge dan web production live di `https://aletheia-edge.ridwanafzn.workers.dev` dan `https://aletheia-web-preview.pages.dev` (web commit `21c0a9a`). Workflow Warm Production berjalan tiap 10 menit; jika login pertama gagal, tunggu beberapa detik lalu coba lagi.

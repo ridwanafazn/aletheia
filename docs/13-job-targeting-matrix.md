@@ -123,7 +123,7 @@ Lowongan memakai frasa "at least one of" dan "one of", jadi pilihan berikut seng
 | ~~P1~~ | ~~Reimburse dan organization management~~ | Selesai 27 November 2026, M6.5 | Tab Reimburse, `/organization`, tabel departemen/posisi; bukti `docs/evidence/m6.5-verification.md` |
 | ~~P1~~ | ~~Paket tenant dan invoice biaya payroll~~ | Selesai 27 November 2026, M6.6 | Plan badge, feature gating, report `PAYROLL_COST_INVOICE`; bukti `docs/evidence/m6.6-verification.md` |
 | ~~P1~~ | ~~Integrasi cuti ke attendance summary~~ | Selesai 27 November 2026, Stage 3A | Approval cuti memperbarui `paid_leave_days`/`unpaid_leave_days`, termasuk cuti lintas bulan; bukti `docs/evidence/stage-3a-leave-attendance.md` |
-| ~~P1~~ | ~~Sidebar menu panjang dan CSP font production~~ | Selesai 27 November 2026, UI Phase 5 | Nav scroll + footer pinned, fade/spacer, dan `font-src 'self' data:`; production `04962c3`; bukti `docs/evidence/ui-phase5-verification.md` |
+| ~~P1~~ | ~~Sidebar menu panjang dan CSP font production~~ | Selesai 27 November 2026, UI Phase 5 | Nav scroll + footer pinned, fade/spacer, dan `font-src 'self' data:`; web `21c0a9a`; bukti `docs/evidence/ui-phase5-verification.md` |
 | P2 | UI Phase 3–4: form clarity dan mobile table-to-card | Alur form dan tabel mobile masih memakai pola lama | Backlog setelah cutover production |
 | P2 | Performance review dan org chart visual | Modul HRIS+ PRO dan BASIC belum lengkap | Bangun setelah core payroll stabil |
 | P1 | Video MP4/narasi | WebM diterima, tetapi MP4 lebih universal | Konversi dengan ffmpeg + narasi opsional |

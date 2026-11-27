@@ -1,7 +1,8 @@
 # Demo History Seed — 15 Bulan Operasional
 
 - **Tanggal:** 27 November 2026.
-- **Commit production:** `544e54e` (`feat(demo): seed 15 months and add role guides`).
+- **Commit seed:** `544e54e` (`feat(demo): seed 15 months and add role guides`).
+- **Web production saat snapshot:** `21c0a9a`.
 - **Web production:** Pages deployment `4509da49-6812-48b2-a147-c42e483edd57`.
 - **Lingkungan:** PostgreSQL lokal `55432` dan Neon production; data production sudah diisi.
 - **Data:** seluruhnya sintetis.
@@ -80,6 +81,8 @@ Seed membutuhkan migrasi terbaru dan policy aktif. Jika database kosong, jalanka
 | Semua divisi terisi | 8/8 |
 | Full E2E | **50 passed, 2 skipped** |
 | Smoke production | **15/15** |
+| Warm Production | `45992431484`, sukses 1m5s |
+| Login employee | 200 setelah service hangat; cold start diberi pesan yang jelas |
 | Production UI check | Overview, Organization, MIS, Profil, dan payslip 2025-09; 0 console error |
 | Bundle | 152.3 KB gzip |
 

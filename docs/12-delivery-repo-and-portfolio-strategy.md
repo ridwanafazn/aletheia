@@ -165,7 +165,7 @@ Ini bukan janji; gunakan sebagai urutan, bukan deadline. Yang penting: setiap mi
 
 ### 8.1 README (wajib)
 
-**Status 27 November 2026:** live di `https://aletheia-web-preview.pages.dev` dengan edge `https://aletheia-edge.ridwanafzn.workers.dev`, commit `04962c3`; smoke production 15/15, async QStash/worker ~5 detik, dan rollback edge/Pages/Render lulus. Bukti: `docs/evidence/ui-phase5-verification.md`.
+**Status 27 November 2026:** live di `https://aletheia-web-preview.pages.dev` dengan edge `https://aletheia-edge.ridwanafzn.workers.dev`, web commit `21c0a9a`; smoke production 15/15, async QStash/worker ~5 detik, dan rollback edge/Pages/Render lulus. Workflow Warm Production berjalan tiap 10 menit. Bukti: `docs/evidence/demo-history-seed.md`.
 
 - Nama, tagline, status (design/implementation/live).
 - Masalah yang dipecahkan (3 kalimat).

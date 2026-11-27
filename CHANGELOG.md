@@ -60,6 +60,10 @@ Semua perubahan penting pada Aletheia. Format mengikuti [Keep a Changelog](https
 - Bukti UI Phase 5: `docs/evidence/ui-phase5-verification.md` dan screenshot sidebar Finance/Compliance.
 - Demo dataset 15 bulan (September 2025–November 2026): 32 personel di 8 divisi, 45 batch payroll, 273 klaim, 470 payslip, 90 laporan, dan 45 baris KPI MIS.
 - Panduan penggunaan per peran dalam format PDF untuk Petugas Klaim, Manajer Cabang, Manajer Keuangan, Spesialis SDM, Administrator Kepatuhan, Analis MIS, dan Karyawan.
+- Workflow `Warm Production` berjalan tiap 10 menit untuk menjaga service Render free tier tetap bangun.
+- Halaman portofolio menampilkan delapan tautan service production, tiga paragraf narasi, dan enam poin result tanpa heading “Hasil”.
+- Pesan login cold-start: “Layanan demo sedang bangun. Tunggu beberapa detik lalu klik Masuk lagi.”
+- Web production `21c0a9a`: halaman portofolio menampilkan seluruh link service, daftar result tanpa heading, dan workflow warm-up 10 menit.
 
 ### Changed
 

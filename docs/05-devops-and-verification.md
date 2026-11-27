@@ -173,7 +173,7 @@ Skenario k6 wajib: `smoke`, `claims-read`, `claim-submit`, `approval-race`, `pay
 | Redis/QStash | Upstash | namespace per environment |
 | Cloudinary | Cloudinary | folder per environment/tenant |
 
-**Status live 27 November 2026:** web Cloudflare Pages di commit `544e54e`, service Render di `04962c3`, edge Cloudflare Workers, Neon PG16, Upstash QStash, dan Cloudinary aktif. Smoke production 15/15; async QStash/worker ~5 detik; rollback edge, Pages, dan Render diuji. Bukti: `docs/evidence/demo-history-seed.md` dan `docs/evidence/ui-phase5-verification.md`.
+**Status live 27 November 2026:** web Cloudflare Pages di commit `21c0a9a`, service Render di `04962c3`, edge Cloudflare Workers, Neon PG16, Upstash QStash, dan Cloudinary aktif. Smoke production 15/15; async QStash/worker ~5 detik; rollback edge, Pages, dan Render diuji. Workflow **Warm Production** berjalan tiap 10 menit. Bukti: `docs/evidence/demo-history-seed.md` dan `docs/evidence/ui-phase5-verification.md`.
 
 **Urutan deploy:** migration → governance → claims/payroll → worker → edge → web. Setiap langkah punya smoke test; jika gagal, rollback ke image/tag sebelumnya.
 

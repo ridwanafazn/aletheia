@@ -376,6 +376,8 @@ The sidebar collapse control is desktop-only. The mobile menu is a drawer with a
 - Sidebar navigation scrolls independently for long role menus; the account footer stays pinned and visible.
 - Menu labels fade softly at the scroll edge, with a spacer so the last item is never hidden under the fade.
 - Cloudflare Pages CSP allows the bundled `data:` font subsets, so Plus Jakarta Sans loads in production with zero console errors.
-- Production runs commit `04962c3`: four Render services, Cloudflare Workers edge, and Cloudflare Pages web.
+- Web production runs commit `21c0a9a`; four Render services run `04962c3`.
+- Workflow **Warm Production** pings the health endpoints every 10 minutes to reduce Render free-tier cold starts.
+- Login shows a clearer cold-start message while services wake up.
 - Post-deploy smoke **15/15**, async QStash/worker ~5 seconds, six-role login, and role-home browser checks pass.
 - Phase 3–4 remain documented backlog; no P0/P1 issues are open.
