@@ -1,6 +1,6 @@
 # Aletheia — Project Status
 
-- **Status:** aktif. UI Phase 0 dan Phase 1 selesai 27 November 2026; Phase 2 berikutnya.
+- **Status:** aktif. UI Phase 0, Phase 1, dan Phase 2 selesai 27 November 2026; Phase 3 berikutnya.
 - **Tanggal snapshot:** 27 November 2026.
 - **Keputusan:** jeda pengembangan sebelumnya dicabut untuk melanjutkan UI refresh.
 - **HEAD saat snapshot:** `1c9915d` ditambah commit UI Phase 0 yang tercatat di riwayat Git.
@@ -21,6 +21,7 @@ Aletheia sudah mencapai M1–M6.6 dan Stage 3A:
 - Stage 3A: approval cuti otomatis memperbarui `attendance_summaries`, termasuk cuti lintas bulan;
 - UI Phase 0: Daylight workspace, logo dan favicon baru, sidebar collapsible, halaman profil, login baru, dan seluruh halaman desktop;
 - UI Phase 1: command palette `Ctrl/Cmd+K` dengan pencarian halaman, aksi cepat per peran, dan navigasi keyboard;
+- UI Phase 2: home per peran dengan urutan tindakan, fokus utama, metrik sekunder, insight chart, dan tabel detail;
 - tidak ada P0/P1 yang terbuka.
 
 ## 2. Yang sudah selesai
@@ -38,6 +39,7 @@ Aletheia sudah mencapai M1–M6.6 dan Stage 3A:
 | UI Phase 0 Daylight workspace | Selesai di `main` dan localhost | `docs/evidence/design-phase5-verification.md` |
 | UI Phase 0 final adjustments | Selesai | Login tanpa MFA, carousel akun looping, dua kartu sama tinggi, tenant `SEIHITSU`; commit `fc09cfc` |
 | UI Phase 1 navigasi | Selesai | Command palette `Ctrl/Cmd+K`, aksi cepat per peran, keyboard, search topbar; bukti `docs/evidence/ui-phase1-verification.md` |
+| UI Phase 2 insight | Selesai | Home per peran, action-first, fokus utama, metrik sekunder, insight chart, detail table; bukti `docs/evidence/ui-phase2-verification.md` |
 | OpenAPI artifact | Diperbarui; CI gate lulus | `2f8b07f` |
 | Test fixture payroll | Diperbaiki; payroll integration 54/54 | `1c9915d` |
 
@@ -46,7 +48,7 @@ Aletheia sudah mencapai M1–M6.6 dan Stage 3A:
 | Item | Status | Catatan |
 | --- | --- | --- |
 | M6.2 monitoring sign-off | Ditunda | 1/4 run terjadwal sukses (`45894766221`); automation finalisasi paused; workflow Production Monitor tetap terjadwal |
-| UI Phase 2 insight | Berikutnya | Hierarki insight dan home per peran |
+| UI Phase 3 alur inti | Berikutnya | Form hierarchy, validasi inline, sticky action, dan penjelasan SoD |
 | Stage 3A di production | Belum deploy | Production masih `5d231c1`; Render `autoDeployTrigger: off` |
 | Performance review karyawan | Backlog | Modul HRIS berikutnya |
 | CRUD organisasi dan org chart visual | Backlog | Halaman `/organization` masih read-only |
@@ -120,4 +122,5 @@ Tidak ada item di atas yang merupakan bug produksi atau blocker demo.
 | `cf52a7b` | Daylight workspace, logo, login, profil, sidebar collapsible |
 | `fc09cfc` | Login tanpa MFA, carousel akun, tenant SEIHITSU |
 | commit UI Phase 1 | Command palette, aksi cepat, search topbar |
+| commit UI Phase 2 | Home per peran, hierarki insight, chart/insight |
 | commit evidence Phase 0 | Screenshot dan verifikasi UI Phase 0 |

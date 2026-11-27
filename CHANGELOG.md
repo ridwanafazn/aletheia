@@ -51,6 +51,9 @@ Semua perubahan penting pada Aletheia. Format mengikuti [Keep a Changelog](https
 - Bukti UI Phase 0: `docs/evidence/design-phase5-verification.md` dan galeri screenshot baru.
 - UI Phase 1: command palette `Ctrl/Cmd+K` yang menggabungkan pencarian halaman dan aksi cepat per peran, dengan navigasi keyboard dan tombol search di topbar.
 - UI Phase 1: aksi cepat buat klaim, konsol payroll, antrean cuti/lembur, verifikasi audit, dan MIS; mobile memakai trigger search ikon.
+- UI Phase 2: home per peran untuk Claims Officer, Branch Manager, Finance Manager, HR Specialist, Compliance Admin, dan MIS Analyst.
+- UI Phase 2: urutan action-first — “Perlu tindakan” atau “Sinyal analisis”, fokus utama, tiga metrik sekunder, chart dengan “Apa artinya”, lalu tabel detail per peran.
+- UI Phase 2: chart tanpa animasi masuk dan empty state untuk data nol; kontras teks sekunder dinaikkan agar axe stabil saat transisi halaman.
 
 ### Changed
 

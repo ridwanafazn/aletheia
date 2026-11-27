@@ -351,8 +351,18 @@ The sidebar collapse control is desktop-only. The mobile menu is a drawer with a
 - Mobile: icon-only search trigger; palette remains full-width.
 - Sidebar collapse and profile entry remain from Phase 0.
 
-**Phase 2 — Insight hierarchy: next.**
+**Phase 2 — Insight hierarchy: complete.**
 
-- Data search across employees, claims, and payroll is not part of Phase 1.
+- Role-based home for Claims Officer, Branch Manager, Finance Manager, HR Specialist, Compliance Admin, and MIS Analyst.
+- Action-first layout: “Perlu tindakan” or “Sinyal analisis” before metrics.
+- One primary focus card per role, followed by a three-metric secondary strip.
+- One chart with a short “Apa artinya” insight, then a role-specific detail table.
+- Empty, loading, and error states for the active queries.
+- Chart bars render without entrance animation so evidence and reduced-motion users see the final state immediately.
+- Employee role keeps Ruang Saya as its home.
+
+**Phase 3 — Core workflow clarity: next.**
+
+- Form hierarchy, inline validation, sticky actions, and SoD explanations.
 - Mobile table-to-card conversion for payslips, reports, and workforce remains Phase 4.
-- Legacy Quiet Ledger CSS cleanup remains after the rollout stabilizes.
+- Data search across employees, claims, and payroll remains a future Phase 1 extension.

@@ -32,7 +32,7 @@ test("capture quiet ledger overview and phase 2 pages", async ({ page }) => {
 
   await page.getByRole("link", { name: "Ikhtisar" }).click();
   await expect(page.getByRole("heading", { name: /Selamat datang/ })).toBeVisible();
-  await expect(page.getByText("Perlu perhatian")).toBeVisible();
+  await expect(page.locator(".overview-actions-panel .panel__title")).toBeVisible();
   await page.waitForTimeout(500);
   await page.screenshot({ path: `${EVIDENCE}/overview.png`, fullPage: true });
   expect(await accessibilityViolations(page)).toEqual([]);

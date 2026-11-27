@@ -34,6 +34,9 @@ export function PayrollTrendChart({ data }: { data: TrendPoint[] }) {
   if (data.length === 0) {
     return <div className="chart-empty">Belum ada data tren payroll.</div>;
   }
+  if (data.every((point) => point.payroll === 0)) {
+    return <div className="chart-empty">Belum ada nilai payroll pada periode ini.</div>;
+  }
   return (
     <ResponsiveContainer width="100%" height={260}>
       <AreaChart data={data} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
@@ -77,6 +80,7 @@ export function PayrollTrendChart({ data }: { data: TrendPoint[] }) {
           stroke={PRIMARY}
           strokeWidth={2.5}
           fill="url(#payrollFill)"
+          isAnimationActive={false}
           activeDot={{ r: 4, fill: PRIMARY, stroke: SURFACE, strokeWidth: 2 }}
         />
       </AreaChart>
@@ -92,6 +96,9 @@ export interface ClaimStatusPoint {
 export function ClaimsStatusChart({ data }: { data: ClaimStatusPoint[] }) {
   if (data.length === 0) {
     return <div className="chart-empty">Belum ada data klaim.</div>;
+  }
+  if (data.every((point) => point.value === 0)) {
+    return <div className="chart-empty">Belum ada klaim pada periode ini.</div>;
   }
   return (
     <ResponsiveContainer width="100%" height={220}>
@@ -116,7 +123,13 @@ export function ClaimsStatusChart({ data }: { data: ClaimStatusPoint[] }) {
           }}
           formatter={(value) => formatCompactNumber(Number(value))}
         />
-        <Bar dataKey="value" name="Klaim" radius={[0, 6, 6, 0]} barSize={16}>
+        <Bar
+          dataKey="value"
+          name="Klaim"
+          radius={[0, 6, 6, 0]}
+          barSize={16}
+          isAnimationActive={false}
+        >
           {data.map((entry, index) => (
             <Cell
               key={entry.label}
