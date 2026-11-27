@@ -1,7 +1,7 @@
 # UI Phase 0 — Daylight Workspace Verification
 
 - **Tanggal:** 27 November 2026.
-- **Commit:** `cf52a7b` (`feat(web): refresh UI to daylight workspace`).
+- **Commit:** `cf52a7b` (`feat(web): refresh UI to daylight workspace`) dan `fc09cfc` (`fix(web): refine login and profile layout`).
 - **Lingkungan:** lokal, Vite web `5173`, edge `8787`, PostgreSQL `55432`, Chromium Playwright.
 - **Data:** sintetis.
 
