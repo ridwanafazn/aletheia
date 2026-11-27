@@ -18,7 +18,7 @@ Paket aset untuk halaman `https://ridwanafazn.my.id/projects/aletheia`.
 | `gallery/06-claims.png` | 3200×2000 | Ruang Klaim |
 | `gallery/07-mis-intelligence.png` | 3200×2000 | MIS Intelligence |
 | `gallery.json` | — | Manifest caption/alt untuk lightbox |
-| `copywriting.md` | — | Copy lengkap dengan framing eksplorasi |
+| `copywriting.md` | — | Catatan framing dan aturan copy |
 | `render-banner.mjs` | — | Script reproduksi banner |
 
 ## Upload ke Cloudinary
@@ -89,20 +89,20 @@ Script membutuhkan screenshot `gallery/07-mis-intelligence.png` dan font di `sou
 | Peran “Fullstack Developer” | “Eksplorasi fullstack / solo build” |
 | Stack “React” | “React 19 · TypeScript · PostgreSQL · Go · Cloudflare” |
 | Subtitle “Enterprise Disbursement Governance & MIS Intelligence Platform” | “Ruang eksplorasi fullstack untuk klaim, payroll, dan MIS.” |
-| Satu paragraf singkat | Section dari `page-copy.md` |
+| Satu paragraf singkat | Tiga paragraf dari `page-copy.md`, tanpa heading |
 | Galeri kosong | Delapan gambar di `gallery/` dengan caption dari `gallery.json` |
 | OG image screenshot lama | `banner-og-1200x630.png` |
 | Preview di daftar `/projects` | `gallery/07-mis-intelligence.png` (16:10, lebih terbaca di thumbnail) |
 
 ## Cara pasang di portofx
 
-Halaman proyek di `portofx` membaca `longDescription` dan memecahnya menjadi section berdasarkan heading `##`. Jadi:
+Halaman proyek di `portofx` membaca `longDescription`. Untuk Aletheia, isi dengan tiga paragraf tanpa heading; parser akan merendernya sebagai satu section tanpa label. Jadi:
 
 1. Upload `banner-aletheia-2400x1350.png` ke Cloudinary, pakai sebagai `coverImage` dan `ogImage`.
-2. Salin bagian dari `page-copy.md` mulai “Kenapa saya membangun ini” sampai “Yang saya pelajari” ke `longDescription`. Heading `##` akan menjadi section.
+2. Salin tiga paragraf dari `page-copy.md` ke `longDescription`. Jangan tambahkan heading `##` atau label STAR.
 3. Upload delapan gambar galeri live (mobile opsional), lalu isi `gallery` dengan `alt` dan `caption` dari `gallery.json`.
 4. Ubah `role` menjadi “Eksplorasi fullstack / solo build” dan `techStack` menjadi daftar stack lengkap.
-5. Ganti meta description dengan versi di `page-copy.md`.
+5. Kosongkan `highlights` agar section “Hasil” tidak muncul, lalu ganti meta description dengan versi di `page-copy.md`.
 
 ## Catatan framing
 

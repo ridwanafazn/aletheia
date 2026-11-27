@@ -12,9 +12,9 @@
 | --- | --- |
 | `role` | `Eksplorasi fullstack / solo build` |
 | `description` | `Ruang eksplorasi fullstack untuk klaim, payroll, dan MIS.` |
-| `long_description` | Sembilan section `##` dari `page-copy.md` |
+| `long_description` | Tiga paragraf, tanpa heading section dan tanpa label STAR |
 | `tech_stack` | React 19, TypeScript, PostgreSQL, Go, Express, Cloudflare Workers, Neon, Upstash, Playwright |
-| `highlights` | Enam hasil utama |
+| `highlights` | Kosong; section “Hasil” tidak ditampilkan |
 | `links` | Live demo, Repository, Panduan per peran |
 | `gallery` | Delapan aset dengan caption dan alt |
 | `seo` | Title, description, dan OG image |
@@ -36,7 +36,8 @@
 
 ## Verifikasi
 
-- HTML live memuat role, description, copy section, dan delapan gallery item.
+- HTML live memuat role, description, tiga paragraf narasi, dan delapan gallery item.
+- Tidak ada heading section, label STAR, atau section “Hasil”.
 - Banner live: `portfolio/banner-aletheia-2400x1350`.
 - Screenshot halaman live: `docs/portfolio/aletheia/live-project-page.png`.
 - Gallery live menampilkan **08 gambar**.
