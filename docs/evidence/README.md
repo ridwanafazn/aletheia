@@ -2,6 +2,8 @@
 
 Folder ini menyimpan bukti yang dapat diperiksa reviewer: verifikasi milestone, hasil load test, query plan, screenshot SLO, dan demo access.
 
+**Status final pengembangan:** dijeda 27 November 2026. Snapshot lengkap ada di [`../FINAL-STATUS.md`](../FINAL-STATUS.md).
+
 ## Milestone
 
 | File | Isi | Status |

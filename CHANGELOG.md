@@ -50,6 +50,7 @@ Semua perubahan penting pada Aletheia. Format mengikuti [Keep a Changelog](https
 - Dokumentasi status M5.4, RLS, deployment, live URL, dan evidence diperbarui.
 - `QSTASH_URL` memakai region `us-east-1`; `WORKER_URL` memakai host `aletheia-worker-zjnt.onrender.com`.
 - Edge production memakai subdomain akun `ridwanafzn.workers.dev`; dokumentasi lama dengan `ridwanafazn` diperbaiki.
+- Pengembangan dijeda 27 November 2026; snapshot final, verifikasi, dan backlog dicatat di `docs/FINAL-STATUS.md`.
 
 ### Fixed
 

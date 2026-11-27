@@ -2,6 +2,7 @@
 
 - **Tanggal:** 27 November 2026.
 - **Commit:** `3d0aa67` (`feat(payroll): sync approved leave to attendance`).
+- **Status:** selesai di `main` dan CI; belum di-deploy ke production. Progresi dijeda 27 November 2026; lihat `docs/FINAL-STATUS.md`.
 - **Lingkungan:** lokal, PostgreSQL test container `55432`, role aplikasi `aletheia_app`.
 - **Data:** sintetis.
 
