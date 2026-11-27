@@ -1,6 +1,6 @@
 # Aletheia — Copy Notes
 
-Copy final ada di `page-copy.md`. Halaman live memakai tiga paragraf tanpa heading section, tanpa label STAR, dan tanpa daftar “Hasil”.
+Copy final ada di `page-copy.md`. Halaman live memakai tiga paragraf tanpa heading section dan tanpa label STAR. Daftar hasil tetap tampil, tetapi heading “Hasil” sudah dihapus.
 
 ## Framing
 
@@ -27,7 +27,7 @@ Tiga paragraf, urutan STAR secara implisit:
 
 1. **Situation / Task** — pertanyaan tentang uang, approval, dan bukti; alasan eksplorasi.
 2. **Action** — policy versioning, maker-checker-payer, audit hash chain, RLS, stack, data 15 bulan.
-3. **Result** — angka demo, audit yang bisa diverifikasi, batasan yang jujur. Tidak diberi label.
+3. **Result** — angka demo, audit yang bisa diverifikasi, batasan yang jujur. Tidak diberi label. Enam poin hasil tampil sebagai daftar tanpa heading.
 
 ## Batasan yang harus tetap muncul
 

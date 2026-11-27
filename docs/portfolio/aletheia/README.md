@@ -102,7 +102,7 @@ Halaman proyek di `portofx` membaca `longDescription`. Untuk Aletheia, isi denga
 2. Salin tiga paragraf dari `page-copy.md` ke `longDescription`. Jangan tambahkan heading `##` atau label STAR.
 3. Upload delapan gambar galeri live (mobile opsional), lalu isi `gallery` dengan `alt` dan `caption` dari `gallery.json`.
 4. Ubah `role` menjadi “Eksplorasi fullstack / solo build” dan `techStack` menjadi daftar stack lengkap.
-5. Kosongkan `highlights` agar section “Hasil” tidak muncul, lalu ganti meta description dengan versi di `page-copy.md`.
+5. Isi `highlights` dengan enam poin hasil. Heading “Hasil” sudah dihapus dari template `portofx`, jadi daftar tetap tampil tanpa label.
 
 ## Catatan framing
 

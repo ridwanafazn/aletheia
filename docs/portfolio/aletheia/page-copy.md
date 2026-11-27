@@ -33,6 +33,19 @@ Demo live mencakup tujuh peran, 32 personel di delapan divisi, 45 batch payroll,
 
 ---
 
+## Poin hasil
+
+Enam poin ini tampil di halaman tanpa heading “Hasil”:
+
+- Policy versioning + checksum untuk menjaga transaksi historis.
+- Maker-checker-payer yang dijaga di UI, API, dan database.
+- Audit hash chain yang bisa diverifikasi.
+- RLS multi-tenant dengan dua tenant demo.
+- Dashboard per peran untuk klaim, payroll, dan MIS.
+- 15 bulan data sintetis: 32 personel, 45 batch, 273 klaim.
+
+---
+
 ## SEO
 
 **Title:** Aletheia — Eksplorasi disbursement governance & MIS

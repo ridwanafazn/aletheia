@@ -14,7 +14,7 @@
 | `description` | `Ruang eksplorasi fullstack untuk klaim, payroll, dan MIS.` |
 | `long_description` | Tiga paragraf, tanpa heading section dan tanpa label STAR |
 | `tech_stack` | React 19, TypeScript, PostgreSQL, Go, Express, Cloudflare Workers, Neon, Upstash, Playwright |
-| `highlights` | Kosong; section “Hasil” tidak ditampilkan |
+| `highlights` | Enam poin hasil; heading “Hasil” dihapus dari template |
 | `links` | Live demo, Repository, Panduan per peran |
 | `gallery` | Delapan aset dengan caption dan alt |
 | `seo` | Title, description, dan OG image |
@@ -36,14 +36,15 @@
 
 ## Verifikasi
 
-- HTML live memuat role, description, tiga paragraf narasi, dan delapan gallery item.
-- Tidak ada heading section, label STAR, atau section “Hasil”.
+- HTML live memuat role, description, tiga paragraf narasi, daftar hasil, dan delapan gallery item.
+- Tidak ada heading section, label STAR, atau heading “Hasil”; daftar hasil tetap tampil.
 - Banner live: `portfolio/banner-aletheia-2400x1350`.
 - Screenshot halaman live: `docs/portfolio/aletheia/live-project-page.png`.
 - Gallery live menampilkan **08 gambar**.
 
 ## Catatan
 
-- Perubahan dilakukan langsung ke Neon melalui MCP; tidak ada perubahan kode di `portofx`.
+- Perubahan dilakukan langsung ke Neon melalui MCP.
+- Template `portofx` diubah untuk menyembunyikan heading “Hasil” tanpa menghapus daftar hasil; deploy Worker `17670b84-f6ba-42e9-8997-48445c2d9c10`.
 - `seo` disimpan di row, tetapi halaman saat ini memakai `title` dan `description` proyek untuk metadata utama.
 - Copy mengikuti framing eksplorasi: tidak ada klaim “expert”, “enterprise-grade”, atau “production-ready untuk perusahaan”.
