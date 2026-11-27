@@ -425,6 +425,21 @@ describe.skipIf(!integrationEnabled)("payroll service integration", () => {
          set entitlement_days = excluded.entitlement_days`,
       [TENANT, financeLinkedEmployeeId],
     );
+    const attendanceSeed = await call(
+      "PUT",
+      `/api/v1/attendance/${financeLinkedEmployeeId}/2026-12`,
+      {
+        working_days: 22,
+        present_days: 18,
+        paid_leave_days: 1,
+        unpaid_leave_days: 1,
+        absent_days: 0,
+        overtime_hours: 0,
+        source: "MANUAL",
+      },
+      hr,
+    );
+    expect(attendanceSeed.status).toBe(200);
     const leave = await call(
       "POST",
       "/api/v1/leave-requests",
@@ -467,6 +482,16 @@ describe.skipIf(!integrationEnabled)("payroll service integration", () => {
     expect(balances.status).toBe(200);
     expect(balances.body.data.items[0].used_days).toBe(2);
     expect(balances.body.data.items[0].pending_days).toBe(0);
+
+    const attendance = await call(
+      "GET",
+      `/api/v1/attendance?personnel_id=${financeLinkedEmployeeId}&period=2026-12`,
+      undefined,
+      hr,
+    );
+    expect(attendance.status).toBe(200);
+    expect(attendance.body.data.items[0].paid_leave_days).toBe(3);
+    expect(attendance.body.data.items[0].unpaid_leave_days).toBe(1);
   });
 
   it("menyetujui lembur dan memperbarui ringkasan absensi", async () => {
@@ -640,7 +665,7 @@ describe.skipIf(!integrationEnabled)("payroll service integration", () => {
         expense_date: "2026-11-07",
         amount: "120000.00",
         description: "Klinik November",
-        receipt_url: `https://res.cloudinary.com/${process.env.CLOUDINARY_CLOUD_NAME ?? "aletheia-test"}/image/upload/${process.env.CLOUDINARY_FOLDER_PREFIX ?? "aletheia/claims"}/${TENANT}/reimbursements/receipt-medical.pdf`,
+        receipt_url: `https://res.cloudinary.com/${process.env.CLOUDINARY_CLOUD_NAME || "aletheia-demo"}/image/upload/${process.env.CLOUDINARY_FOLDER_PREFIX || "aletheia"}/${TENANT}/reimbursements/receipt-medical.pdf`,
       },
       finance,
       `reimb-${randomUUID()}`,
