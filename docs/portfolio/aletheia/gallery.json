@@ -10,6 +10,11 @@
     "caption": "Ikhtisar Manajer Keuangan: antrean tindakan, fokus payroll, dan tren enam bulan."
   },
   {
+    "src": "gallery/02b-overview-branch.png",
+    "alt": "Dashboard Ikhtisar untuk peran Manajer Cabang.",
+    "caption": "Ikhtisar Manajer Cabang: antrean keputusan klaim, cuti, lembur, dan reimburse."
+  },
+  {
     "src": "gallery/03-command-palette.png",
     "alt": "Command palette Aletheia dengan daftar halaman dan aksi.",
     "caption": "Command palette untuk navigasi dan aksi cepat lintas halaman."

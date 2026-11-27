@@ -11,6 +11,7 @@ Paket aset untuk halaman `https://ridwanafazn.my.id/projects/aletheia`.
 | `banner-og-1200x630.png` | 1200×630 | Open Graph / Twitter card |
 | `gallery/01-login.png` | 3200×2000 | Login dan akun demo |
 | `gallery/02-overview-finance.png` | 3200×2000 | Ikhtisar Manajer Keuangan |
+| `gallery/02b-overview-branch.png` | 3200×2000 | Ikhtisar Manajer Cabang |
 | `gallery/03-command-palette.png` | 3200×2000 | Command palette |
 | `gallery/04-payroll-console.png` | 3200×2000 | Konsol Payroll |
 | `gallery/05-organization.png` | 3200×2000 | Struktur Organisasi |
@@ -81,13 +82,26 @@ node docs/portfolio/aletheia/render-banner.mjs
 
 Script membutuhkan screenshot `gallery/07-mis-intelligence.png` dan font di `source/fonts/`.
 
+## Yang berubah di halaman
+
+| Sekarang | Ganti dengan |
+| --- | --- |
+| Cover `Screenshot_2026-11-27_121751` | `banner-2400x1350.png` |
+| Peran “Fullstack Developer” | “Eksplorasi fullstack / solo build” |
+| Stack “React” | “React 19 · TypeScript · PostgreSQL · Go · Cloudflare” |
+| Subtitle “Enterprise Disbursement Governance & MIS Intelligence Platform” | “Ruang eksplorasi fullstack untuk klaim, payroll, dan MIS.” |
+| Satu paragraf singkat | Section dari `page-copy.md` |
+| Galeri kosong | Delapan gambar di `gallery/` dengan caption dari `gallery.json` |
+| OG image screenshot lama | `banner-og-1200x630.png` |
+| Preview di daftar `/projects` | `gallery/07-mis-intelligence.png` (16:10, lebih terbaca di thumbnail) |
+
 ## Cara pasang di portofx
 
 Halaman proyek di `portofx` membaca `longDescription` dan memecahnya menjadi section berdasarkan heading `##`. Jadi:
 
 1. Upload `banner-2400x1350.png` ke Cloudinary, pakai sebagai `coverImage` dan `ogImage`.
 2. Salin bagian dari `page-copy.md` mulai “Kenapa saya membangun ini” sampai “Yang saya pelajari” ke `longDescription`. Heading `##` akan menjadi section.
-3. Upload delapan gambar galeri, lalu isi `gallery` dengan `alt` dan `caption` dari `gallery.json`.
+3. Upload sembilan gambar galeri, lalu isi `gallery` dengan `alt` dan `caption` dari `gallery.json`.
 4. Ubah `role` menjadi “Eksplorasi fullstack / solo build” dan `techStack` menjadi daftar stack lengkap.
 5. Ganti meta description dengan versi di `page-copy.md`.
 

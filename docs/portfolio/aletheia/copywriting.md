@@ -147,6 +147,7 @@ Caption pendek untuk lightbox:
 | --- | --- | --- |
 | `01-login.png` | Login dengan pemilihan akun demo per peran. | Halaman login Aletheia dengan carousel akun demo. |
 | `02-overview-finance.png` | Ikhtisar Manajer Keuangan: antrean tindakan, fokus payroll, dan tren enam bulan. | Dashboard Ikhtisar untuk peran Manajer Keuangan. |
+| `02b-overview-branch.png` | Ikhtisar Manajer Cabang: antrean keputusan klaim, cuti, lembur, dan reimburse. | Dashboard Ikhtisar untuk peran Manajer Cabang. |
 | `03-command-palette.png` | Command palette untuk navigasi dan aksi cepat lintas halaman. | Command palette Aletheia dengan daftar halaman dan aksi. |
 | `04-payroll-console.png` | Konsol Payroll: batch per cabang dan periode dengan status pencairan. | Tabel batch payroll di Konsol Payroll. |
 | `05-organization.png` | Struktur Organisasi: delapan divisi dan 32 personel. | Halaman Struktur Organisasi dengan kartu departemen. |
