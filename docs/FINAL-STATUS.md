@@ -114,5 +114,5 @@ Tidak ada item di atas yang merupakan bug produksi atau blocker demo.
 | `3d0aa67` | Stage 3A cuti → attendance |
 | `bc3c2fe` | Evidence dan dokumentasi Stage 3A |
 | `1c9915d` | Perbaikan fixture integration test |
-| commit UI Phase 0 | Daylight workspace, logo, login, profil, sidebar collapsible |
+| `cf52a7b` | Daylight workspace, logo, login, profil, sidebar collapsible |
 | commit evidence Phase 0 | Screenshot dan verifikasi UI Phase 0 |
