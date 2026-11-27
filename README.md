@@ -176,7 +176,7 @@ Web production menyajikan CSP, HSTS, COOP, dan Permissions-Policy. Render free t
 pnpm warm:production
 ```
 
-Lalu buka web production dan masuk dengan akun demo di atas. Uji async QStash/worker dengan `pnpm async:production`. Monitoring production berjalan setiap 6 jam lewat workflow **Production Monitor**; baseline `45816325368` dan run pasca-drill `45821314200` lulus dengan smoke 15/15. Untuk stack lokal, gunakan `bash scripts/dev-up.sh` dan `http://localhost:5173`.
+Lalu buka web production dan masuk dengan akun demo di atas. Uji async QStash/worker dengan `pnpm async:production`. Monitoring production berjalan setiap 6 jam lewat workflow **Production Monitor**; baseline `45816325368` dan run pasca-drill `45821314200` lulus dengan smoke 15/15. Deploy 27 November 2026 untuk M6.3–M6.6 dan desain fase 1–4 live di commit `5d231c1`; bukti lengkap ada di [`docs/evidence/design-phases-production-deploy.md`](docs/evidence/design-phases-production-deploy.md). Untuk stack lokal, gunakan `bash scripts/dev-up.sh` dan `http://localhost:5173`.
 
 Semua endpoint selain health, login, refresh, dan webhook payment memerlukan header bertanda tangan gateway. Produksi wajib mengisi `INTERNAL_GATEWAY_SECRET`, `JWT_PRIVATE_KEY`, `JWT_PUBLIC_KEY`, `REFRESH_TOKEN_PEPPER`, `MFA_ENCRYPTION_KEY`, `PII_PEPPER`, kredensial Cloudinary, `PAYMENT_WEBHOOK_SECRET`, dan `FILE_SIGNING_SECRET`.
 
