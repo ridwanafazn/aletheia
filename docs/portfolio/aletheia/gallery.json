@@ -1,0 +1,42 @@
+[
+  {
+    "src": "gallery/01-login.png",
+    "alt": "Halaman login Aletheia dengan carousel akun demo.",
+    "caption": "Login dengan pemilihan akun demo per peran."
+  },
+  {
+    "src": "gallery/02-overview-finance.png",
+    "alt": "Dashboard Ikhtisar untuk peran Manajer Keuangan.",
+    "caption": "Ikhtisar Manajer Keuangan: antrean tindakan, fokus payroll, dan tren enam bulan."
+  },
+  {
+    "src": "gallery/03-command-palette.png",
+    "alt": "Command palette Aletheia dengan daftar halaman dan aksi.",
+    "caption": "Command palette untuk navigasi dan aksi cepat lintas halaman."
+  },
+  {
+    "src": "gallery/04-payroll-console.png",
+    "alt": "Tabel batch payroll di Konsol Payroll.",
+    "caption": "Konsol Payroll: batch per cabang dan periode dengan status pencairan."
+  },
+  {
+    "src": "gallery/05-organization.png",
+    "alt": "Halaman Struktur Organisasi dengan kartu departemen.",
+    "caption": "Struktur Organisasi: delapan divisi dan 32 personel."
+  },
+  {
+    "src": "gallery/06-claims.png",
+    "alt": "Tabel klaim dengan status dan flag konflik.",
+    "caption": "Ruang Klaim: status, risiko, dan konflik dalam satu daftar."
+  },
+  {
+    "src": "gallery/07-mis-intelligence.png",
+    "alt": "Dashboard MIS Intelligence dengan KPI dan tabel cabang.",
+    "caption": "MIS Intelligence: KPI cabang, approval rate, dan tren payroll/klaim."
+  },
+  {
+    "src": "gallery/08-ruang-saya-mobile.png",
+    "alt": "Halaman Ruang Saya pada layar mobile.",
+    "caption": "Ruang Saya di mobile: slip, absensi, cuti, lembur, dan reimburse."
+  }
+]
