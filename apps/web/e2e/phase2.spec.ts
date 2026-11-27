@@ -49,3 +49,39 @@ test("role-based homes show the right lens and action hierarchy", async ({ page 
     await expect(page.getByRole("heading", { name: "Selamat datang kembali" })).toBeVisible();
   }
 });
+
+test("long role sidebars scroll while the account footer stays visible", async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 720 });
+
+  for (const role of ["Manajer Keuangan", "Administrator Kepatuhan"]) {
+    await login(page, role);
+    await page.goto("/overview");
+
+    const nav = page.locator("aside.sidebar nav.nav");
+    const logout = page.locator(".sidebar__footer").getByRole("button", { name: "Keluar" });
+    await expect(logout).toBeVisible();
+
+    const logoutBox = await logout.boundingBox();
+    expect(logoutBox).not.toBeNull();
+    expect((logoutBox?.y ?? 0) + (logoutBox?.height ?? 0)).toBeLessThanOrEqual(720);
+
+    const metrics = await nav.evaluate((element) => ({
+      scrollHeight: element.scrollHeight,
+      clientHeight: element.clientHeight,
+    }));
+    expect(metrics.scrollHeight).toBeGreaterThan(metrics.clientHeight);
+
+    const lastItem = nav.getByRole("link", { name: "Jejak Audit" });
+    await lastItem.evaluate((element) => element.scrollIntoView({ block: "nearest" }));
+    const lastBox = await lastItem.boundingBox();
+    expect(lastBox).not.toBeNull();
+    expect((lastBox?.y ?? 0) + (lastBox?.height ?? 0)).toBeLessThanOrEqual(720);
+    expect(await accessibilityViolations(page)).toEqual([]);
+
+    if (role === "Administrator Kepatuhan") {
+      await page.screenshot({ path: `${EVIDENCE}/compliance-sidebar.png` });
+    }
+
+    await logout.click();
+  }
+});

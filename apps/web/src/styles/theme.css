@@ -56,6 +56,7 @@ h3 {
 }
 
 .sidebar {
+  overflow: hidden;
   background: var(--surface-0);
   color: var(--ink-700);
   border-right: 1px solid var(--border-200);
@@ -64,6 +65,7 @@ h3 {
 }
 
 .brand {
+  flex: none;
   padding: 0 8px 22px;
 }
 
@@ -106,6 +108,7 @@ h3 {
   color: var(--ink-900);
   text-align: left;
   cursor: pointer;
+  flex: none;
 }
 
 .workspace-switcher:hover {
@@ -149,7 +152,27 @@ h3 {
 }
 
 .nav {
+  flex: 1 1 auto;
+  min-height: 0;
   gap: 2px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
+  margin-right: -6px;
+  padding-right: 6px;
+}
+
+.nav::-webkit-scrollbar {
+  width: 6px;
+}
+
+.nav::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background: var(--border-300);
+}
+
+.nav::-webkit-scrollbar-track {
+  background: transparent;
 }
 
 .nav__label {
@@ -201,6 +224,7 @@ h3 {
 }
 
 .sidebar__footer {
+  flex: none;
   border-top: 1px solid var(--border-200);
   color: var(--ink-500);
 }
