@@ -45,9 +45,15 @@ async function accessibilityViolations(page: Page) {
   );
 }
 
-test("tenant plan is visible and the cost invoice report can be downloaded", async ({ page }) => {
+test("tenant plan is not shown as a topbar chip and the cost invoice report can be downloaded", async ({
+  page,
+}) => {
   await login(page, "Spesialis SDM");
-  await expect(page.getByText("HRIS Pro", { exact: true })).toBeVisible();
+  await expect(page.getByText("HRIS Pro", { exact: true })).toHaveCount(0);
+
+  await page.getByRole("button", { name: "Buka halaman profil" }).click();
+  await expect(page.getByRole("heading", { name: "Profil" })).toBeVisible();
+  await expect(page.getByText("Fitur aktif")).toBeVisible();
 
   await page.getByRole("link", { name: "Laporan dan Ekspor" }).click();
   await expect(page.getByRole("heading", { name: "Laporan dan Ekspor" })).toBeVisible();

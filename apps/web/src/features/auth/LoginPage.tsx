@@ -98,9 +98,7 @@ export default function LoginPage() {
     <main className="login-page">
       <section className="login-brand" aria-label="Tentang Aletheia">
         <div className="login-brand__mark">
-          <span className="brand__mark" aria-hidden="true">
-            A
-          </span>
+          <img src="/brand/aletheia-mark-white.svg" alt="" className="brand__mark" />
           <div>
             <span className="brand__name">Aletheia</span>
             <span className="brand__sub">Governed money movement</span>

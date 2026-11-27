@@ -42,6 +42,11 @@ Semua perubahan penting pada Aletheia. Format mengikuti [Keep a Changelog](https
 - Bukti deploy: `docs/evidence/design-phases-production-deploy.md` dan screenshot production MIS.
 - Hardening review: default paket tenant menjadi BASIC, invoice dicek ulang saat unduhan, reimburse memakai idempotency key dan SoD decider/payer, bukti Cloudinary divalidasi per tenant, dan app role tidak dapat menghapus baris reimburse.
 - Stage 3A: approval cuti otomatis memperbarui `attendance_summaries` (`paid_leave_days`/`unpaid_leave_days`) per bulan, termasuk cuti lintas bulan; guard `ERR_ATTENDANCE_MISSING`/`ERR_ATTENDANCE_CAPACITY` dan audit `attendance_sync`.
+- UI Phase 0 — Daylight workspace: token warna cobalt, permukaan terang, kartu ber-border, tabel airy, chart baru, login diagonal, dan shell sidebar terang.
+- Brand mark baru, app icon, dan favicon; halaman profil `/profile` yang dapat dibuka dari avatar topbar dan blok pengguna sidebar.
+- Sidebar dapat dibuka/tutup di desktop dan tersimpan sebagai preferensi; badge `HRIS Pro` dihapus dari topbar, konteks tenant pindah ke workspace card dan profil.
+- Mobile self-service payslip memakai kartu, bukan tabel horizontal.
+- Bukti UI Phase 0: `docs/evidence/design-phase5-verification.md` dan galeri screenshot baru.
 
 ### Changed
 
@@ -50,7 +55,7 @@ Semua perubahan penting pada Aletheia. Format mengikuti [Keep a Changelog](https
 - Dokumentasi status M5.4, RLS, deployment, live URL, dan evidence diperbarui.
 - `QSTASH_URL` memakai region `us-east-1`; `WORKER_URL` memakai host `aletheia-worker-zjnt.onrender.com`.
 - Edge production memakai subdomain akun `ridwanafzn.workers.dev`; dokumentasi lama dengan `ridwanafazn` diperbaiki.
-- Pengembangan dijeda 27 November 2026; snapshot final, verifikasi, dan backlog dicatat di `docs/FINAL-STATUS.md`.
+- Pengembangan dilanjutkan 27 November 2026 untuk UI Phase 0; status, verifikasi, dan backlog dicatat di `docs/FINAL-STATUS.md`.
 
 ### Fixed
 

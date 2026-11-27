@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="Aletheia">
+  <rect width="128" height="128" rx="28" fill="#FFFDF8"/>
+  <path fill="#2F4BD8" d="M58 22c-4 0-8 2-11 5L33 40c-4 3-6 8-6 13v22c0 5 2 10 6 13l14 13c3 3 7 5 11 5V93c0-3-1-5-3-7l-9-8c-2-2-3-4-3-7V57c0-3 1-5 3-7l9-8c2-2 3-4 3-7V22Z"/>
+  <path fill="#2F4BD8" d="M70 22c4 0 8 2 11 5l14 13c4 3 6 8 6 13v22c0 5-2 10-6 13l-14 13c-3 3-7 5-11 5V93c0-3 1-5 3-7l9-8c2-2 3-4 3-7V57c0-3-1-5-3-7l-9-8c-2-2-3-4-3-7V22Z"/>
+</svg>

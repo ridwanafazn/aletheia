@@ -7,6 +7,7 @@ import "@fontsource-variable/plus-jakarta-sans";
 import "@fontsource/ibm-plex-mono/latin-400.css";
 import "@fontsource/ibm-plex-mono/latin-500.css";
 import "./styles/global.css";
+import "./styles/theme.css";
 
 import { AuthProvider } from "./features/auth/AuthProvider";
 import { router } from "./app/router";

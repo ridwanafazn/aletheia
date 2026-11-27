@@ -132,7 +132,7 @@
 
 **Deploy final:** production demo di free-tier, dengan akun demo dan data sintetis.
 **Demo:** 6 role → claims → payroll → payslip/report → MIS → policy/audit.
-**Status:** progresi dijeda 27 November 2026; snapshot final di `docs/FINAL-STATUS.md`.
+**Status:** UI Phase 0 selesai 27 November 2026; progresi dilanjutkan ke Phase 1. Snapshot di `docs/FINAL-STATUS.md`.
 
 ## 4. Deployment Matrix
 

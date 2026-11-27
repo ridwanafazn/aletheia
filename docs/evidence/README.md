@@ -2,7 +2,7 @@
 
 Folder ini menyimpan bukti yang dapat diperiksa reviewer: verifikasi milestone, hasil load test, query plan, screenshot SLO, dan demo access.
 
-**Status final pengembangan:** dijeda 27 November 2026. Snapshot lengkap ada di [`../FINAL-STATUS.md`](../FINAL-STATUS.md).
+**Status pengembangan:** aktif; UI Phase 0 selesai 27 November 2026. Snapshot lengkap ada di [`../FINAL-STATUS.md`](../FINAL-STATUS.md) dan sistem visual di [`../../DESIGN.md`](../../DESIGN.md).
 
 ## Milestone
 
@@ -31,6 +31,7 @@ Folder ini menyimpan bukti yang dapat diperiksa reviewer: verifikasi milestone, 
 | `m6.5-verification.md` | Reimburse, organization management, E2E, axe | Selesai 27 November 2026 |
 | `m6.6-verification.md` | Paket tenant, feature gating, invoice biaya payroll, E2E, axe | Selesai 27 November 2026 |
 | `stage-3a-leave-attendance.md` | Approval cuti ke attendance summary, cuti lintas bulan, guard kapasitas, test | Selesai 27 November 2026 |
+| `design-phase5-verification.md` | UI Phase 0 Daylight workspace, logo, shell, login, profil, axe | Selesai 27 November 2026 |
 | `design-phase1-verification.md` | Quiet Ledger foundation, tokens, shell, komponen, E2E, axe | Selesai 27 November 2026 |
 | `design-phase2-verification.md` | Overview, reports v2, organization v2, charts, E2E, axe | Selesai 27 November 2026 |
 | `design-phase3-verification.md` | Payroll, employees, workforce, ruang saya, claims, E2E, axe | Selesai 27 November 2026 |

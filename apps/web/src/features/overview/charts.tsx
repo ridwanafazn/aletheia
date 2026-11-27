@@ -13,12 +13,15 @@ import {
 
 import { formatCompactMoney, formatCompactNumber } from "../../shared/lib/format";
 
-const JADE = "#0f6b5c";
-const JADE_SOFT = "#8bd8c0";
-const AMBER = "#b7791f";
-const DANGER = "#a8323e";
-const INK = "#34433f";
-const GRID = "#e3dccf";
+const PRIMARY = "#2f4bd8";
+const PRIMARY_SOFT = "#9db4ff";
+const TEAL = "#0e9384";
+const AMBER = "#b54708";
+const DANGER = "#d92d20";
+const INK = "#667085";
+const GRID = "#e3e8f0";
+const SURFACE = "#ffffff";
+const SURFACE_ALT = "#f6f8fc";
 
 export interface TrendPoint {
   label: string;
@@ -36,8 +39,8 @@ export function PayrollTrendChart({ data }: { data: TrendPoint[] }) {
       <AreaChart data={data} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
         <defs>
           <linearGradient id="payrollFill" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor={JADE} stopOpacity={0.26} />
-            <stop offset="100%" stopColor={JADE} stopOpacity={0.02} />
+            <stop offset="0%" stopColor={PRIMARY} stopOpacity={0.26} />
+            <stop offset="100%" stopColor={PRIMARY} stopOpacity={0.02} />
           </linearGradient>
         </defs>
         <CartesianGrid stroke={GRID} strokeDasharray="2 4" vertical={false} />
@@ -56,12 +59,12 @@ export function PayrollTrendChart({ data }: { data: TrendPoint[] }) {
           tickFormatter={(value: number) => formatCompactMoney(value)}
         />
         <Tooltip
-          cursor={{ stroke: JADE, strokeDasharray: "3 3" }}
+          cursor={{ stroke: PRIMARY, strokeDasharray: "3 3" }}
           contentStyle={{
-            background: "#fffdf8",
+            background: SURFACE,
             border: `1px solid ${GRID}`,
             borderRadius: 10,
-            boxShadow: "0 10px 30px -18px rgba(23,33,31,.45)",
+            boxShadow: "0 12px 28px -18px rgba(16,24,40,.35)",
             fontSize: 12,
           }}
           formatter={(value) => formatCompactMoney(Number(value))}
@@ -71,10 +74,10 @@ export function PayrollTrendChart({ data }: { data: TrendPoint[] }) {
           type="monotone"
           dataKey="payroll"
           name="Payroll"
-          stroke={JADE}
+          stroke={PRIMARY}
           strokeWidth={2.5}
           fill="url(#payrollFill)"
-          activeDot={{ r: 4, fill: JADE, stroke: "#fffdf8", strokeWidth: 2 }}
+          activeDot={{ r: 4, fill: PRIMARY, stroke: SURFACE, strokeWidth: 2 }}
         />
       </AreaChart>
     </ResponsiveContainer>
@@ -104,9 +107,9 @@ export function ClaimsStatusChart({ data }: { data: ClaimStatusPoint[] }) {
           tick={{ fill: INK, fontSize: 11 }}
         />
         <Tooltip
-          cursor={{ fill: "#f5f2ea" }}
+          cursor={{ fill: SURFACE_ALT }}
           contentStyle={{
-            background: "#fffdf8",
+            background: SURFACE,
             border: `1px solid ${GRID}`,
             borderRadius: 10,
             fontSize: 12,
@@ -117,7 +120,17 @@ export function ClaimsStatusChart({ data }: { data: ClaimStatusPoint[] }) {
           {data.map((entry, index) => (
             <Cell
               key={entry.label}
-              fill={index === 0 ? JADE : index === 1 ? AMBER : index === 2 ? DANGER : JADE_SOFT}
+              fill={
+                index === 0
+                  ? AMBER
+                  : index === 1
+                    ? TEAL
+                    : index === 2
+                      ? PRIMARY
+                      : index === 3
+                        ? DANGER
+                        : PRIMARY_SOFT
+              }
             />
           ))}
         </Bar>

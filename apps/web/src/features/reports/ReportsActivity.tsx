@@ -6,9 +6,9 @@ import { StatusDonut } from "../overview/charts";
 import { listReports } from "./api";
 
 const COLORS = {
-  ready: "#0f6b5c",
-  pending: "#b7791f",
-  failed: "#a8323e",
+  ready: "#0e9384",
+  pending: "#b54708",
+  failed: "#d92d20",
 };
 
 export function ReportsActivity() {

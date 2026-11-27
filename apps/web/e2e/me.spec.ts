@@ -44,7 +44,7 @@ test("employee sees own payslip, attendance, and leave balances", async ({ page 
   await expect(page.getByText("EMP-BDG-001").first()).toBeVisible();
 
   await page.getByLabel("Periode").fill("2026-11");
-  await expect(page.getByText("SLP-202611-001")).toBeVisible();
+  await expect(page.getByRole("cell", { name: "SLP-202611-001" })).toBeVisible();
   await expect(page.getByText("Budi Santoso")).toHaveCount(0);
   expect(await accessibilityViolations(page)).toEqual([]);
   await page.screenshot({ path: `${EVIDENCE}/me-payslips.png`, fullPage: true });

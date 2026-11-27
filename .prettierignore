@@ -15,6 +15,10 @@ coverage/
 .vercel/
 .playwright/
 test-results/
+**/test-results/
+playwright-report/
+**/playwright-report/
+.impeccable/
 docs/
 *.md
 .agents/

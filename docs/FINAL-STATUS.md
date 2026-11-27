@@ -1,13 +1,14 @@
-# Aletheia — Final Status (Development Paused)
+# Aletheia — Project Status
 
+- **Status:** aktif. UI Phase 0 selesai 27 November 2026; Phase 1 berjalan.
 - **Tanggal snapshot:** 27 November 2026.
-- **Keputusan:** progresi pengembangan dijeda/dihentikan atas permintaan pemilik proyek.
-- **HEAD saat snapshot:** `1c9915d` (`test(payroll): align integration fixtures with 3A guards`).
+- **Keputusan:** jeda pengembangan sebelumnya dicabut untuk melanjutkan UI refresh.
+- **HEAD saat snapshot:** `1c9915d` ditambah commit UI Phase 0 yang tercatat di riwayat Git.
 - **Production:** tetap live di commit `5d231c1`; Stage 3A **belum** di-deploy ke Render.
 - **Data:** seluruhnya sintetis. Tidak ada uang nyata atau PII nyata.
-- **Local stack:** dihentikan dengan `bash scripts/dev-down.sh`; volume data dipertahankan.
+- **Local stack:** aktif untuk verifikasi UI Phase 0; hentikan dengan `bash scripts/dev-down.sh` bila perlu.
 
-Dokumen ini adalah catatan penutup. Untuk konteks lengkap, baca [`HANDOVER.md`](../HANDOVER.md) dan [`docs/evidence/README.md`](evidence/README.md).
+Dokumen ini adalah snapshot status. Untuk konteks lengkap, baca [`HANDOVER.md`](../HANDOVER.md), [`DESIGN.md`](../DESIGN.md), dan [`docs/evidence/README.md`](evidence/README.md).
 
 ## 1. Ringkasan
 
@@ -18,6 +19,7 @@ Aletheia sudah mencapai M1–M6.6 dan Stage 3A:
 - CI terakhir `45928294052` **hijau**, termasuk payroll integration **54/54**;
 - Security terakhir `45928294049` **hijau**;
 - Stage 3A: approval cuti otomatis memperbarui `attendance_summaries`, termasuk cuti lintas bulan;
+- UI Phase 0: Daylight workspace, logo dan favicon baru, sidebar collapsible, halaman profil, login baru, dan seluruh halaman desktop;
 - tidak ada P0/P1 yang terbuka.
 
 ## 2. Yang sudah selesai
@@ -32,6 +34,7 @@ Aletheia sudah mencapai M1–M6.6 dan Stage 3A:
 | M6.5 reimburse dan struktur organisasi | Selesai | `docs/evidence/m6.5-verification.md` |
 | M6.6 paket tenant dan invoice biaya | Selesai | `docs/evidence/m6.6-verification.md` |
 | Stage 3A cuti → attendance | Selesai di `main` dan CI; belum deploy | `docs/evidence/stage-3a-leave-attendance.md` |
+| UI Phase 0 Daylight workspace | Selesai di `main` dan localhost | `docs/evidence/design-phase5-verification.md` |
 | OpenAPI artifact | Diperbarui; CI gate lulus | `2f8b07f` |
 | Test fixture payroll | Diperbaiki; payroll integration 54/54 | `1c9915d` |
 
@@ -39,7 +42,8 @@ Aletheia sudah mencapai M1–M6.6 dan Stage 3A:
 
 | Item | Status | Catatan |
 | --- | --- | --- |
-| M6.2 monitoring sign-off | Ditunda | 1/4 run terjadwal sukses (`45894766221`); automation finalisasi dijeda; workflow Production Monitor tetap terjadwal |
+| M6.2 monitoring sign-off | Ditunda | 1/4 run terjadwal sukses (`45894766221`); automation finalisasi paused; workflow Production Monitor tetap terjadwal |
+| UI Phase 1 navigasi | Berjalan | Pencarian/command palette, quick actions, dan mobile tables untuk slip/laporan/workforce |
 | Stage 3A di production | Belum deploy | Production masih `5d231c1`; Render `autoDeployTrigger: off` |
 | Performance review karyawan | Backlog | Modul HRIS berikutnya |
 | CRUD organisasi dan org chart visual | Backlog | Halaman `/organization` masih read-only |
@@ -110,4 +114,5 @@ Tidak ada item di atas yang merupakan bug produksi atau blocker demo.
 | `3d0aa67` | Stage 3A cuti → attendance |
 | `bc3c2fe` | Evidence dan dokumentasi Stage 3A |
 | `1c9915d` | Perbaikan fixture integration test |
-| commit dokumen ini | Snapshot final dan penutupan progresi |
+| commit UI Phase 0 | Daylight workspace, logo, login, profil, sidebar collapsible |
+| commit evidence Phase 0 | Screenshot dan verifikasi UI Phase 0 |

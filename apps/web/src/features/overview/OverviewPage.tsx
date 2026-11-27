@@ -26,7 +26,7 @@ import {
   statusClass,
   statusLabel,
 } from "../../shared/lib/format";
-import { ErrorState, SkeletonTable, Sparkline } from "../../shared/ui";
+import { ErrorState, SkeletonTable } from "../../shared/ui";
 import { useAuth } from "../auth/AuthProvider";
 import { listClaims } from "../claims/api";
 import { fetchMisDashboard } from "../mis/api";
@@ -417,21 +417,19 @@ export default function OverviewPage() {
         <SkeletonTable rows={4} />
       ) : (
         <div className="kpi-grid">
-          {kpis.map((kpi) => (
-            <article className="kpi-card" key={kpi.label}>
-              <div className="kpi-card__top">
-                <span className="kpi-card__label">{kpi.label}</span>
-                <span className={`kpi-card__icon kpi-card__icon--${kpi.tone ?? "jade"}`}>
-                  {kpi.icon}
-                </span>
-              </div>
-              <div className="kpi-card__value">{kpi.value}</div>
-              <div className="kpi-card__footer">
-                <span>{kpi.meta}</span>
-                <Sparkline values={kpi.trend} tone={kpi.tone ?? "jade"} />
-              </div>
-            </article>
-          ))}
+          {kpis.map((kpi, index) => {
+            const tone = (["blue", "teal", "violet", "amber"] as const)[index] ?? "blue";
+            return (
+              <article className="kpi-card" key={kpi.label}>
+                <div className="kpi-card__top">
+                  <span className="kpi-card__label">{kpi.label}</span>
+                  <span className={`kpi-card__icon kpi-card__icon--${tone}`}>{kpi.icon}</span>
+                </div>
+                <div className="kpi-card__value">{kpi.value}</div>
+                <div className="kpi-card__meta">{kpi.meta}</div>
+              </article>
+            );
+          })}
         </div>
       )}
 

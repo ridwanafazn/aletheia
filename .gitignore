@@ -18,6 +18,7 @@ coverage/
 .vercel/
 .playwright/
 test-results/
+.impeccable/
 
 *.tsbuildinfo
 **/*.tsbuildinfo

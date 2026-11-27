@@ -95,7 +95,7 @@ export function MyPayslipsTab() {
         />
       ) : (
         <>
-          <div className="table-wrap">
+          <div className="table-wrap payslip-table">
             <table className="table">
               <caption className="sr-only">
                 Slip gaji saya dengan periode, bruto, net, kode verifikasi, dan unduhan
@@ -149,6 +149,41 @@ export function MyPayslipsTab() {
                 ))}
               </tbody>
             </table>
+          </div>
+          <div className="mobile-payslip-list">
+            {items.map((payslip) => (
+              <article className="payslip-card" key={payslip.id}>
+                <div className="payslip-card__top">
+                  <div>
+                    <div className="payslip-card__period">{formatPeriod(payslip.period_month)}</div>
+                    <div className="payslip-card__meta">
+                      Versi {payslip.version} · {payslip.verification_code}
+                    </div>
+                  </div>
+                  <FileText size={16} aria-hidden="true" />
+                </div>
+                <div className="payslip-card__amounts">
+                  <div>
+                    <span>Bruto</span>
+                    <Money value={payslip.gross_income} />
+                  </div>
+                  <div>
+                    <span>Net</span>
+                    <Money value={payslip.net_take_home_pay} />
+                  </div>
+                </div>
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  icon={<Download size={14} />}
+                  loading={downloadMutation.isPending && downloadMutation.variables === payslip.id}
+                  onClick={() => downloadMutation.mutate(payslip.id)}
+                  aria-label={`Unduh slip ${formatPeriod(payslip.period_month)}`}
+                >
+                  Unduh
+                </Button>
+              </article>
+            ))}
           </div>
           {query.hasNextPage ? (
             <Button

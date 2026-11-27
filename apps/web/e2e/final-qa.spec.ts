@@ -154,13 +154,22 @@ test("keyboard dapat membuka detail batch dan menutup breakdown", async ({ page 
   await loginUi(page, "Spesialis SDM", "Konsol Payroll");
   await expect(page.getByRole("table")).toBeVisible();
 
-  const firstBatch = page.locator(".payroll-table tbody tr").first().getByRole("button").first();
+  const firstBatch = page
+    .locator(".payroll-table tbody tr")
+    .filter({ hasText: "BDG-01" })
+    .first()
+    .getByRole("button")
+    .first();
   await firstBatch.focus();
   await expect(firstBatch).toBeFocused();
   await page.keyboard.press("Enter");
   await expect(page.getByRole("heading", { name: "Detail Batch Payroll" })).toBeVisible();
 
-  const firstEmployee = page.getByRole("button", { name: /Siti Aminah|Load Employee/ }).first();
+  const firstEmployee = page
+    .locator(".payroll-items-table tbody tr")
+    .first()
+    .getByRole("button")
+    .first();
   await firstEmployee.focus();
   await expect(firstEmployee).toBeFocused();
   await page.keyboard.press("Enter");

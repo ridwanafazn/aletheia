@@ -1,7 +1,7 @@
 # Aletheia — Handover
 
 * **Status:** M1–M5.4 live di production. Web, edge, empat service Render, Neon, Upstash QStash, dan Cloudinary aktif; smoke production 15/15 lulus; async QStash/worker terverifikasi; login tujuh peran, UI web, serta rollback edge, Pages, dan Render terverifikasi. M6.2 live dengan monitoring 24 jam berjalan via workflow Production Monitor. M6.3 menambahkan pusat slip gaji dan laporan di web. M6.4 menambahkan employee self-service, e-cuti, dan e-lembur. M6.5 menambahkan reimburse dan struktur organisasi. M6.6 menambahkan paket tenant dan invoice biaya payroll. Stage 3A menautkan approval cuti ke attendance summary payroll. **Freeze deploy dicabut 27 November 2026; M6.3–M6.6 dan desain fase 1–4 live di commit `5d231c1` dengan smoke production 15/15.**
-* **Status progresi:** dijeda/dihentikan 27 November 2026. Snapshot final, verifikasi, dan cara melanjutkan ada di [`docs/FINAL-STATUS.md`](docs/FINAL-STATUS.md). Production tetap live di commit `5d231c1`; Stage 3A sudah di `main` dan CI hijau, tetapi belum di-deploy ke Render.
+* **Status progresi:** dilanjutkan 27 November 2026 untuk UI Phase 0. Snapshot, verifikasi, dan cara melanjutkan ada di [`docs/FINAL-STATUS.md`](docs/FINAL-STATUS.md); sistem visual ada di [`DESIGN.md`](DESIGN.md). Production tetap live di commit `5d231c1`; Stage 3A sudah di `main` dan CI hijau, tetapi belum di-deploy ke Render.
 * **Tanggal handover:** 26 November 2026
 * **Data:** seluruhnya sintetis. Tidak ada uang nyata atau PII nyata.
 * **Server demo:** dihentikan. Nyalakan ulang dengan `bash scripts/dev-up.sh`.
@@ -24,7 +24,7 @@ Aletheia adalah platform governance pencairan klaim dan payroll dengan:
 
 **Yang belum selesai:**
 
-* Monitoring production berkelanjutan; Production Monitor berjalan tiap 6 jam. Sign-off M6.2 ditunda karena progresi dijeda (1/4 run terjadwal).
+* Monitoring production berkelanjutan; Production Monitor berjalan tiap 6 jam. Sign-off M6.2 ditunda dan automation finalisasi sedang paused (1/4 run terjadwal).
 * Cold start Render free tier; mitigasi `pnpm warm:production`. `pnpm deploy:check` sudah lulus; runbook ada di `docs/runbooks/m6.2-launch.md`.
 * Performance review, CRUD organisasi dan org chart visual, serta kebijakan reimburse. Ini modul HRIS berikutnya.
 * RUM LCP/INP, exporter span edge, dan label Prometheus kardinalitas tinggi.
@@ -338,6 +338,6 @@ Status deploy terbaru:
 2. Production Monitor tetap berjalan setiap 6 jam.
 3. Bukti deploy: `docs/evidence/design-phases-production-deploy.md`.
 4. Langkah berikutnya: performance review, CRUD organisasi, dan pengaturan paket.
-5. Progresi dijeda 27 November 2026. Jangan lanjutkan tanpa keputusan baru; baca [`docs/FINAL-STATUS.md`](docs/FINAL-STATUS.md).
+5. UI Phase 0 selesai 27 November 2026. Lanjut Phase 1: navigasi, pencarian, dan mobile tables. Baca [`docs/FINAL-STATUS.md`](docs/FINAL-STATUS.md) dan [`DESIGN.md`](DESIGN.md).
 
 Untuk demo, jalankan `pnpm warm:production` lebih dulu.
