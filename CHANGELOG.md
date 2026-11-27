@@ -41,6 +41,7 @@ Semua perubahan penting pada Aletheia. Format mengikuti [Keep a Changelog](https
 - Production deploy 27 November 2026: migrasi `0012`–`0017`, empat service Render, edge Worker, dan Pages berada di commit `5d231c1`; smoke production 15/15 dan async QStash lulus.
 - Bukti deploy: `docs/evidence/design-phases-production-deploy.md` dan screenshot production MIS.
 - Hardening review: default paket tenant menjadi BASIC, invoice dicek ulang saat unduhan, reimburse memakai idempotency key dan SoD decider/payer, bukti Cloudinary divalidasi per tenant, dan app role tidak dapat menghapus baris reimburse.
+- Stage 3A: approval cuti otomatis memperbarui `attendance_summaries` (`paid_leave_days`/`unpaid_leave_days`) per bulan, termasuk cuti lintas bulan; guard `ERR_ATTENDANCE_MISSING`/`ERR_ATTENDANCE_CAPACITY` dan audit `attendance_sync`.
 
 ### Changed
 
@@ -53,6 +54,7 @@ Semua perubahan penting pada Aletheia. Format mengikuti [Keep a Changelog](https
 ### Fixed
 
 - Artefak `packages/shared-contracts/openapi.json` disegarkan agar CI `Verify OpenAPI artifact is current` lulus setelah penambahan kontrak M6.4–M6.6.
+- Fixture integrasi reimburse memakai `CLOUDINARY_CLOUD_NAME` dan `CLOUDINARY_FOLDER_PREFIX` dari environment, bukan nama cloud hardcoded.
 - QStash mengembalikan `enqueued=false` karena token berada di `us-east-1` tetapi endpoint default mengarah ke `eu-central-1`.
 - Production Monitor gagal resolve edge karena variabel memakai subdomain `ridwanafazn`, bukan `ridwanafzn`.
 - CI integration test gagal karena `@aletheia/observability` belum dibangun pada checkout bersih.

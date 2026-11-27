@@ -41,6 +41,7 @@ import { decodeCursor, encodeCursor } from "../lib/pagination.js";
 import { hashBankAccount, hashNik, maskBankAccount, maskNik } from "../lib/pii.js";
 import { sendData } from "../lib/response.js";
 import {
+  applyApprovedLeaveToAttendance,
   leaveYear,
   lockLeaveBalance,
   recomputeOvertimeSummary,
@@ -901,6 +902,17 @@ leaveRouter.post(
                     decided_at, decision_notes, created_at`,
         [auth.tenantId, id, input.decision, auth.userId, input.notes ?? null],
       );
+      const attendanceSync =
+        input.decision === "APPROVED"
+          ? await applyApprovedLeaveToAttendance(client, {
+              tenantId: auth.tenantId,
+              personnelId: row.personnel_id,
+              leaveType: row.leave_type,
+              startDate: row.start_date,
+              endDate: row.end_date,
+              days: Number(row.days),
+            })
+          : null;
       await appendAudit(
         {
           tenantId: auth.tenantId,
@@ -915,6 +927,11 @@ leaveRouter.post(
             decision: input.decision,
             notes: input.notes ?? null,
             personnel_id: row.personnel_id,
+            leave_type: row.leave_type,
+            start_date: row.start_date,
+            end_date: row.end_date,
+            days: Number(row.days),
+            attendance_sync: attendanceSync,
           },
           correlationId: request.correlationId,
         },

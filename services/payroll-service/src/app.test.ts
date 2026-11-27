@@ -169,6 +169,32 @@ describe.skipIf(!integrationEnabled)("payroll service integration", () => {
   let batchId = "";
   let payslipId = "";
 
+  async function createLeaveTestEmployee(suffix: string): Promise<string> {
+    const created = await call(
+      "POST",
+      "/api/v1/employees",
+      {
+        personnel_code: `EMP-3A-${suffix}`,
+        personnel_type: "EMPLOYEE",
+        full_name: `Cuti Test ${suffix}`,
+        nik: `32730000000095${suffix.padStart(2, "0")}`,
+        bank_account_number: `12345095${suffix.padStart(2, "0")}`,
+        bank_code: "BCA",
+        bank_name: "Bank Central Asia",
+        ptkp_status: "TK/0",
+        risk_class: "I",
+        employment_status: "PERMANENT",
+        base_salary: "5000000.00",
+        fixed_allowance: "0.00",
+        join_date: "2025-01-01",
+        user_id: null,
+      },
+      hr,
+    );
+    expect(created.status).toBe(201);
+    return created.body.data.id;
+  }
+
   beforeAll(async () => {
     await pool.query(`delete from payroll.generated_files where tenant_id = $1`, [TENANT]);
     await pool.query(`delete from payroll.payment_webhook_events where tenant_id = $1`, [TENANT]);
@@ -614,7 +640,7 @@ describe.skipIf(!integrationEnabled)("payroll service integration", () => {
         expense_date: "2026-11-07",
         amount: "120000.00",
         description: "Klinik November",
-        receipt_url: `https://res.cloudinary.com/aletheia-demo/image/upload/aletheia/${TENANT}/reimbursements/receipt-medical.pdf`,
+        receipt_url: `https://res.cloudinary.com/${process.env.CLOUDINARY_CLOUD_NAME ?? "aletheia-test"}/image/upload/${process.env.CLOUDINARY_FOLDER_PREFIX ?? "aletheia/claims"}/${TENANT}/reimbursements/receipt-medical.pdf`,
       },
       finance,
       `reimb-${randomUUID()}`,
@@ -1198,5 +1224,321 @@ describe.skipIf(!integrationEnabled)("payroll service integration", () => {
       tenantId: "019361a2-7c00-7000-8000-000000000001",
     });
     expect(response.status).toBe(404);
+  });
+
+  it("3A: memperbarui ringkasan absensi saat cuti disetujui", async () => {
+    const employee = await call(
+      "POST",
+      "/api/v1/employees",
+      {
+        personnel_code: "EMP-3A-001",
+        personnel_type: "EMPLOYEE",
+        full_name: "Cuti Test",
+        nik: "3273000000000951",
+        bank_account_number: "1234500951",
+        bank_code: "BCA",
+        bank_name: "Bank Central Asia",
+        ptkp_status: "TK/0",
+        risk_class: "I",
+        employment_status: "PERMANENT",
+        base_salary: "5000000.00",
+        fixed_allowance: "0.00",
+        join_date: "2025-01-01",
+        user_id: null,
+      },
+      hr,
+    );
+    expect(employee.status).toBe(201);
+    const personnelId = employee.body.data.id;
+
+    const attendanceSeed = await call(
+      "PUT",
+      `/api/v1/attendance/${personnelId}/2027-02`,
+      {
+        working_days: 22,
+        present_days: 18,
+        paid_leave_days: 0,
+        unpaid_leave_days: 0,
+        absent_days: 0,
+        overtime_hours: 0,
+        source: "MANUAL",
+      },
+      hr,
+    );
+    expect(attendanceSeed.status).toBe(200);
+
+    await pool.query(
+      `insert into payroll.leave_balances
+         (id, tenant_id, personnel_id, leave_type, year, entitlement_days, used_days, pending_days)
+       values (gen_random_uuid(),$1,$2,'ANNUAL',2027,'12.00','0.00','0.00')
+       on conflict (tenant_id, personnel_id, leave_type, year) do update
+         set entitlement_days = excluded.entitlement_days`,
+      [TENANT, personnelId],
+    );
+
+    const leave = await call(
+      "POST",
+      "/api/v1/leave-requests",
+      {
+        personnel_id: personnelId,
+        leave_type: "ANNUAL",
+        start_date: "2027-02-10",
+        end_date: "2027-02-11",
+        days: 2,
+        reason: "Keperluan keluarga",
+      },
+      hr,
+    );
+    expect(leave.status).toBe(201);
+
+    const decided = await call(
+      "POST",
+      `/api/v1/leave-requests/${leave.body.data.id}/decide`,
+      { decision: "APPROVED" },
+      manager,
+    );
+    expect(decided.status).toBe(200);
+
+    const attendance = await call(
+      "GET",
+      `/api/v1/attendance?personnel_id=${personnelId}&period=2027-02`,
+      undefined,
+      hr,
+    );
+    expect(attendance.status).toBe(200);
+    expect(attendance.body.data.items[0].paid_leave_days).toBe(2);
+    expect(attendance.body.data.items[0].unpaid_leave_days).toBe(0);
+  });
+
+  it("3A: menambah cuti tidak berbayar ke unpaid_leave_days", async () => {
+    const personnelId = await createLeaveTestEmployee("02");
+    const attendanceSeed = await call(
+      "PUT",
+      `/api/v1/attendance/${personnelId}/2027-03`,
+      {
+        working_days: 22,
+        present_days: 20,
+        paid_leave_days: 0,
+        unpaid_leave_days: 0,
+        absent_days: 0,
+        overtime_hours: 0,
+        source: "MANUAL",
+      },
+      hr,
+    );
+    expect(attendanceSeed.status).toBe(200);
+
+    const leave = await call(
+      "POST",
+      "/api/v1/leave-requests",
+      {
+        personnel_id: personnelId,
+        leave_type: "UNPAID",
+        start_date: "2027-03-10",
+        end_date: "2027-03-11",
+        days: 2,
+        reason: "Keperluan pribadi",
+      },
+      hr,
+    );
+    expect(leave.status).toBe(201);
+
+    const decided = await call(
+      "POST",
+      `/api/v1/leave-requests/${leave.body.data.id}/decide`,
+      { decision: "APPROVED" },
+      manager,
+    );
+    expect(decided.status).toBe(200);
+
+    const attendance = await call(
+      "GET",
+      `/api/v1/attendance?personnel_id=${personnelId}&period=2027-03`,
+      undefined,
+      hr,
+    );
+    expect(attendance.status).toBe(200);
+    expect(attendance.body.data.items[0].paid_leave_days).toBe(0);
+    expect(attendance.body.data.items[0].unpaid_leave_days).toBe(2);
+  });
+
+  it("3A: membagi cuti lintas bulan ke dua ringkasan absensi", async () => {
+    const personnelId = await createLeaveTestEmployee("03");
+    for (const period of ["2026-12", "2027-01"]) {
+      const seeded = await call(
+        "PUT",
+        `/api/v1/attendance/${personnelId}/${period}`,
+        {
+          working_days: 22,
+          present_days: 18,
+          paid_leave_days: 0,
+          unpaid_leave_days: 0,
+          absent_days: 0,
+          overtime_hours: 0,
+          source: "MANUAL",
+        },
+        hr,
+      );
+      expect(seeded.status).toBe(200);
+    }
+
+    await pool.query(
+      `insert into payroll.leave_balances
+         (id, tenant_id, personnel_id, leave_type, year, entitlement_days, used_days, pending_days)
+       values (gen_random_uuid(),$1,$2,'ANNUAL',2026,'12.00','0.00','0.00')
+       on conflict (tenant_id, personnel_id, leave_type, year) do update
+         set entitlement_days = excluded.entitlement_days`,
+      [TENANT, personnelId],
+    );
+
+    const leave = await call(
+      "POST",
+      "/api/v1/leave-requests",
+      {
+        personnel_id: personnelId,
+        leave_type: "ANNUAL",
+        start_date: "2026-12-30",
+        end_date: "2027-01-02",
+        days: 3,
+        reason: "Libur akhir tahun",
+      },
+      hr,
+    );
+    expect(leave.status).toBe(201);
+
+    const decided = await call(
+      "POST",
+      `/api/v1/leave-requests/${leave.body.data.id}/decide`,
+      { decision: "APPROVED" },
+      manager,
+    );
+    expect(decided.status).toBe(200);
+
+    const december = await call(
+      "GET",
+      `/api/v1/attendance?personnel_id=${personnelId}&period=2026-12`,
+      undefined,
+      hr,
+    );
+    const january = await call(
+      "GET",
+      `/api/v1/attendance?personnel_id=${personnelId}&period=2027-01`,
+      undefined,
+      hr,
+    );
+    expect(december.body.data.items[0].paid_leave_days).toBe(2);
+    expect(january.body.data.items[0].paid_leave_days).toBe(1);
+  });
+
+  it("3A: menolak approval cuti jika ringkasan absensi belum tersedia", async () => {
+    const personnelId = await createLeaveTestEmployee("04");
+    await pool.query(
+      `insert into payroll.leave_balances
+         (id, tenant_id, personnel_id, leave_type, year, entitlement_days, used_days, pending_days)
+       values (gen_random_uuid(),$1,$2,'ANNUAL',2027,'12.00','0.00','0.00')
+       on conflict (tenant_id, personnel_id, leave_type, year) do update
+         set entitlement_days = excluded.entitlement_days`,
+      [TENANT, personnelId],
+    );
+
+    const leave = await call(
+      "POST",
+      "/api/v1/leave-requests",
+      {
+        personnel_id: personnelId,
+        leave_type: "ANNUAL",
+        start_date: "2027-05-10",
+        end_date: "2027-05-11",
+        days: 2,
+        reason: "Keperluan keluarga",
+      },
+      hr,
+    );
+    expect(leave.status).toBe(201);
+
+    const decided = await call(
+      "POST",
+      `/api/v1/leave-requests/${leave.body.data.id}/decide`,
+      { decision: "APPROVED" },
+      manager,
+    );
+    expect(decided.status).toBe(409);
+    expect(decided.body.error.code).toBe("ERR_ATTENDANCE_MISSING");
+
+    const leaves = await call(
+      "GET",
+      `/api/v1/leave-requests?personnel_id=${personnelId}`,
+      undefined,
+      hr,
+    );
+    expect(leaves.body.data.items[0].status).toBe("PENDING");
+
+    const balances = await call(
+      "GET",
+      `/api/v1/leave-balances?personnel_id=${personnelId}&year=2027`,
+      undefined,
+      hr,
+    );
+    expect(balances.body.data.items[0].pending_days).toBe(2);
+    expect(balances.body.data.items[0].used_days).toBe(0);
+  });
+
+  it("3A: menolak approval cuti jika kapasitas absensi penuh", async () => {
+    const personnelId = await createLeaveTestEmployee("05");
+    const attendanceSeed = await call(
+      "PUT",
+      `/api/v1/attendance/${personnelId}/2027-06`,
+      {
+        working_days: 22,
+        present_days: 20,
+        paid_leave_days: 2,
+        unpaid_leave_days: 0,
+        absent_days: 0,
+        overtime_hours: 0,
+        source: "MANUAL",
+      },
+      hr,
+    );
+    expect(attendanceSeed.status).toBe(200);
+    await pool.query(
+      `insert into payroll.leave_balances
+         (id, tenant_id, personnel_id, leave_type, year, entitlement_days, used_days, pending_days)
+       values (gen_random_uuid(),$1,$2,'ANNUAL',2027,'12.00','0.00','0.00')
+       on conflict (tenant_id, personnel_id, leave_type, year) do update
+         set entitlement_days = excluded.entitlement_days`,
+      [TENANT, personnelId],
+    );
+
+    const leave = await call(
+      "POST",
+      "/api/v1/leave-requests",
+      {
+        personnel_id: personnelId,
+        leave_type: "ANNUAL",
+        start_date: "2027-06-10",
+        end_date: "2027-06-11",
+        days: 2,
+        reason: "Keperluan keluarga",
+      },
+      hr,
+    );
+    expect(leave.status).toBe(201);
+
+    const decided = await call(
+      "POST",
+      `/api/v1/leave-requests/${leave.body.data.id}/decide`,
+      { decision: "APPROVED" },
+      manager,
+    );
+    expect(decided.status).toBe(422);
+    expect(decided.body.error.code).toBe("ERR_ATTENDANCE_CAPACITY");
+
+    const attendance = await call(
+      "GET",
+      `/api/v1/attendance?personnel_id=${personnelId}&period=2027-06`,
+      undefined,
+      hr,
+    );
+    expect(attendance.body.data.items[0].paid_leave_days).toBe(2);
   });
 });
