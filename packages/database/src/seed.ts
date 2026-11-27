@@ -5,6 +5,7 @@ import { hash as argonHash } from "@node-rs/argon2";
 import type { PoolClient } from "pg";
 
 import { adminPool as pool, closeAdminDatabase } from "./admin.js";
+import { seedDemoHistory } from "./seed-history.js";
 
 function uid(value: number): string {
   return `019361a2-7c00-7000-8000-${String(value).padStart(12, "0")}`;
@@ -1444,6 +1445,8 @@ async function main(): Promise<void> {
         provider: "MOCK",
       },
     );
+
+    await seedDemoHistory(client, { tenantId: T_SAU, passwordHash });
 
     await client.query("REFRESH MATERIALIZED VIEW analytics.mis_monthly_kpi");
     await client.query("COMMIT");

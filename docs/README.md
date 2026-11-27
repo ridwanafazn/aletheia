@@ -46,6 +46,8 @@ Mulai dari `HANDOVER.md` di root repository. Dokumen ini adalah indeks spesifika
 | `evidence/ui-phase1-verification.md` | Bukti command palette, aksi cepat, dan keyboard |
 | `evidence/ui-phase2-verification.md` | Bukti home per peran, hierarki insight, dan axe |
 | `evidence/ui-phase5-verification.md` | Bukti sidebar scroll, CSP font, dan production cutover `04962c3` |
+| `evidence/demo-history-seed.md` | Seed 15 bulan: 32 personel, 8 divisi, payroll/klaim/laporan historis |
+| `guides/README.md` | Panduan PDF penggunaan aplikasi untuk tujuh peran |
 
 ## Evidence
 

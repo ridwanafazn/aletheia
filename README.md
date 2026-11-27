@@ -6,7 +6,7 @@ Aletheia (Greek: *unconcealment*) is a reference implementation for governed mon
 
 > **Status:** M1–M5.4 dan M6.1–M6.6 live di production. Web, edge, empat service Render, Neon, Upstash QStash, dan Cloudinary aktif; smoke production **15/15 lulus**, async QStash/worker terverifikasi, login enam peran operasional dan UI web terverifikasi, serta rollback edge, Pages, dan Render diuji. M6.2 live dengan monitoring 24 jam berjalan via `.github/workflows/production-monitor.yml`; run terjadwal pertama lulus dan sign-off menunggu 3 run berikutnya. M6.3 menambahkan pusat slip gaji dan layar laporan PPh 21/BPJS. M6.4 menambahkan employee self-service, e-cuti, dan e-lembur. M6.5 menambahkan reimburse dan struktur organisasi. M6.6 menambahkan paket tenant dan invoice biaya payroll. Stage 3A menautkan approval cuti ke attendance summary payroll. **Production live di commit `04962c3`; smoke production 15/15 dan UI Phase 5 selesai 27 November 2026.** Render free tier memiliki cold start; jalankan `pnpm warm:production` sebelum demo. Baca [`HANDOVER.md`](HANDOVER.md) sebelum melanjutkan.
 >
-> **UI Phase 0–2 dan Phase 5 selesai 27 November 2026.** Arah *Daylight workspace*, command palette, home per peran, dan final polish sudah live di production: token baru, sidebar collapsible dengan navigasi yang bisa di-scroll, logo dan favicon, halaman profil, login baru, seluruh halaman desktop, pencarian halaman/aksi via `Ctrl/Cmd+K`, hierarki insight per peran, serta perbaikan CSP font. UI Phase 3 (form clarity) dan Phase 4 (mobile table conversion) sengaja ditunda dan tetap tercatat sebagai backlog. Snapshot ada di [`docs/FINAL-STATUS.md`](docs/FINAL-STATUS.md).
+> **UI Phase 0–2 dan Phase 5 selesai 27 November 2026.** Arah *Daylight workspace*, command palette, home per peran, dan final polish sudah live di production: token baru, sidebar collapsible dengan navigasi yang bisa di-scroll, logo dan favicon, halaman profil, login baru, seluruh halaman desktop, pencarian halaman/aksi via `Ctrl/Cmd+K`, hierarki insight per peran, serta perbaikan CSP font. UI Phase 3 (form clarity) dan Phase 4 (mobile table conversion) sengaja ditunda dan tetap tercatat sebagai backlog. **Demo dataset mencakup 15 bulan (September 2025–November 2026), 32 personel di 8 divisi, dan panduan PDF per peran di [`docs/guides`](docs/guides/README.md).** Snapshot ada di [`docs/FINAL-STATUS.md`](docs/FINAL-STATUS.md).
 
 ## Why this exists
 
@@ -116,6 +116,8 @@ flowchart TB
 | [`docs/evidence/ui-phase1-verification.md`](docs/evidence/ui-phase1-verification.md) | Bukti UI Phase 1: command palette, aksi cepat, dan keyboard |
 | [`docs/evidence/ui-phase2-verification.md`](docs/evidence/ui-phase2-verification.md) | Bukti UI Phase 2: home per peran, hierarki insight, dan axe |
 | [`docs/evidence/ui-phase5-verification.md`](docs/evidence/ui-phase5-verification.md) | Bukti UI Phase 5: sidebar scroll, CSP font, dan production cutover |
+| [`docs/guides/README.md`](docs/guides/README.md) | Panduan PDF penggunaan aplikasi untuk tujuh peran |
+| [`docs/evidence/demo-history-seed.md`](docs/evidence/demo-history-seed.md) | Seed 15 bulan operasional dan seluruh divisi terisi |
 | [`docs/evidence/m6.1-verification.md`](docs/evidence/m6.1-verification.md) | Verifikasi portofolio M6.1 |
 | [`docs/runbooks/m6.2-launch.md`](docs/runbooks/m6.2-launch.md) | Runbook launch, smoke, rollback, monitoring M6.2 |
 | [`docs/evidence/m6.2-verification.md`](docs/evidence/m6.2-verification.md) | Bukti smoke production, web UI, rollback edge/Pages/Render, cold start, monitoring |

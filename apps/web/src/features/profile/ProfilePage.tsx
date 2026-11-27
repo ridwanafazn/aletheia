@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
-import { Building2, LogOut, Mail, ShieldCheck, UserRound } from "lucide-react";
+import { Building2, FileText, LogOut, Mail, ShieldCheck, UserRound } from "lucide-react";
 
 import { initials, roleLabel } from "../../shared/lib/format";
 import { Button, PageHeader } from "../../shared/ui";
@@ -8,6 +8,19 @@ import { useAuth } from "../auth/AuthProvider";
 import { useTenantProfile } from "../tenant/api";
 
 type SidebarPreference = "expanded" | "collapsed";
+
+const ROLE_GUIDES: Record<string, { title: string; file: string }> = {
+  CLAIMS_OFFICER: { title: "Petugas Klaim", file: "panduan-petugas-klaim.pdf" },
+  BRANCH_MANAGER: { title: "Manajer Cabang", file: "panduan-manajer-cabang.pdf" },
+  FINANCE_MANAGER: { title: "Manajer Keuangan", file: "panduan-manajer-keuangan.pdf" },
+  HR_SPECIALIST: { title: "Spesialis SDM", file: "panduan-spesialis-sdm.pdf" },
+  COMPLIANCE_ADMIN: {
+    title: "Administrator Kepatuhan",
+    file: "panduan-administrator-kepatuhan.pdf",
+  },
+  MIS_ANALYST: { title: "Analis MIS", file: "panduan-analis-mis.pdf" },
+  EMPLOYEE: { title: "Karyawan", file: "panduan-karyawan.pdf" },
+};
 
 function readSidebarPreference(): SidebarPreference {
   try {
@@ -28,6 +41,8 @@ export default function ProfilePage() {
   if (user === null) {
     return null;
   }
+
+  const guide = ROLE_GUIDES[user.role];
 
   const chooseSidebar = (value: SidebarPreference) => {
     setSidebarPreference(value);
@@ -185,6 +200,29 @@ export default function ProfilePage() {
           </div>
         </div>
       </section>
+
+      {guide === undefined ? null : (
+        <section className="panel">
+          <div className="panel__header">
+            <div>
+              <div className="panel__title">Panduan penggunaan</div>
+              <div className="panel__description">
+                Panduan PDF langkah demi langkah untuk peran {guide.title}.
+              </div>
+            </div>
+            <FileText size={16} aria-hidden="true" />
+          </div>
+          <div className="panel__body">
+            <p className="muted small" style={{ marginBottom: 12 }}>
+              Berisi alur kerja utama, checklist harian, arti status, dan aturan keamanan.
+            </p>
+            <a className="btn btn--secondary btn--sm" href={`/guides/${guide.file}`} download>
+              <FileText size={15} aria-hidden="true" />
+              Unduh panduan {guide.title}
+            </a>
+          </div>
+        </section>
+      )}
     </div>
   );
 }

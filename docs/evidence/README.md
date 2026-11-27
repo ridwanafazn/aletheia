@@ -35,6 +35,7 @@ Folder ini menyimpan bukti yang dapat diperiksa reviewer: verifikasi milestone, 
 | `ui-phase1-verification.md` | UI Phase 1 command palette, aksi cepat, keyboard, search topbar | Selesai 27 November 2026 |
 | `ui-phase2-verification.md` | UI Phase 2 home per peran, hierarki insight, axe | Selesai 27 November 2026 |
 | `ui-phase5-verification.md` | UI Phase 5 sidebar scroll, CSP font, production cutover | Selesai 27 November 2026 |
+| `demo-history-seed.md` | Seed 15 bulan, 8 divisi, payroll/klaim/laporan historis | Selesai 27 November 2026 |
 | `design-phase1-verification.md` | Quiet Ledger foundation, tokens, shell, komponen, E2E, axe | Selesai 27 November 2026 |
 | `design-phase2-verification.md` | Overview, reports v2, organization v2, charts, E2E, axe | Selesai 27 November 2026 |
 | `design-phase3-verification.md` | Payroll, employees, workforce, ruang saya, claims, E2E, axe | Selesai 27 November 2026 |

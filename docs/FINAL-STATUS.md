@@ -23,6 +23,8 @@ Aletheia sudah mencapai M1–M6.6 dan Stage 3A:
 - UI Phase 1: command palette `Ctrl/Cmd+K` dengan pencarian halaman, aksi cepat per peran, dan navigasi keyboard;
 - UI Phase 2: home per peran dengan urutan tindakan, fokus utama, metrik sekunder, insight chart, dan tabel detail;
 - UI Phase 5: sidebar dengan menu panjang dapat di-scroll, footer akun tetap terlihat, CSP font production diperbaiki, dan cutover production selesai;
+- demo dataset 15 bulan (September 2025–November 2026): 32 personel di 8 divisi, 45 batch payroll, 273 klaim, 470 payslip, dan 90 laporan;
+- panduan penggunaan PDF tersedia untuk tujuh peran di `docs/guides/` dan dapat diunduh dari halaman Profil;
 - UI Phase 3–4 ditunda dan tetap tercatat sebagai backlog;
 - tidak ada P0/P1 yang terbuka.
 
@@ -43,6 +45,8 @@ Aletheia sudah mencapai M1–M6.6 dan Stage 3A:
 | UI Phase 1 navigasi | Selesai | Command palette `Ctrl/Cmd+K`, aksi cepat per peran, keyboard, search topbar; bukti `docs/evidence/ui-phase1-verification.md` |
 | UI Phase 2 insight | Selesai | Home per peran, action-first, fokus utama, metrik sekunder, insight chart, detail table; bukti `docs/evidence/ui-phase2-verification.md` |
 | UI Phase 5 final polish dan production | Selesai | Sidebar scroll, CSP font, cutover `04962c3`, smoke 15/15; bukti `docs/evidence/ui-phase5-verification.md` |
+| Demo history 15 bulan | Selesai | 32 personel, 8 divisi, 45 batch payroll, 273 klaim, 470 payslip, 90 laporan; bukti `docs/evidence/demo-history-seed.md` |
+| Panduan PDF per peran | Selesai | Tujuh PDF di `docs/guides/` dan dapat diunduh dari Profil; bukti `docs/guides/README.md` |
 | OpenAPI artifact | Diperbarui; CI gate lulus | `2f8b07f` |
 | Test fixture payroll | Diperbaiki; payroll integration 54/54 | `1c9915d` |
 
@@ -69,8 +73,9 @@ Tidak ada item di atas yang merupakan bug produksi atau blocker demo.
 | Gate | Hasil |
 | --- | --- |
 | `pnpm verify` | Lulus |
-| Full Playwright E2E | 49 passed, 2 skipped |
+| Full Playwright E2E | 50 passed, 2 skipped |
 | UI Phase 2 focused Playwright | 2 passed; enam role home + sidebar panjang, axe 0 serious/critical |
+| Guide download Playwright | 1 passed; Finance, Compliance, dan Karyawan mengunduh PDF peran |
 | Build web | 152.3 KB gzip |
 | CI `45954282337` | Hijau |
 | Security `45954282286` | Hijau |
@@ -130,4 +135,5 @@ Tidak ada item di atas yang merupakan bug produksi atau blocker demo.
 | `fbc320d` | Evidence dan status UI Phase 2 |
 | `abb4827` | Sidebar panjang dapat di-scroll; footer akun tetap terlihat |
 | `04962c3` | CSP font production dan fade sidebar; production cutover |
+| commit demo dataset | Seed 15 bulan, 32 personel, panduan PDF per peran |
 | commit docs Phase 5 | Snapshot final, evidence deploy, dan roadmap |

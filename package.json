@@ -16,6 +16,7 @@
     "db:migrate": "pnpm --filter @aletheia/database db:migrate",
     "db:seed": "pnpm --filter @aletheia/database db:seed",
     "db:check": "pnpm --filter @aletheia/database db:check",
+    "docs:guides": "node apps/web/scripts/generate-role-guides.mjs",
     "db:provision-app": "pnpm --filter @aletheia/database build && node scripts/provision-app-role.mjs",
     "compose:config": "docker compose config",
     "verify": "bash scripts/verify-all.sh",

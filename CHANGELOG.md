@@ -58,6 +58,8 @@ Semua perubahan penting pada Aletheia. Format mengikuti [Keep a Changelog](https
 - UI Phase 5: CSP Cloudflare Pages mengizinkan font `data:` dari bundel Plus Jakarta Sans, sehingga production bebas error console.
 - UI Phase 5: production cutover commit `04962c3` — empat service Render, edge Worker, dan Pages; smoke 15/15, async QStash/worker ~5 detik.
 - Bukti UI Phase 5: `docs/evidence/ui-phase5-verification.md` dan screenshot sidebar Finance/Compliance.
+- Demo dataset 15 bulan (September 2025–November 2026): 32 personel di 8 divisi, 45 batch payroll, 273 klaim, 470 payslip, 90 laporan, dan 45 baris KPI MIS.
+- Panduan penggunaan per peran dalam format PDF untuk Petugas Klaim, Manajer Cabang, Manajer Keuangan, Spesialis SDM, Administrator Kepatuhan, Analis MIS, dan Karyawan.
 
 ### Changed
 
