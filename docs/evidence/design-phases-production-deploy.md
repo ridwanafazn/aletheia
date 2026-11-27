@@ -1,5 +1,7 @@
 # Production Deploy — M6.3–M6.6 dan Desain Fase 1–4
 
+> **Catatan:** dokumen ini merekam deploy `5d231c1` pada 27 November 2026. Deploy UI Phase 5 berikutnya ada di [`ui-phase5-verification.md`](ui-phase5-verification.md) (commit `04962c3`).
+
 - **Tanggal:** 27 November 2026, 06:23–06:30 WIB.
 - **Commit:** `5d231c1` (`feat(web): refine MIS and audit with motion polish`).
 - **Status:** Freeze deploy dicabut. Seluruh service live dan smoke production 15/15 lulus.

@@ -132,13 +132,15 @@ Alur minimum:
 3. Branch Manager approve Level 1; Finance Manager approve eskalasi.
 4. SoD: maker tidak melihat tombol approve; direct API ditolak.
 5. HR membuat batch payroll, kalkulasi, melihat breakdown.
-6. Finance approve dan disburse. Payslip menyusul pada TASK-11.
+6. Finance approve dan disburse. Payslip tersedia di M6.3.
 7. HR generate laporan PPh 21/BPJS; unduh; checksum terlihat.
 8. MIS Analyst melihat KPI, menjalankan What-If, melihat variance.
 9. Compliance publish policy baru; klaim lama tetap memakai versi lama.
 10. Audit explorer memverifikasi hash chain.
 
-> **Status M5.3:** 21 test Playwright lulus dua run berturut-turut. Alur login enam peran, klaim sampai pencairan, eskalasi level 2, SoD, payroll create/calculate/approve/disburse, MIS, audit, keyboard, dan axe berjalan. Test payroll memakai worker lokal secara langsung karena QStash tidak aktif. UI payslip dan laporan belum tersedia; API-nya diverifikasi di M3.4.
+> **Status M5.3:** 21 test Playwright lulus dua run berturut-turut. Alur login enam peran, klaim sampai pencairan, eskalasi level 2, SoD, payroll create/calculate/approve/disburse, MIS, audit, keyboard, dan axe berjalan. Test payroll memakai worker lokal secara langsung karena QStash tidak aktif. UI payslip dan laporan belum tersedia saat M5.3; API-nya diverifikasi di M3.4.
+>
+> **Pembaruan 27 November 2026:** full suite **49 passed, 2 skipped**; UI payslip dan laporan (M6.3), employee self-service (M6.4), reimburse/organisasi (M6.5), paket tenant/invoice (M6.6), Stage 3A, dan UI Phase 0–2 serta Phase 5 sudah live. QStash aktif di production. Bukti terbaru: `docs/evidence/ui-phase5-verification.md`.
 
 Aturan:
 - Gunakan seed data deterministik; jangan bergantung pada urutan test lain.

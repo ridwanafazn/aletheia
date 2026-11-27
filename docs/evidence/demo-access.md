@@ -1,8 +1,8 @@
-# Demo Access — Aletheia Lokal
+# Demo Access — Aletheia
 
-* **Tanggal:** 26 November 2026
-* **Lingkungan:** lokal, data sintetis
-* **Status server:** dihentikan setelah M5.3. Nyalakan dengan `bash scripts/dev-up.sh` dan baca `HANDOVER.md`.
+* **Tanggal:** 27 November 2026
+* **Lingkungan:** lokal dan production, data sintetis
+* **Status server:** production live di commit `04962c3`; stack lokal dapat dinyalakan dengan `bash scripts/dev-up.sh` dan dijelaskan di `HANDOVER.md`.
 * **Kata sandi semua akun demo:** `AletheiaDemo!2026`
 * **MFA:** nonaktif
 
@@ -10,20 +10,23 @@
 
 | Email | Role | Tenant | Cabang | Cocok untuk |
 | --- | --- | --- | --- | --- |
-| `officer.bdg@aletheia.id` | CLAIMS_OFFICER | SAU | BDG-01 | Buat, ubah, submit klaim |
-| `officer.sby@aletheia.id` | CLAIMS_OFFICER | SAU | SBY-01 | Klaim cabang Surabaya |
-| `manager.bdg@aletheia.id` | BRANCH_MANAGER | SAU | BDG-01 | Approval level 1 dan antrean persetujuan |
-| `finance.vp@aletheia.id` | FINANCE_MANAGER | SAU | JKT-HQ | Approval level 2, pencairan, approve dan disburse payroll, retry payment |
-| `hr.ops@aletheia.id` | HR_SPECIALIST | SAU | JKT-HQ | Employee directory, batch payroll, kalkulasi |
-| `compliance@aletheia.id` | COMPLIANCE_ADMIN | SAU | JKT-HQ | Review kepatuhan, policy, audit chain |
-| `mis.analyst@aletheia.id` | MIS_ANALYST | SAU | JKT-HQ | Dashboard MIS dan What-If |
-| `compliance@bpui.id` | COMPLIANCE_ADMIN | BPUI | JKT-HQ | Uji isolasi tenant |
+| `officer.bdg@aletheia.id` | CLAIMS_OFFICER | SEIHITSU (`SAU`) | BDG-01 | Buat, ubah, submit klaim |
+| `officer.sby@aletheia.id` | CLAIMS_OFFICER | SEIHITSU (`SAU`) | SBY-01 | Klaim cabang Surabaya |
+| `manager.bdg@aletheia.id` | BRANCH_MANAGER | SEIHITSU (`SAU`) | BDG-01 | Approval level 1 dan antrean persetujuan |
+| `finance.vp@aletheia.id` | FINANCE_MANAGER | SEIHITSU (`SAU`) | JKT-HQ | Approval level 2, pencairan, approve dan disburse payroll, retry payment |
+| `hr.ops@aletheia.id` | HR_SPECIALIST | SEIHITSU (`SAU`) | JKT-HQ | Employee directory, batch payroll, kalkulasi |
+| `compliance@aletheia.id` | COMPLIANCE_ADMIN | SEIHITSU (`SAU`) | JKT-HQ | Review kepatuhan, policy, audit chain |
+| `mis.analyst@aletheia.id` | MIS_ANALYST | SEIHITSU (`SAU`) | JKT-HQ | Dashboard MIS dan What-If |
+| `employee.siti@aletheia.id` | EMPLOYEE | SEIHITSU (`SAU`) | BDG-01 | Ruang Saya, slip gaji, e-cuti, e-lembur, reimburse |
+| `compliance@bpui.id` | COMPLIANCE_ADMIN | BPUI Demo | JKT-HQ | Uji isolasi tenant |
 
 ## URL
 
 | Komponen | URL |
 | --- | --- |
-| Web | `http://localhost:5173` |
+| Web production | `https://aletheia-web-preview.pages.dev` |
+| Edge production | `https://aletheia-edge.ridwanafzn.workers.dev` |
+| Web lokal | `http://localhost:5173` |
 | Edge Gateway | `http://127.0.0.1:8787` |
 | Governance Service | `http://127.0.0.1:4101` |
 | Claims Service | `http://127.0.0.1:4102` |
@@ -61,4 +64,4 @@ docker compose --profile observability up -d otel-collector jaeger prometheus gr
 
 * Semua data adalah sintetis. Tidak ada uang nyata atau PII nyata.
 * Service runtime memakai role non-owner `aletheia_app` dengan tenant binding per request; migrasi/seed memakai role owner. Bukti: `docs/evidence/m5.4-verification.md`.
-* Edge preview live perlu deploy ulang di TASK-18. Web preview statis aktif di `https://aletheia-web-preview.pages.dev`.
+* Edge dan web production live di `https://aletheia-edge.ridwanafzn.workers.dev` dan `https://aletheia-web-preview.pages.dev` (commit `04962c3`). Jalankan `pnpm warm:production` sebelum demo karena Render free tier tidur saat idle.

@@ -165,7 +165,7 @@ Ini bukan janji; gunakan sebagai urutan, bukan deadline. Yang penting: setiap mi
 
 ### 8.1 README (wajib)
 
-**Status 26 November 2026:** live di `https://aletheia-web-preview.pages.dev` dengan edge `https://aletheia-edge.ridwanafzn.workers.dev`; smoke production 15/15 dan rollback edge/Pages/Render lulus.
+**Status 27 November 2026:** live di `https://aletheia-web-preview.pages.dev` dengan edge `https://aletheia-edge.ridwanafzn.workers.dev`, commit `04962c3`; smoke production 15/15, async QStash/worker ~5 detik, dan rollback edge/Pages/Render lulus. Bukti: `docs/evidence/ui-phase5-verification.md`.
 
 - Nama, tagline, status (design/implementation/live).
 - Masalah yang dipecahkan (3 kalimat).

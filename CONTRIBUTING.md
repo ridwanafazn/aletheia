@@ -1,6 +1,6 @@
 # Contributing to Aletheia
 
-Aletheia is past the design phase. M1 through M5.3 are implemented. Read `HANDOVER.md` before changing code.
+Aletheia is past the design phase. M1 through M6.6, Stage 3A, and UI Phase 5 are implemented. Read `HANDOVER.md` before changing code.
 
 ## Before you start
 

@@ -95,7 +95,7 @@ It is designed for finance, HR, compliance, and MIS teams that need speed withou
 
 ## Demo narrative
 
-A reviewer should be able to log in as six roles and see one coherent story: a claim with a cross-domain conflict is escalated and approved; a payroll batch with mixed PTKP statuses is calculated, approved, disbursed, and turned into a payslip and PPh 21/BPJS report; an MIS analyst simulates a commission change without touching production; compliance publishes a new policy while old transactions keep their old version; the audit chain verifies.
+A reviewer should be able to log in as seven roles (six operational roles plus employee self-service) and see one coherent story: a claim with a cross-domain conflict is escalated and approved; a payroll batch with mixed PTKP statuses is calculated, approved, disbursed, and turned into a payslip and PPh 21/BPJS report; an MIS analyst simulates a commission change without touching production; compliance publishes a new policy while old transactions keep their old version; the audit chain verifies.
 
 ## Voice and tone
 

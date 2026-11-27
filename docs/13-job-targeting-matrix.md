@@ -12,11 +12,11 @@
 | --- | --- | --- |
 | Requirement teknis wajib tercakup di desain | 100% | 100% |
 | Preferred qualification tercakup di desain | 100% | 100% |
-| Kesiapan bukti saat ini | 100% requirement yang dapat dibuktikan (M1–M6.3); live URL aktif | 100% requirement yang dapat dibuktikan (M1–M6.3); live URL aktif |
+| Kesiapan bukti saat ini | 100% requirement yang dapat dibuktikan (M1–M6.6, Stage 3A, UI Phase 5); live URL aktif | 100% requirement yang dapat dibuktikan (M1–M6.6, Stage 3A, UI Phase 5); live URL aktif |
 | Target setelah implementasi | 120%+ | 120%+ |
 | Gap yang tidak bisa ditutup proyek | Pengalaman formal 2 tahun | — |
 
-**Kesimpulan:** seluruh requirement teknis dan preferred qualification sudah diimplementasikan dengan artefak yang dapat diperiksa: kode, test, screenshot, video 2:16, load test, query plan, security evidence, live URL production, dan Neon production. J1-R1 (gelar) dan J1-R2 (pengalaman formal 2 tahun) tetap `N/A` dan dikompensasi dengan portfolio. UI payslip dan laporan selesai di M6.3. Employee self-service, e-cuti, dan e-lembur selesai di M6.4. Reimburse dan struktur organisasi selesai di M6.5. Paket tenant dan invoice biaya payroll selesai di M6.6. Gap berikutnya adalah **performance review, CRUD organisasi, dan pengaturan paket**; integrasi cuti ke attendance summary selesai di Stage 3A.
+**Kesimpulan:** seluruh requirement teknis dan preferred qualification sudah diimplementasikan dengan artefak yang dapat diperiksa: kode, test, screenshot, video 2:16, load test, query plan, security evidence, live URL production, dan Neon production. J1-R1 (gelar) dan J1-R2 (pengalaman formal 2 tahun) tetap `N/A` dan dikompensasi dengan portfolio. UI payslip dan laporan selesai di M6.3. Employee self-service, e-cuti, dan e-lembur selesai di M6.4. Reimburse dan struktur organisasi selesai di M6.5. Paket tenant dan invoice biaya payroll selesai di M6.6. UI Phase 0–2 dan Phase 5 selesai (Daylight workspace, command palette, home per peran, sidebar scroll, CSP font). Gap berikutnya adalah **performance review, CRUD organisasi, pengaturan paket, dan UI Phase 3–4**; integrasi cuti ke attendance summary selesai di Stage 3A.
 
 ## 1. Metode Penilaian
 
@@ -100,7 +100,7 @@ Lowongan memakai frasa "at least one of" dan "one of", jadi pilihan berikut seng
 ## 5. Evidence Checklist (Harus Ada Sebelum Melamar)
 
 - [x] URL demo live — `https://aletheia-web-preview.pages.dev` (edge `https://aletheia-edge.ridwanafzn.workers.dev`).
-- [x] 6 akun demo + data seed realistis.
+- [x] 6 akun demo operasional + employee self-service + data seed realistis.
 - [x] README dengan arsitektur, screenshot, cara jalan, akun demo.
 - [x] Test report: unit, integration, E2E, race; coverage domain ≥ 90%.
 - [x] Load test report: p95, error rate, batch 500 item.
@@ -108,12 +108,12 @@ Lowongan memakai frasa "at least one of" dan "one of", jadi pilihan berikut seng
 - [x] Bundle analyzer + ukuran gzip.
 - [x] Security checklist + hasil probe (SoD, replay, cross-tenant, audit tamper).
 - [x] 5–8 ADR yang menjelaskan trade-off.
-- [x] 8 screenshot inti + 3 mobile + 4 screenshot M6.3 dan 4 screenshot M6.4 untuk slip, laporan, dan Ruang Saya.
+- [x] 8 screenshot inti + 3 mobile + 4 screenshot M6.3 dan 4 screenshot M6.4 untuk slip, laporan, dan Ruang Saya; role home Phase 2 dan sidebar Phase 5 di `docs/evidence/ui-phase2/` dan `docs/evidence/ui-phase5/`.
 - [x] Video walkthrough 2:16 (`docs/evidence/m6.1/aletheia-demo.webm`).
 - [x] CHANGELOG + riwayat commit yang rapi.
 - [x] Job matrix ini diperbarui dengan status aktual.
 
-## 6. Residual Gap (Status 26 November 2026)
+## 6. Residual Gap (Status 27 November 2026)
 
 | Prioritas | Gap | Dampak | Aksi |
 | --- | --- | --- | --- |
@@ -123,6 +123,8 @@ Lowongan memakai frasa "at least one of" dan "one of", jadi pilihan berikut seng
 | ~~P1~~ | ~~Reimburse dan organization management~~ | Selesai 27 November 2026, M6.5 | Tab Reimburse, `/organization`, tabel departemen/posisi; bukti `docs/evidence/m6.5-verification.md` |
 | ~~P1~~ | ~~Paket tenant dan invoice biaya payroll~~ | Selesai 27 November 2026, M6.6 | Plan badge, feature gating, report `PAYROLL_COST_INVOICE`; bukti `docs/evidence/m6.6-verification.md` |
 | ~~P1~~ | ~~Integrasi cuti ke attendance summary~~ | Selesai 27 November 2026, Stage 3A | Approval cuti memperbarui `paid_leave_days`/`unpaid_leave_days`, termasuk cuti lintas bulan; bukti `docs/evidence/stage-3a-leave-attendance.md` |
+| ~~P1~~ | ~~Sidebar menu panjang dan CSP font production~~ | Selesai 27 November 2026, UI Phase 5 | Nav scroll + footer pinned, fade/spacer, dan `font-src 'self' data:`; production `04962c3`; bukti `docs/evidence/ui-phase5-verification.md` |
+| P2 | UI Phase 3–4: form clarity dan mobile table-to-card | Alur form dan tabel mobile masih memakai pola lama | Backlog setelah cutover production |
 | P2 | Performance review dan org chart visual | Modul HRIS+ PRO dan BASIC belum lengkap | Bangun setelah core payroll stabil |
 | P1 | Video MP4/narasi | WebM diterima, tetapi MP4 lebih universal | Konversi dengan ffmpeg + narasi opsional |
 | P2 | RUM LCP/INP, edge span OTLP | SLO web/edge belum terukur production | Tambah web-vitals dan exporter edge |

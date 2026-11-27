@@ -2,7 +2,7 @@
 
 * **Status Dokumen:** Peta Jalan Eksekusi (*Single Source of Truth* untuk Agen OpenCode)
 * **Strategi:** *Contract-First, Vertical Slice, Evidence-Driven, Zero Context Drift*
-* **Kondisi Saat Ini:** Fase 0, M1.1–M1.3, M2.1–M2.3, M3.1–M3.4, M4.1, M4.2, M5.1–M5.4, M6.1, M6.3, M6.4, M6.5, dan M6.6 selesai. M5.4 live di Render, Neon, Upstash, Cloudinary, dan Cloudflare; smoke production 15/15, async QStash/worker ~5 detik, login enam peran, UI web, serta rollback edge, Pages, dan Render terverifikasi. M6.2 live; Production Monitor baseline `45816325368` dan pasca-drill `45821314200` lulus, serta run terjadwal `45894766221` lulus (1/4). Sisa 3 run terjadwal; freeze deploy sudah dicabut; sign-off menunggu. M6.3 menambahkan pusat slip gaji dan laporan di web. M6.4 menambahkan employee self-service, e-cuti, dan e-lembur. M6.5 menambahkan reimburse dan struktur organisasi. M6.6 menambahkan paket tenant dan invoice biaya payroll. Stage 3A menautkan approval cuti ke attendance summary payroll (paid/unpaid leave per bulan, termasuk lintas bulan). Render free tier memiliki cold start; jalankan `pnpm warm:production` sebelum demo. Bukti: `docs/evidence/m5.4-verification.md`, `docs/evidence/m6.1-verification.md`, `docs/evidence/m6.2-verification.md`, `docs/evidence/m6.3-verification.md`, `docs/evidence/m6.4-verification.md`, `docs/evidence/m6.5-verification.md`, `docs/evidence/m6.6-verification.md`, `docs/evidence/stage-3a-leave-attendance.md`. **UI Phase 0–2 dan Phase 5 selesai 27 November 2026; Phase 3–4 ditunda. Production live di commit `04962c3` dengan smoke 15/15. Snapshot: `docs/FINAL-STATUS.md` dan `DESIGN.md`.**
+* **Kondisi Saat Ini:** Fase 0, M1.1–M1.3, M2.1–M2.3, M3.1–M3.4, M4.1, M4.2, M5.1–M5.4, M6.1, M6.3, M6.4, M6.5, dan M6.6 selesai. M5.4 live di Render, Neon, Upstash, Cloudinary, dan Cloudflare; smoke production 15/15, async QStash/worker ~5 detik, login enam peran operasional, UI web, serta rollback edge, Pages, dan Render terverifikasi. M6.2 live; Production Monitor baseline `45816325368` dan pasca-drill `45821314200` lulus, serta run terjadwal `45894766221` lulus (1/4). Sisa 3 run terjadwal; freeze deploy sudah dicabut; sign-off menunggu. M6.3 menambahkan pusat slip gaji dan laporan di web. M6.4 menambahkan employee self-service, e-cuti, dan e-lembur. M6.5 menambahkan reimburse dan struktur organisasi. M6.6 menambahkan paket tenant dan invoice biaya payroll. Stage 3A menautkan approval cuti ke attendance summary payroll (paid/unpaid leave per bulan, termasuk lintas bulan). Render free tier memiliki cold start; jalankan `pnpm warm:production` sebelum demo. Bukti: `docs/evidence/m5.4-verification.md`, `docs/evidence/m6.1-verification.md`, `docs/evidence/m6.2-verification.md`, `docs/evidence/m6.3-verification.md`, `docs/evidence/m6.4-verification.md`, `docs/evidence/m6.5-verification.md`, `docs/evidence/m6.6-verification.md`, `docs/evidence/stage-3a-leave-attendance.md`. **UI Phase 0–2 dan Phase 5 selesai 27 November 2026; Phase 3–4 ditunda. Production live di commit `04962c3` dengan smoke 15/15. Snapshot: `docs/FINAL-STATUS.md` dan `DESIGN.md`.**
 
 ## 1. Protokol Kerja Agen
 
@@ -172,7 +172,7 @@
 * **Gerbang:** 21/21 lulus dua run berturut-turut; 0 flaky; axe 0 serious/critical; coverage domain 96,26% lines; integration 27/36/34 lulus; Go race lulus.
 
 #### `TASK-18` — CI/CD Production & Deployment
-* **Status:** selesai live 26 November 2026. Render menjalankan governance, claims, payroll, dan worker; Neon production aktif; Upstash QStash dan Cloudinary aktif; edge Workers dan web Pages live. Smoke production 15/15; async QStash/worker ~5 detik; web UI 3 peran; rollback edge, Pages, dan Render diuji. Production Monitor baseline `45816325368`, pasca-drill `45821314200`, dan run terjadwal `45894766221` lulus; 1/4 run terjadwal selesai, sign-off menunggu 3 run berikutnya.
+* **Status:** selesai live 26 November 2026. Render menjalankan governance, claims, payroll, dan worker; Neon production aktif; Upstash QStash dan Cloudinary aktif; edge Workers dan web Pages live. Smoke production 15/15; async QStash/worker ~5 detik; web UI 3 peran; rollback edge, Pages, dan Render diuji. Production Monitor baseline `45816325368`, pasca-drill `45821314200`, dan run terjadwal `45894766221` lulus; 1/4 run terjadwal selesai, sign-off menunggu 3 run berikutnya. Deploy UI Phase 5 pada 27 November 2026 live di commit `04962c3`; bukti `docs/evidence/ui-phase5-verification.md`.
 * **Konteks Wajib:** `docs/05`, `docs/12`.
 * **Cakupan:** pipeline deploy, Cloudflare Pages/Workers, Render, Neon/Upstash/Cloudinary, smoke test, rollback.
 * **Gerbang:** `/readyz` 200; demo live; rollback diuji; tidak ada secret.
@@ -183,7 +183,7 @@
 ### FASE 6 — Portofolio
 
 #### `TASK-19` — README, Screenshot, Video & Job Matrix
-* **Status:** aset selesai 26 November 2026. README final, 8 screenshot inti + 3 mobile, video 2:16, akun demo, CHANGELOG, dan job matrix aktual tersedia. Live URL production aktif; async QStash dan rollback edge/Pages/Render lulus; M6.2 tinggal 3 run monitoring terjadwal dan sign-off.
+* **Status:** aset selesai 26 November 2026; galeri UI diperbarui sampai Phase 5. README final, screenshot inti + mobile, video 2:16, akun demo, CHANGELOG, dan job matrix aktual tersedia. Live URL production aktif; async QStash dan rollback edge/Pages/Render lulus; M6.2 tinggal 3 run monitoring terjadwal dan sign-off.
 * **Konteks Wajib:** `docs/12`, `docs/13`.
 * **Cakupan:** README final, 8 screenshot desktop/mobile, video 2–3 menit, akun demo, CHANGELOG, job matrix status 3/4.
 * **Gerbang:** reviewer dapat menjalankan demo < 3 menit; semua evidence ada; matrix ≥ 100%.
@@ -193,7 +193,7 @@
 
 ## 3. Urutan Demo yang Harus Selalu Hidup
 
-1. Login 6 peran.
+1. Login 6 peran operasional + employee self-service.
 2. Claims: submit → risk/conflict → approve/SoD → disburse.
 3. Payroll: batch → calculate → variance → approve → disburse → payslip.
 4. Reports: PPh 21 monthly/annual, BPJS, bank file.

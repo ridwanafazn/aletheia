@@ -60,10 +60,10 @@ Screenshot di `docs/evidence/design-phase5/`:
 
 ## 6. Batasan dan lanjutan
 
-- Tabel mobile untuk pusat slip gaji, laporan, dan antrean workforce masih berupa tabel scroll; Phase 1/4 akan mengubahnya menjadi kartu.
+- Tabel mobile untuk pusat slip gaji, laporan, dan antrean workforce masih berupa tabel scroll; Phase 4 (ditunda) direncanakan mengubahnya menjadi kartu.
 - Pencarian global/command palette dan quick-action menu belum ada.
 - `global.css` masih menyimpan struktur lama Quiet Ledger; `theme.css` adalah lapisan visual aktif. Konsolidasi CSS dilakukan setelah rollout stabil.
-- Stage 3A dan UI Phase 0 belum di-deploy ke Render; production masih `5d231c1`.
+- Stage 3A dan UI Phase 0 belum di-deploy pada saat snapshot ini; production saat itu masih `5d231c1`. Deploy berikutnya tercatat di [`ui-phase5-verification.md`](ui-phase5-verification.md) (commit `04962c3`).
 - M6.2 sign-off tetap ditunda (1/4 run terjadwal) dan automation finalisasi sedang paused.
 
 ## 7. File utama

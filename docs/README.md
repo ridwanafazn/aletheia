@@ -43,14 +43,22 @@ Mulai dari `HANDOVER.md` di root repository. Dokumen ini adalah indeks spesifika
 | `evidence/m6.4-verification.md` | Bukti employee self-service, e-cuti, e-lembur, E2E, dan axe |
 | `evidence/m6.5-verification.md` | Bukti reimburse, struktur organisasi, E2E, dan axe |
 | `evidence/m6.6-verification.md` | Bukti paket tenant, feature gating, invoice biaya payroll, E2E, dan axe |
+| `evidence/ui-phase1-verification.md` | Bukti command palette, aksi cepat, dan keyboard |
+| `evidence/ui-phase2-verification.md` | Bukti home per peran, hierarki insight, dan axe |
+| `evidence/ui-phase5-verification.md` | Bukti sidebar scroll, CSP font, dan production cutover `04962c3` |
 
 ## Evidence
 
 Indeks bukti ada di `evidence/README.md`. Bukti terbaru:
 
-* `evidence/m5.3-verification.md`
-* `evidence/m5.2-verification.md`
-* `evidence/m5.1-verification.md`
+* `evidence/ui-phase5-verification.md`
+* `evidence/ui-phase2-verification.md`
+* `evidence/ui-phase1-verification.md`
+* `evidence/m6.6-verification.md`
+* `evidence/m6.5-verification.md`
+* `evidence/m6.4-verification.md`
+* `evidence/m6.3-verification.md`
+* `evidence/m6.2-verification.md`
 * `evidence/load/`
 * `evidence/slo/`
 * `evidence/query-plans/`

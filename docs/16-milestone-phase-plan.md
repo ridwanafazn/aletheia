@@ -131,7 +131,7 @@
 | M6.7 | HRIS gap — cuti ke attendance (Stage 3A) | **Selesai 27 November 2026.** Approval cuti menambah `paid_leave_days`/`unpaid_leave_days` per periode, termasuk cuti lintas bulan; guard `ERR_ATTENDANCE_MISSING`/`ERR_ATTENDANCE_CAPACITY`; audit `attendance_sync`. Bukti: `docs/evidence/stage-3a-leave-attendance.md`. | Approval cuti memperbarui ringkasan absensi atau rollback dengan error yang jelas |
 
 **Deploy final:** production demo di free-tier, dengan akun demo dan data sintetis.
-**Demo:** 6 role → claims → payroll → payslip/report → MIS → policy/audit.
+**Demo:** 6 role operasional + employee self-service → claims → payroll → payslip/report → MIS → policy/audit.
 **Status:** UI Phase 0–2 dan Phase 5 selesai 27 November 2026; Phase 3–4 ditunda. Production live di commit `04962c3`. Snapshot di `docs/FINAL-STATUS.md`.
 
 ## 4. Deployment Matrix
