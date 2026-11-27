@@ -215,7 +215,7 @@ Declare elevation once. Do not combine a wide soft shadow with a 1px border on t
 - Brand mark, headline, body, and feature labels in white over cobalt.
 - Right panel: white with a crisp line illustration of a calm office scene, 42% opacity.
 - Login card: white, 20px radius, soft floating shadow, 420px max width.
-- Demo role buttons are light neutral cards in a two-column grid with equal row heights; no full-width last card, no bento asymmetry. MFA input is hidden in the demo login; the backend still supports MFA.
+- Demo role options are a looping horizontal card slider with arrows, dots, and swipe. One active card is centered; adjacent cards peek with a fade. No vertical grid, no bento asymmetry. MFA input is hidden in the demo login; the backend still supports MFA.
 - Mobile: stacked layout; cobalt header with watermark, form card below, illustration hidden.
 
 ### Dialogs and drawers

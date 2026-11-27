@@ -35,7 +35,7 @@ Aletheia sudah mencapai M1–M6.6 dan Stage 3A:
 | M6.6 paket tenant dan invoice biaya | Selesai | `docs/evidence/m6.6-verification.md` |
 | Stage 3A cuti → attendance | Selesai di `main` dan CI; belum deploy | `docs/evidence/stage-3a-leave-attendance.md` |
 | UI Phase 0 Daylight workspace | Selesai di `main` dan localhost | `docs/evidence/design-phase5-verification.md` |
-| UI Phase 0 final adjustments | Selesai | Login tanpa MFA, opsi akun seragam, dua kartu sama tinggi, tenant `SEIHITSU`; commit `fc09cfc` |
+| UI Phase 0 final adjustments | Selesai | Login tanpa MFA, carousel akun looping, dua kartu sama tinggi, tenant `SEIHITSU`; commit `fc09cfc` |
 | OpenAPI artifact | Diperbarui; CI gate lulus | `2f8b07f` |
 | Test fixture payroll | Diperbaiki; payroll integration 54/54 | `1c9915d` |
 

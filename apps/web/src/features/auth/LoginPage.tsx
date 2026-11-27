@@ -1,6 +1,6 @@
-import { useState, type FormEvent } from "react";
+import { useRef, useState, type FormEvent } from "react";
 import { Navigate, useNavigate } from "@tanstack/react-router";
-import { ArrowRight, LockKeyhole } from "lucide-react";
+import { ArrowRight, ChevronLeft, ChevronRight, LockKeyhole } from "lucide-react";
 
 import type { Role } from "@aletheia/shared-contracts";
 
@@ -62,10 +62,13 @@ function landingFor(role: Role | undefined): "/payroll" | "/mis" | "/claims" | "
 export default function LoginPage() {
   const { login, status, user } = useAuth();
   const navigate = useNavigate();
-  const [email, setEmail] = useState("officer.bdg@aletheia.id");
+  const [email, setEmail] = useState(DEMO_USERS[0]?.email ?? "employee.siti@aletheia.id");
   const [password, setPassword] = useState("AletheiaDemo!2026");
   const [error, setError] = useState<unknown>(null);
   const [submitting, setSubmitting] = useState(false);
+  const [accountIndex, setAccountIndex] = useState(0);
+  const trackRef = useRef<HTMLDivElement>(null);
+  const cardRefs = useRef<Array<HTMLButtonElement | null>>([]);
 
   if (status === "loading") {
     return (
@@ -90,6 +93,60 @@ export default function LoginPage() {
       setError(caught);
     } finally {
       setSubmitting(false);
+    }
+  };
+
+  const centerAccount = (index: number, behavior: ScrollBehavior = "smooth") => {
+    const track = trackRef.current;
+    const card = cardRefs.current[index];
+    if (track === null || card === null || card === undefined) {
+      return;
+    }
+    const nextLeft = card.offsetLeft - (track.clientWidth - card.offsetWidth) / 2;
+    track.scrollTo({ left: Math.max(0, nextLeft), behavior });
+  };
+
+  const selectAccount = (index: number) => {
+    const next = DEMO_USERS[index];
+    if (next === undefined) {
+      return;
+    }
+    setAccountIndex(index);
+    setEmail(next.email);
+    setPassword("AletheiaDemo!2026");
+    centerAccount(index);
+  };
+
+  const moveAccount = (delta: number) => {
+    const next = (accountIndex + delta + DEMO_USERS.length) % DEMO_USERS.length;
+    selectAccount(next);
+  };
+
+  const handleAccountScroll = () => {
+    const track = trackRef.current;
+    if (track === null) {
+      return;
+    }
+    const center = track.scrollLeft + track.clientWidth / 2;
+    let nearest = 0;
+    let nearestDistance = Number.POSITIVE_INFINITY;
+    cardRefs.current.forEach((card, index) => {
+      if (card === null) {
+        return;
+      }
+      const distance = Math.abs(card.offsetLeft + card.offsetWidth / 2 - center);
+      if (distance < nearestDistance) {
+        nearest = index;
+        nearestDistance = distance;
+      }
+    });
+    if (nearest !== accountIndex) {
+      const next = DEMO_USERS[nearest];
+      if (next !== undefined) {
+        setAccountIndex(nearest);
+        setEmail(next.email);
+        setPassword("AletheiaDemo!2026");
+      }
     }
   };
 
@@ -176,21 +233,85 @@ export default function LoginPage() {
             </Button>
           </form>
 
-          <div className="demo-roles" aria-label="Akun demo">
-            {DEMO_USERS.map((user) => (
-              <button
-                key={user.email}
-                type="button"
-                className="demo-role"
-                onClick={() => {
-                  setEmail(user.email);
-                  setPassword("AletheiaDemo!2026");
-                }}
-              >
-                <strong>{user.label}</strong>
-                {user.note}
-              </button>
-            ))}
+          <div
+            className="account-carousel"
+            role="region"
+            aria-roledescription="carousel"
+            aria-label="Akun demo"
+            onKeyDown={(event) => {
+              if (event.key === "ArrowLeft") {
+                event.preventDefault();
+                moveAccount(-1);
+              }
+              if (event.key === "ArrowRight") {
+                event.preventDefault();
+                moveAccount(1);
+              }
+            }}
+          >
+            <div className="account-carousel__track" ref={trackRef} onScroll={handleAccountScroll}>
+              {DEMO_USERS.map((demoUser, index) => {
+                const active = index === accountIndex;
+                return (
+                  <button
+                    key={demoUser.email}
+                    type="button"
+                    ref={(node) => {
+                      cardRefs.current[index] = node;
+                    }}
+                    className={`account-card${active ? " account-card--active" : ""}`}
+                    aria-pressed={active}
+                    aria-label={`Pilih akun ${demoUser.label}`}
+                    onClick={() => selectAccount(index)}
+                  >
+                    <span className="account-card__label">{demoUser.label}</span>
+                    <span className="account-card__note">{demoUser.note}</span>
+                    <span className="account-card__state">
+                      {active ? "Terpilih" : "Pilih akun"}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+            <button
+              type="button"
+              className="account-carousel__arrow account-carousel__arrow--prev"
+              aria-label="Akun sebelumnya"
+              onClick={() => moveAccount(-1)}
+            >
+              <ChevronLeft size={18} aria-hidden="true" />
+            </button>
+            <button
+              type="button"
+              className="account-carousel__arrow account-carousel__arrow--next"
+              aria-label="Akun berikutnya"
+              onClick={() => moveAccount(1)}
+            >
+              <ChevronRight size={18} aria-hidden="true" />
+            </button>
+            <div className="account-carousel__footer">
+              <div className="account-carousel__dots" aria-label="Posisi akun demo">
+                {DEMO_USERS.map((demoUser, index) => (
+                  <button
+                    key={demoUser.email}
+                    type="button"
+                    className={`account-carousel__dot${
+                      index === accountIndex ? " account-carousel__dot--active" : ""
+                    }`}
+                    aria-label={`Tampilkan akun ${index + 1}`}
+                    aria-current={index === accountIndex ? "true" : undefined}
+                    onClick={() => selectAccount(index)}
+                  />
+                ))}
+              </div>
+              <span className="account-carousel__count">
+                {accountIndex + 1} / {DEMO_USERS.length}
+              </span>
+            </div>
+            <p className="sr-only" aria-live="polite">
+              Akun demo {accountIndex + 1} dari {DEMO_USERS.length}:{" "}
+              {DEMO_USERS[accountIndex]?.label ?? ""}
+            </p>
           </div>
 
           <p className="muted small" style={{ marginTop: 18 }}>
