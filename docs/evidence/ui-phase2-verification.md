@@ -1,7 +1,7 @@
 # UI Phase 2 — Role-Based Insight Home
 
 - **Tanggal:** 27 November 2026.
-- **Commit:** `feat(web): add role-based overview for phase 2` di riwayat Git.
+- **Commit:** `2d46589` (`feat(web): add role-based overview for phase 2`).
 - **Lingkungan:** lokal, Vite `5173`, Chromium Playwright.
 - **Data:** sintetis.
 

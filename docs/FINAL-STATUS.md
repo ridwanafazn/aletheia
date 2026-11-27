@@ -122,5 +122,5 @@ Tidak ada item di atas yang merupakan bug produksi atau blocker demo.
 | `cf52a7b` | Daylight workspace, logo, login, profil, sidebar collapsible |
 | `fc09cfc` | Login tanpa MFA, carousel akun, tenant SEIHITSU |
 | commit UI Phase 1 | Command palette, aksi cepat, search topbar |
-| commit UI Phase 2 | Home per peran, hierarki insight, chart/insight |
+| `2d46589` | Home per peran, hierarki insight, chart/insight |
 | commit evidence Phase 0 | Screenshot dan verifikasi UI Phase 0 |
