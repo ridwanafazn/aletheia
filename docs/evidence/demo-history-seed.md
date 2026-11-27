@@ -1,8 +1,9 @@
 # Demo History Seed — 15 Bulan Operasional
 
 - **Tanggal:** 27 November 2026.
-- **Commit:** `feat(database): seed 15 months of demo history` (lihat riwayat Git).
-- **Lingkungan:** PostgreSQL lokal `55432`, database `aletheia`; production diisi setelah verifikasi.
+- **Commit production:** `544e54e` (`feat(demo): seed 15 months and add role guides`).
+- **Web production:** Pages deployment `4509da49-6812-48b2-a147-c42e483edd57`.
+- **Lingkungan:** PostgreSQL lokal `55432` dan Neon production; data production sudah diisi.
 - **Data:** seluruhnya sintetis.
 
 ## 1. Tujuan
@@ -77,10 +78,34 @@ Seed membutuhkan migrasi terbaru dan policy aktif. Jika database kosong, jalanka
 | `pnpm security:audit` | Audit chain SAU valid (52 baris) |
 | Distribusi MIS | 15 bulan × 3 cabang |
 | Semua divisi terisi | 8/8 |
-| Full E2E | 49 passed, 2 skipped |
-| Bundle | Tidak berubah (152.3 KB gzip) |
+| Full E2E | **50 passed, 2 skipped** |
+| Smoke production | **15/15** |
+| Production UI check | Overview, Organization, MIS, Profil, dan payslip 2025-09; 0 console error |
+| Bundle | 152.3 KB gzip |
 
-## 7. Batasan
+Production DB counts setelah seed: 32 personel, 8 departemen, 273 klaim, 45 batch, 472 item, 470 payslip, 90 laporan, 480 attendance, dan 45 baris KPI. Screenshot ada di `docs/evidence/demo-history/`:
+
+- `production-overview.png`
+- `production-organization.png`
+- `production-mis.png`
+- `production-profile.png`
+- `production-payslips-2025-09.png`
+
+## 7. Panduan PDF
+
+Tujuh panduan per peran tersedia di `docs/guides/` dan juga disajikan oleh web production:
+
+- `https://aletheia-web-preview.pages.dev/guides/panduan-petugas-klaim.pdf`
+- `https://aletheia-web-preview.pages.dev/guides/panduan-manajer-cabang.pdf`
+- `https://aletheia-web-preview.pages.dev/guides/panduan-manajer-keuangan.pdf`
+- `https://aletheia-web-preview.pages.dev/guides/panduan-spesialis-sdm.pdf`
+- `https://aletheia-web-preview.pages.dev/guides/panduan-administrator-kepatuhan.pdf`
+- `https://aletheia-web-preview.pages.dev/guides/panduan-analis-mis.pdf`
+- `https://aletheia-web-preview.pages.dev/guides/panduan-karyawan.pdf`
+
+Link unduhan juga muncul di halaman **Profil** sesuai peran yang sedang login.
+
+## 8. Batasan
 
 - Data sintetis; angka pajak/BPJS adalah aproksimasi demo, bukan perhitungan resmi.
 - November BDG memakai batch baseline 3 item; personel BDG lain dibayar pada histori Oktober dan sebelumnya.

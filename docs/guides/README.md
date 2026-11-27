@@ -14,6 +14,18 @@ PDF panduan untuk setiap peran di Aletheia Demo. Semua data di aplikasi sintetis
 
 Kata sandi semua akun: `AletheiaDemo!2026`. Login di [aletheia-web-preview.pages.dev](https://aletheia-web-preview.pages.dev).
 
+PDF juga tersedia langsung di web production:
+
+- `https://aletheia-web-preview.pages.dev/guides/panduan-petugas-klaim.pdf`
+- `https://aletheia-web-preview.pages.dev/guides/panduan-manajer-cabang.pdf`
+- `https://aletheia-web-preview.pages.dev/guides/panduan-manajer-keuangan.pdf`
+- `https://aletheia-web-preview.pages.dev/guides/panduan-spesialis-sdm.pdf`
+- `https://aletheia-web-preview.pages.dev/guides/panduan-administrator-kepatuhan.pdf`
+- `https://aletheia-web-preview.pages.dev/guides/panduan-analis-mis.pdf`
+- `https://aletheia-web-preview.pages.dev/guides/panduan-karyawan.pdf`
+
+Halaman **Profil** menampilkan tombol unduh sesuai peran yang sedang login.
+
 ## Isi setiap panduan
 
 - Ringkasan peran dan menu yang boleh diakses.

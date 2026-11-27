@@ -3,10 +3,10 @@
 - **Status:** final untuk scope portofolio. UI Phase 0–2 dan Phase 5 selesai 27 November 2026; Phase 3–4 ditunda.
 - **Tanggal snapshot:** 27 November 2026.
 - **Keputusan:** UI Phase 5 menjadi fase penutup; Phase 3 (form clarity) dan Phase 4 (mobile table conversion) dipindah ke backlog.
-- **HEAD saat snapshot:** `04962c3` ditambah commit dokumentasi Phase 5.
-- **Production:** live di commit `04962c3`; Stage 3A sudah di-deploy ke Render.
+- **HEAD saat snapshot:** `544e54e` ditambah commit dokumentasi demo dataset.
+- **Production:** web Pages `544e54e` (deployment `4509da49-6812-48b2-a147-c42e483edd57`); empat service Render `04962c3`; database sudah diisi histori 15 bulan. Stage 3A sudah live.
 - **Data:** seluruhnya sintetis. Tidak ada uang nyata atau PII nyata.
-- **Local stack:** aktif untuk verifikasi UI Phase 5; hentikan dengan `bash scripts/dev-down.sh` bila perlu.
+- **Local stack:** aktif untuk verifikasi demo dataset; hentikan dengan `bash scripts/dev-down.sh` bila perlu.
 
 Dokumen ini adalah snapshot status. Untuk konteks lengkap, baca [`HANDOVER.md`](../HANDOVER.md), [`DESIGN.md`](../DESIGN.md), dan [`docs/evidence/README.md`](evidence/README.md).
 
@@ -14,10 +14,10 @@ Dokumen ini adalah snapshot status. Untuk konteks lengkap, baca [`HANDOVER.md`](
 
 Aletheia sudah mencapai M1–M6.6 dan Stage 3A:
 
-- production live di Cloudflare Pages/Workers, empat service Render, Neon PostgreSQL, Upstash QStash, dan Cloudinary pada commit `04962c3`;
+- production live di Cloudflare Pages/Workers, empat service Render, Neon PostgreSQL, Upstash QStash, dan Cloudinary; web Pages `544e54e`, service Render `04962c3`;
 - smoke production terakhir **15/15**;
-- CI terakhir `45954282337` **hijau**;
-- Security terakhir `45954282286` **hijau**;
+- CI terakhir `45966061909` **hijau**;
+- Security terakhir `45966061996` **hijau**;
 - Stage 3A: approval cuti otomatis memperbarui `attendance_summaries`, termasuk cuti lintas bulan, dan sudah live di production;
 - UI Phase 0: Daylight workspace, logo dan favicon baru, sidebar collapsible, halaman profil, login baru, dan seluruh halaman desktop;
 - UI Phase 1: command palette `Ctrl/Cmd+K` dengan pencarian halaman, aksi cepat per peran, dan navigasi keyboard;
@@ -77,11 +77,12 @@ Tidak ada item di atas yang merupakan bug produksi atau blocker demo.
 | UI Phase 2 focused Playwright | 2 passed; enam role home + sidebar panjang, axe 0 serious/critical |
 | Guide download Playwright | 1 passed; Finance, Compliance, dan Karyawan mengunduh PDF peran |
 | Build web | 152.3 KB gzip |
-| CI `45954282337` | Hijau |
-| Security `45954282286` | Hijau |
+| CI `45966061909` | Hijau |
+| Security `45966061996` | Hijau |
 | Production smoke | 15/15 |
 | Async QStash/worker | ~5 detik |
-| Production UI check | Finance/Compliance sidebar scroll, footer terlihat, 0 console error |
+| Production UI check | Overview, Organization, MIS, Profil, payslip 2025-09; 0 console error |
+| Production seed | 32 personel, 8 divisi, 45 batch, 273 klaim, 470 payslip |
 | Working tree | Bersih setelah dokumen ini di-commit |
 
 ## 5. Cara melanjutkan
@@ -135,5 +136,5 @@ Tidak ada item di atas yang merupakan bug produksi atau blocker demo.
 | `fbc320d` | Evidence dan status UI Phase 2 |
 | `abb4827` | Sidebar panjang dapat di-scroll; footer akun tetap terlihat |
 | `04962c3` | CSP font production dan fade sidebar; production cutover |
-| commit demo dataset | Seed 15 bulan, 32 personel, panduan PDF per peran |
+| `544e54e` | Seed 15 bulan, 32 personel, panduan PDF per peran |
 | commit docs Phase 5 | Snapshot final, evidence deploy, dan roadmap |

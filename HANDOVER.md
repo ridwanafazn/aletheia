@@ -1,7 +1,7 @@
 # Aletheia — Handover
 
-* **Status:** M1–M5.4 dan M6.1–M6.6 live di production. Web, edge, empat service Render, Neon, Upstash QStash, dan Cloudinary aktif; smoke production 15/15 lulus; async QStash/worker terverifikasi; login tujuh peran, UI web, serta rollback edge, Pages, dan Render terverifikasi. M6.2 live dengan monitoring 24 jam berjalan via workflow Production Monitor. M6.3 menambahkan pusat slip gaji dan laporan di web. M6.4 menambahkan employee self-service, e-cuti, dan e-lembur. M6.5 menambahkan reimburse dan struktur organisasi. M6.6 menambahkan paket tenant dan invoice biaya payroll. Stage 3A menautkan approval cuti ke attendance summary payroll. **UI Phase 5 live di production commit `04962c3`; smoke production 15/15 dan async QStash/worker ~5 detik.**
-* **Status progresi:** UI Phase 0–2 dan Phase 5 selesai 27 November 2026; Phase 3–4 sengaja ditunda. Snapshot, verifikasi, dan cara melanjutkan ada di [`docs/FINAL-STATUS.md`](docs/FINAL-STATUS.md); sistem visual ada di [`DESIGN.md`](DESIGN.md). Production live di commit `04962c3`; Stage 3A sudah di-deploy ke Render.
+* **Status:** M1–M5.4 dan M6.1–M6.6 live di production. Web, edge, empat service Render, Neon, Upstash QStash, dan Cloudinary aktif; smoke production 15/15 lulus; async QStash/worker terverifikasi; login tujuh peran, UI web, serta rollback edge, Pages, dan Render terverifikasi. M6.2 live dengan monitoring 24 jam berjalan via workflow Production Monitor. M6.3 menambahkan pusat slip gaji dan laporan di web. M6.4 menambahkan employee self-service, e-cuti, dan e-lembur. M6.5 menambahkan reimburse dan struktur organisasi. M6.6 menambahkan paket tenant dan invoice biaya payroll. Stage 3A menautkan approval cuti ke attendance summary payroll. **Web production live di commit `544e54e`; demo dataset 15 bulan dan panduan PDF tujuh peran sudah aktif.**
+* **Status progresi:** UI Phase 0–2 dan Phase 5 selesai 27 November 2026; Phase 3–4 sengaja ditunda. Snapshot, verifikasi, dan cara melanjutkan ada di [`docs/FINAL-STATUS.md`](docs/FINAL-STATUS.md); sistem visual ada di [`DESIGN.md`](DESIGN.md). Web production di `544e54e`, service Render di `04962c3`, database sudah berisi histori 15 bulan.
 * **Tanggal handover:** 26 November 2026, diperbarui 27 November 2026.
 * **Data:** seluruhnya sintetis. Tidak ada uang nyata atau PII nyata.
 * **Server demo:** production aktif di `https://aletheia-web-preview.pages.dev`; stack lokal dinyalakan dengan `bash scripts/dev-up.sh`.
@@ -335,9 +335,9 @@ M5.4 live, smoke 15/15, async QStash lulus, dan rollback edge/Pages/Render sudah
 
 Status deploy terbaru:
 
-1. UI Phase 5 live di production commit `04962c3`: Cloudflare Pages, edge Worker, dan empat service Render; smoke 15/15 dan async QStash/worker ~5 detik.
+1. Web production live di commit `544e54e`; empat service Render tetap di `04962c3`; database sudah diisi histori 15 bulan dan panduan PDF tujuh peran.
 2. Production Monitor tetap berjalan setiap 6 jam.
-3. Bukti deploy: `docs/evidence/ui-phase5-verification.md`; riwayat deploy sebelumnya ada di `docs/evidence/design-phases-production-deploy.md`.
+3. Bukti deploy: `docs/evidence/demo-history-seed.md` dan `docs/evidence/ui-phase5-verification.md`.
 4. UI Phase 0–2 dan Phase 5 selesai; Phase 3–4 ditunda (form clarity dan mobile table-to-card).
 5. Backlog berikutnya: performance review, CRUD organisasi, pengaturan paket, RUM/edge span, dan CI E2E full-stack. Baca [`docs/FINAL-STATUS.md`](docs/FINAL-STATUS.md) dan [`DESIGN.md`](DESIGN.md).
 

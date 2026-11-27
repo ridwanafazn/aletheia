@@ -3,6 +3,7 @@
 - **Tanggal:** 27 November 2026.
 - **Commit production:** `04962c3` (`fix(web): unblock inline fonts and polish sidebar scroll`).
 - **Status:** selesai. Production live, smoke **15/15**, async QStash/worker ~5 detik, dan production UI check 0 console error.
+- **Catatan:** cutover Phase 5 berada di `04962c3`; web berikutnya naik ke `544e54e` untuk demo dataset dan panduan PDF. Service Render tetap di `04962c3`.
 - **Data:** sintetis; payment provider `MOCK`.
 
 ## 1. Scope
