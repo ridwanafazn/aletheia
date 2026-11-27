@@ -49,6 +49,8 @@ Semua perubahan penting pada Aletheia. Format mengikuti [Keep a Changelog](https
 - Login demo menyembunyikan input MFA; opsi akun memakai carousel horizontal looping dengan panah, dots, dan swipe.
 - Profil memakai aturan dua kartu sama tinggi; tenant demo tampil sebagai `SEIHITSU`.
 - Bukti UI Phase 0: `docs/evidence/design-phase5-verification.md` dan galeri screenshot baru.
+- UI Phase 1: command palette `Ctrl/Cmd+K` yang menggabungkan pencarian halaman dan aksi cepat per peran, dengan navigasi keyboard dan tombol search di topbar.
+- UI Phase 1: aksi cepat buat klaim, konsol payroll, antrean cuti/lembur, verifikasi audit, dan MIS; mobile memakai trigger search ikon.
 
 ### Changed
 

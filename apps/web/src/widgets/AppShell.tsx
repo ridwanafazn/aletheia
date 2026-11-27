@@ -7,6 +7,7 @@ import {
   ClipboardList,
   FileSpreadsheet,
   FileText,
+  FilePlus2,
   FlaskConical,
   Inbox,
   LayoutDashboard,
@@ -15,6 +16,7 @@ import {
   Menu,
   PanelLeftClose,
   PanelLeftOpen,
+  Search,
   ShieldCheck,
   UserRound,
   Users,
@@ -26,6 +28,7 @@ import { useAuth } from "../features/auth/AuthProvider";
 import { hasFeature, useTenantProfile } from "../features/tenant/api";
 import { roleLabel, initials } from "../shared/lib/format";
 import { Button } from "../shared/ui";
+import { CommandPalette, type CommandItem } from "./CommandPalette";
 
 interface NavItem {
   to:
@@ -264,6 +267,7 @@ export function AppShell() {
   const navigate = useNavigate();
   const pathname = useRouterState({ select: (state) => state.location.pathname });
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [paletteOpen, setPaletteOpen] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(() => {
     try {
       return localStorage.getItem("aletheia.sidebar") === "collapsed";
@@ -291,6 +295,21 @@ export function AppShell() {
     return () => window.removeEventListener("aletheia:sidebar", handler);
   }, []);
 
+  useEffect(() => {
+    const handler = (event: KeyboardEvent) => {
+      if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "k") {
+        event.preventDefault();
+        setPaletteOpen((open) => !open);
+      }
+    };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, []);
+
+  useEffect(() => {
+    setPaletteOpen(false);
+  }, [pathname]);
+
   if (status === "loading") {
     return (
       <div className="content" role="status" aria-label="Memuat sesi">
@@ -312,6 +331,85 @@ export function AppShell() {
         (item.feature === undefined || hasFeature(tenant, item.feature)),
     ),
   })).filter((group) => group.items.length > 0);
+
+  const quickActions: CommandItem[] = [];
+  if (hasRole("EMPLOYEE")) {
+    quickActions.push({
+      label: "Buka Ruang Saya",
+      hint: "Slip, absensi, cuti, dan reimburse",
+      group: "Aksi cepat",
+      to: "/me",
+      icon: <UserRound size={15} aria-hidden="true" />,
+    });
+  }
+  if (
+    hasRole(
+      "CLAIMS_OFFICER",
+      "BRANCH_MANAGER",
+      "FINANCE_MANAGER",
+      "COMPLIANCE_ADMIN",
+      "MIS_ANALYST",
+    )
+  ) {
+    quickActions.push({
+      label: "Buat klaim baru",
+      hint: "Mulai pengajuan klaim",
+      group: "Aksi cepat",
+      to: "/claims/new",
+      icon: <FilePlus2 size={15} aria-hidden="true" />,
+    });
+  }
+  if (hasRole("HR_SPECIALIST", "FINANCE_MANAGER")) {
+    quickActions.push({
+      label: "Buka Konsol Payroll",
+      hint: "Batch, kalkulasi, dan pencairan",
+      group: "Aksi cepat",
+      to: "/payroll",
+      icon: <Wallet size={15} aria-hidden="true" />,
+    });
+  }
+  if (hasRole("HR_SPECIALIST", "BRANCH_MANAGER", "FINANCE_MANAGER")) {
+    quickActions.push({
+      label: "Tinjau cuti dan lembur",
+      hint: "Antrean keputusan HR",
+      group: "Aksi cepat",
+      to: "/workforce",
+      icon: <CalendarDays size={15} aria-hidden="true" />,
+    });
+  }
+  if (hasRole("COMPLIANCE_ADMIN", "FINANCE_MANAGER")) {
+    quickActions.push({
+      label: "Verifikasi audit",
+      hint: "Periksa rantai hash tenant",
+      group: "Aksi cepat",
+      to: "/audit",
+      icon: <ShieldCheck size={15} aria-hidden="true" />,
+    });
+  }
+  if (hasRole("MIS_ANALYST", "FINANCE_MANAGER", "COMPLIANCE_ADMIN")) {
+    quickActions.push({
+      label: "Buka MIS Intelligence",
+      hint: "KPI cabang dan tren",
+      group: "Aksi cepat",
+      to: "/mis",
+      icon: <BarChart3 size={15} aria-hidden="true" />,
+    });
+  }
+
+  const paletteItems: CommandItem[] = [
+    ...quickActions,
+    ...visibleGroups.flatMap((group) =>
+      group.items.map((item) => {
+        const Icon = item.icon;
+        return {
+          label: item.label,
+          group: group.label,
+          to: item.to,
+          icon: <Icon size={15} aria-hidden="true" />,
+        };
+      }),
+    ),
+  ];
 
   return (
     <div className={`app-shell${sidebarCollapsed ? " app-shell--collapsed" : ""}`}>
@@ -451,6 +549,16 @@ export function AppShell() {
             <span aria-hidden="true">/</span>
             <span className="topbar__title">{titleFor(pathname)}</span>
           </div>
+          <button
+            type="button"
+            className="topbar__search"
+            onClick={() => setPaletteOpen(true)}
+            aria-label="Cari halaman atau aksi"
+          >
+            <Search size={15} aria-hidden="true" />
+            <span>Cari halaman atau aksi</span>
+            <kbd>Ctrl K</kbd>
+          </button>
           <div className="topbar__spacer" />
           <div className="topbar__action">
             {hasRole("COMPLIANCE_ADMIN") ? (
@@ -478,6 +586,15 @@ export function AppShell() {
           </div>
         </main>
       </div>
+      <CommandPalette
+        open={paletteOpen}
+        items={paletteItems}
+        onClose={() => setPaletteOpen(false)}
+        onSelect={(path) => {
+          setPaletteOpen(false);
+          void navigate({ to: path as NavItem["to"] });
+        }}
+      />
     </div>
   );
 }

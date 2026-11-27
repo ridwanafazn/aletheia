@@ -342,11 +342,17 @@ The sidebar collapse control is desktop-only. The mobile menu is a drawer with a
 - Mobile self-service payslips converted to cards.
 - Playwright theme review with axe checks on login, overview, payroll, profile, and self-service.
 
-**Phase 1 — Navigation and orientation: in progress.**
+**Phase 1 — Navigation and orientation: complete.**
 
-- Global search or command palette.
-- Keyboard shortcut guidance.
-- Quick-action menu in the topbar.
-- Mobile table-to-card conversion for payslips, reports, and workforce queues.
-- Refresh README screenshots and evidence for the new visual world.
-- Remove or fold legacy Quiet Ledger CSS after the rollout stabilizes.
+- Topbar search trigger with `Ctrl/Cmd+K`.
+- Command palette combining page navigation with role-aware quick actions.
+- Keyboard navigation: ArrowUp/ArrowDown, Enter, Escape; input autofocus; scroll lock.
+- Quick actions: create claim, payroll console, workforce queue, audit verify, MIS.
+- Mobile: icon-only search trigger; palette remains full-width.
+- Sidebar collapse and profile entry remain from Phase 0.
+
+**Phase 2 — Insight hierarchy: next.**
+
+- Data search across employees, claims, and payroll is not part of Phase 1.
+- Mobile table-to-card conversion for payslips, reports, and workforce remains Phase 4.
+- Legacy Quiet Ledger CSS cleanup remains after the rollout stabilizes.
