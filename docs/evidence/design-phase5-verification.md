@@ -27,6 +27,8 @@ Mengganti lapisan visual Quiet Ledger dengan **Daylight workspace**: HRIS yang t
 
 ## 3. Bukti visual
 
+Galeri interaktif: `docs/evidence/design-phase5/index.html`.
+
 Screenshot di `docs/evidence/design-phase5/`:
 
 - `login.png`, `overview.png`, `overview-collapsed.png`, `overview-mobile.png`

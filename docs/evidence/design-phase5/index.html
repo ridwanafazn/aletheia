@@ -1,0 +1,387 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Aletheia — UI Phase 0</title>
+    <style>
+      :root {
+        --ink-900: #101828;
+        --ink-700: #344054;
+        --ink-500: #667085;
+        --surface: #ffffff;
+        --ground: #f6f8fc;
+        --border: #e3e8f0;
+        --primary: #2f4bd8;
+        --primary-soft: #eef1ff;
+        --success: #087a6e;
+        --success-soft: #ecfdf3;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        background: var(--ground);
+        color: var(--ink-900);
+        font-family: "Plus Jakarta Sans", "Segoe UI", system-ui, sans-serif;
+        line-height: 1.55;
+      }
+      .page {
+        max-width: 1440px;
+        margin: 0 auto;
+        padding: 32px 28px 64px;
+      }
+      .topbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 24px;
+        padding: 20px 24px;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 18px;
+      }
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+      .brand img {
+        width: 44px;
+        height: 44px;
+        border-radius: 12px;
+      }
+      .brand strong {
+        display: block;
+        font-size: 17px;
+        letter-spacing: -0.02em;
+      }
+      .brand span {
+        display: block;
+        color: var(--ink-500);
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+      }
+      .meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        justify-content: flex-end;
+      }
+      .pill {
+        padding: 6px 11px;
+        border: 1px solid var(--border);
+        border-radius: 999px;
+        background: var(--ground);
+        color: var(--ink-700);
+        font-size: 11px;
+        font-weight: 600;
+      }
+      .pill--success {
+        border-color: #d1fadf;
+        background: var(--success-soft);
+        color: var(--success);
+      }
+      .intro {
+        display: grid;
+        grid-template-columns: minmax(0, 1.4fr) minmax(280px, 0.6fr);
+        gap: 20px;
+        margin: 20px 0 28px;
+      }
+      .intro-main {
+        padding: 28px;
+        border: 1px solid var(--primary-soft);
+        border-radius: 18px;
+        background: var(--primary-soft);
+      }
+      h1 {
+        margin: 0;
+        font-size: clamp(30px, 4vw, 44px);
+        line-height: 1.1;
+        letter-spacing: -0.04em;
+      }
+      .intro-main p {
+        max-width: 62ch;
+        margin: 10px 0 0;
+        color: var(--ink-700);
+        font-size: 14px;
+      }
+      .intro-side {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        padding: 22px;
+        border: 1px solid var(--border);
+        border-radius: 18px;
+        background: var(--surface);
+      }
+      .intro-side strong {
+        font-size: 12px;
+      }
+      .intro-side span {
+        color: var(--ink-500);
+        font-size: 12px;
+      }
+      .section {
+        margin-top: 34px;
+      }
+      .section-title {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 16px;
+        margin-bottom: 12px;
+      }
+      .section-title h2 {
+        margin: 0;
+        font-size: 18px;
+        letter-spacing: -0.02em;
+      }
+      .section-title span {
+        color: var(--ink-500);
+        font-size: 12px;
+      }
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 16px;
+        align-items: stretch;
+      }
+      figure {
+        display: flex;
+        flex-direction: column;
+        margin: 0;
+        overflow: hidden;
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        background: var(--surface);
+      }
+      figure img {
+        display: block;
+        width: 100%;
+        height: auto;
+        background: var(--ground);
+      }
+      figcaption {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 14px 16px;
+        border-top: 1px solid var(--border);
+        color: var(--ink-700);
+        font-size: 12px;
+      }
+      figcaption strong {
+        color: var(--ink-900);
+        font-size: 13px;
+      }
+      figcaption span {
+        color: var(--ink-500);
+        font-size: 11px;
+        text-align: right;
+      }
+      .mobile-grid {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 14px;
+      }
+      .mobile-grid figure img {
+        aspect-ratio: 390 / 844;
+        object-fit: cover;
+        object-position: top;
+      }
+      .footer {
+        margin-top: 40px;
+        padding-top: 18px;
+        border-top: 1px solid var(--border);
+        color: var(--ink-500);
+        font-size: 11px;
+      }
+      .footer code {
+        color: var(--ink-700);
+        font-family: ui-monospace, "IBM Plex Mono", monospace;
+      }
+      @media (max-width: 900px) {
+        .intro {
+          grid-template-columns: minmax(0, 1fr);
+        }
+        .grid {
+          grid-template-columns: minmax(0, 1fr);
+        }
+        .mobile-grid {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+      }
+      @media (max-width: 560px) {
+        .page {
+          padding: 16px 14px 40px;
+        }
+        .topbar {
+          flex-direction: column;
+          align-items: flex-start;
+        }
+        .meta {
+          justify-content: flex-start;
+        }
+        .mobile-grid {
+          grid-template-columns: minmax(0, 1fr);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="page">
+      <header class="topbar">
+        <div class="brand">
+          <img src="brand-mark.svg" alt="" />
+          <div>
+            <strong>Aletheia</strong>
+            <span>UI Phase 0 · Daylight workspace</span>
+          </div>
+        </div>
+        <div class="meta">
+          <span class="pill pill--success">46 E2E passed</span>
+          <span class="pill pill--success">0 axe serious/critical</span>
+          <span class="pill">150.9 KB gzip</span>
+          <span class="pill">27 Nov 2026</span>
+        </div>
+      </header>
+
+      <section class="intro">
+        <div class="intro-main">
+          <h1>Kerja HR yang terang, tenang, dan terarah.</h1>
+          <p>
+            Phase 0 mengganti Quiet Ledger dengan Daylight workspace: sidebar terang yang bisa
+            diciutkan, kartu ber-border, tabel airy, login cobalt diagonal, logo baru, dan halaman
+            profil yang bisa dibuka dari avatar. Semua data sintetis.
+          </p>
+        </div>
+        <div class="intro-side">
+          <strong>Yang dikunci di fase ini</strong>
+          <span>Logo mark dan favicon baru</span>
+          <span>Login tanpa MFA, opsi akun seragam</span>
+          <span>Profil dan preferensi sidebar</span>
+          <span>Tenant SEIHITSU, dua kartu sama tinggi</span>
+          <span>Sidebar desktop collapsible dan drawer mobile</span>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="section-title">
+          <h2>Login dan ikhtisar</h2>
+          <span>First impression dan orientasi harian</span>
+        </div>
+        <div class="grid">
+          <figure>
+            <img src="login.png" alt="Halaman login Aletheia" loading="lazy" />
+            <figcaption><strong>Login</strong><span>Cobalt diagonal, watermark, tanpa MFA</span></figcaption>
+          </figure>
+          <figure>
+            <img src="overview.png" alt="Ikhtisar per peran" loading="lazy" />
+            <figcaption><strong>Ikhtisar</strong><span>KPI, insight, dan antrean keputusan</span></figcaption>
+          </figure>
+          <figure>
+            <img src="overview-collapsed.png" alt="Sidebar ringkas" loading="lazy" />
+            <figcaption><strong>Sidebar ringkas</strong><span>Icon rail 78px dengan tooltip</span></figcaption>
+          </figure>
+          <figure>
+            <img src="profile.png" alt="Halaman profil" loading="lazy" />
+            <figcaption><strong>Profil</strong><span>Tenant SEIHITSU, kartu sama tinggi</span></figcaption>
+          </figure>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="section-title">
+          <h2>Payroll dan orang</h2>
+          <span>Operasi inti HRIS</span>
+        </div>
+        <div class="grid">
+          <figure>
+            <img src="payroll.png" alt="Konsol payroll" loading="lazy" />
+            <figcaption><strong>Konsol payroll</strong><span>Pipeline, filter, dan batch</span></figcaption>
+          </figure>
+          <figure>
+            <img src="employees.png" alt="Direktori karyawan" loading="lazy" />
+            <figcaption><strong>Karyawan dan agen</strong><span>Direktori dengan status dan gaji pokok</span></figcaption>
+          </figure>
+          <figure>
+            <img src="payslips.png" alt="Pusat slip gaji" loading="lazy" />
+            <figcaption><strong>Slip gaji</strong><span>Periode, bruto, net, dan unduhan</span></figcaption>
+          </figure>
+          <figure>
+            <img src="reports.png" alt="Laporan dan ekspor" loading="lazy" />
+            <figcaption><strong>Laporan</strong><span>PPh 21, BPJS, dan status berkas</span></figcaption>
+          </figure>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="section-title">
+          <h2>Self-service dan organisasi</h2>
+          <span>Karyawan, cuti, dan struktur</span>
+        </div>
+        <div class="grid">
+          <figure>
+            <img src="me.png" alt="Ruang Saya" loading="lazy" />
+            <figcaption><strong>Ruang Saya</strong><span>Profil, slip, absensi, cuti, reimburse</span></figcaption>
+          </figure>
+          <figure>
+            <img src="organization.png" alt="Struktur organisasi" loading="lazy" />
+            <figcaption><strong>Struktur organisasi</strong><span>Departemen, posisi, dan personel</span></figcaption>
+          </figure>
+          <figure>
+            <img src="claims.png" alt="Ruang klaim" loading="lazy" />
+            <figcaption><strong>Ruang klaim</strong><span>Risiko, status, dan keputusan</span></figcaption>
+          </figure>
+          <figure>
+            <img src="mis.png" alt="MIS intelligence" loading="lazy" />
+            <figcaption><strong>MIS Intelligence</strong><span>KPI cabang dan tren</span></figcaption>
+          </figure>
+          <figure>
+            <img src="audit.png" alt="Jejak audit" loading="lazy" />
+            <figcaption><strong>Jejak audit</strong><span>Hash chain, aktor, dan konteks</span></figcaption>
+          </figure>
+          <figure>
+            <img src="workforce.png" alt="Cuti dan lembur" loading="lazy" />
+            <figcaption><strong>Cuti dan lembur</strong><span>Antrean keputusan HR</span></figcaption>
+          </figure>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="section-title">
+          <h2>Mobile</h2>
+          <span>Drawer, kartu, dan tugas satu tangan</span>
+        </div>
+        <div class="mobile-grid">
+          <figure>
+            <img src="overview-mobile.png" alt="Ikhtisar mobile" loading="lazy" />
+            <figcaption><strong>Ikhtisar</strong><span>390px</span></figcaption>
+          </figure>
+          <figure>
+            <img src="me-mobile.png" alt="Ruang Saya mobile" loading="lazy" />
+            <figcaption><strong>Ruang Saya</strong><span>Kartu slip</span></figcaption>
+          </figure>
+          <figure>
+            <img src="employees-mobile.png" alt="Karyawan mobile" loading="lazy" />
+            <figcaption><strong>Karyawan</strong><span>Card list</span></figcaption>
+          </figure>
+          <figure>
+            <img src="claims-mobile.png" alt="Klaim mobile" loading="lazy" />
+            <figcaption><strong>Klaim</strong><span>Card list</span></figcaption>
+          </figure>
+        </div>
+      </section>
+
+      <footer class="footer">
+        Commit <code>cf52a7b</code> + <code>fc09cfc</code>. Bukti lengkap:
+        <code>docs/evidence/design-phase5-verification.md</code>. Semua data sintetis.
+      </footer>
+    </main>
+  </body>
+</html>
