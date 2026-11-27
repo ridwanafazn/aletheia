@@ -19,7 +19,7 @@
 | Fokus | Disbursement governance, payroll, MIS |
 | Status | Live demo · data sintetis |
 
-**Tombol:** `Live demo` · `Repository` · `Panduan per peran`
+**Tombol:** `Web app` · `Edge gateway` · `Governance health` · `Claims health` · `Payroll health` · `Worker health` · `Repository` · `Panduan per peran`
 
 ---
 

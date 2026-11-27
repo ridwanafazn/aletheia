@@ -179,7 +179,7 @@ Halaman login menyediakan tombol peran demo yang mengisi email dan kata sandi ot
 - Neon production: project `aletheia` (PG16, Singapore), migrasi 0000–0017, RLS aktif.
 - Upstash QStash dan Cloudinary aktif.
 
-Web production menyajikan CSP, HSTS, COOP, dan Permissions-Policy. Render free tier tidur saat idle; cold start bisa lebih dari 2 menit. Sebelum demo:
+Web production menyajikan CSP, HSTS, COOP, dan Permissions-Policy. Render free tier tidur saat idle; cold start bisa lebih dari 2 menit. Workflow **Warm Production** berjalan tiap 10 menit untuk menjaga service tetap bangun. Jika tetap cold, jalankan:
 
 ```bash
 pnpm warm:production

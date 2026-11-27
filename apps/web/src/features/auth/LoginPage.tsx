@@ -150,6 +150,13 @@ export default function LoginPage() {
     }
   };
 
+  const errorMessage =
+    error instanceof ApiError
+      ? error.status >= 500 || error.code === "ERR_INTERNAL_ERROR"
+        ? "Layanan demo sedang bangun. Tunggu beberapa detik lalu klik Masuk lagi."
+        : error.message
+      : "Periksa koneksi lalu coba lagi";
+
   return (
     <main className="login-page">
       <section className="login-brand" aria-label="Tentang Aletheia">
@@ -184,7 +191,7 @@ export default function LoginPage() {
           {error === null ? null : (
             <div className="stack--sm" style={{ marginBottom: 16 }}>
               <Banner tone="danger" title="Tidak dapat masuk">
-                {error instanceof ApiError ? error.message : "Periksa koneksi lalu coba lagi"}
+                {errorMessage}
                 {error instanceof ApiError && error.correlationId !== null ? (
                   <div className="error-state__code">{error.correlationId}</div>
                 ) : null}

@@ -26,7 +26,7 @@ Aletheia adalah platform governance pencairan klaim dan payroll dengan:
 
 * Monitoring production berkelanjutan; Production Monitor berjalan tiap 6 jam. Sign-off M6.2 ditunda dan automation finalisasi sedang paused (1/4 run terjadwal).
 * UI Phase 3–4 (form clarity dan mobile table-to-card) ditunda dan tercatat sebagai backlog.
-* Cold start Render free tier; mitigasi `pnpm warm:production`. `pnpm deploy:check` sudah lulus; runbook ada di `docs/runbooks/m6.2-launch.md`.
+* Cold start Render free tier; mitigasi `pnpm warm:production` dan workflow `Warm Production` tiap 10 menit. `pnpm deploy:check` sudah lulus; runbook ada di `docs/runbooks/m6.2-launch.md`.
 * Performance review, CRUD organisasi dan org chart visual, serta kebijakan reimburse. Ini modul HRIS berikutnya.
 * RUM LCP/INP, exporter span edge, dan label Prometheus kardinalitas tinggi.
 * CI E2E full-stack belum menjadi job CI.

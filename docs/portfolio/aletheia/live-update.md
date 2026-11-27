@@ -15,7 +15,7 @@
 | `long_description` | Tiga paragraf, tanpa heading section dan tanpa label STAR |
 | `tech_stack` | React 19, TypeScript, PostgreSQL, Go, Express, Cloudflare Workers, Neon, Upstash, Playwright |
 | `highlights` | Enam poin hasil; heading “Hasil” dihapus dari template |
-| `links` | Live demo, Repository, Panduan per peran |
+| `links` | Delapan tautan: Web app, Edge gateway, Governance health, Claims health, Payroll health, Worker health, Repository, Panduan per peran |
 | `gallery` | Delapan aset dengan caption dan alt |
 | `seo` | Title, description, dan OG image |
 

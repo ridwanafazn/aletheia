@@ -81,6 +81,21 @@ node docs/portfolio/aletheia/render-banner.mjs
 
 Script membutuhkan screenshot `gallery/07-mis-intelligence.png` dan font di `source/fonts/`.
 
+## Link production
+
+| Komponen | URL |
+| --- | --- |
+| Web app | https://aletheia-web-preview.pages.dev |
+| Edge gateway | https://aletheia-edge.ridwanafazn.workers.dev |
+| Governance health | https://aletheia-governance.onrender.com/healthz |
+| Claims health | https://aletheia-claims.onrender.com/healthz |
+| Payroll health | https://aletheia-payroll.onrender.com/healthz |
+| Worker health | https://aletheia-worker-zjnt.onrender.com/healthz |
+| Repository | https://github.com/ridwanafazn/aletheia |
+| Panduan per peran | https://github.com/ridwanafazn/aletheia/blob/main/docs/guides/README.md |
+
+Render free tier tidur saat idle. Workflow `Warm Production` berjalan tiap 10 menit untuk menjaga service tetap bangun; jika login pertama gagal, tunggu beberapa detik lalu coba lagi.
+
 ## Yang berubah di halaman
 
 | Sekarang | Ganti dengan |
