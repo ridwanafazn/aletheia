@@ -158,8 +158,16 @@ h3 {
   overflow-y: auto;
   overscroll-behavior: contain;
   scrollbar-gutter: stable;
-  margin-right: -6px;
-  padding-right: 6px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-300) transparent;
+  padding-right: 2px;
+  mask-image: linear-gradient(to bottom, #000 calc(100% - 18px), transparent 100%);
+}
+
+.nav::after {
+  content: "";
+  flex: none;
+  height: 18px;
 }
 
 .nav::-webkit-scrollbar {
